@@ -11,8 +11,8 @@ const CHAIR_ANGLES = [0, 90, 180, 270];
 
 const TableComponent = ({ table }) => {
   const isActive = table.status === 1;
-  const backgroundColor = isActive ? "#16a34a" : "#64748b";
-  const chairColor = isActive ? "#22c55e" : "#94a3b8";
+  const backgroundColor = isActive ? "#2563EB" : "#64748B";
+  const chairColor = isActive ? "#93C5FD" : "#64748B";
 
   return (
     <Box sx={{ position: "relative", width: 290, height: 290 }}>

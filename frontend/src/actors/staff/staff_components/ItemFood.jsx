@@ -9,7 +9,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import rectangle3 from "./rectangle-3.png";
+import rectangle3 from "../../../assets/Rectangle 3.png";
 
 export const ItemFood  = () => {
   return (
