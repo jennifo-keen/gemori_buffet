@@ -1,4 +1,5 @@
 const { pool } = require('../../lib/db');
+const { getIO } = require('../../lib/socket');
 
 // Lấy tất cả bàn
 const getAllTables = async () => {
@@ -23,8 +24,17 @@ const openTable = async (tableId) => {
     `UPDATE tables SET status = 'ordering', qr_code = $1 WHERE id = $2 RETURNING *`,
     [qrCode, tableId]
   );
+  try {
+    const io = getIO();
+    io.to('staff').emit('table_status_changed', {
+      tableId,
+      status: 'ordering',
+    });
+  } catch (e) { console.error('Socket error:', e.message); }
+
   return result.rows[0];
 };
+
 
 // Đóng bàn — Web 3 (sau thanh toán)
 const closeTable = async (tableId) => {
@@ -33,6 +43,15 @@ const closeTable = async (tableId) => {
     [tableId]
   );
   if (!result.rows[0]) throw { status: 404, message: 'Bàn không tồn tại' };
+   // ✅ Emit realtime
+  try {
+    const io = getIO();
+    io.to('staff').emit('table_status_changed', {
+      tableId,
+      status: 'empty',
+    });
+  } catch (e) { console.error('Socket error:', e.message); }
+
   return result.rows[0];
 };
 
