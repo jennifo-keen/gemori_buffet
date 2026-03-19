@@ -13,7 +13,7 @@ export default function MenuStaff({ onLogout }) {
     <Box
       sx={{
         width: 260,
-        height: "943px",
+        height: "100%",
         bgcolor: "white",
         boxShadow: "95px 0 27px 0 rgba(0, 0, 0, 0.1)",
         p: "24px",

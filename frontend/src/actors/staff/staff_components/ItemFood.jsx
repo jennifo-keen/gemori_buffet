@@ -19,7 +19,6 @@ export const ItemFood  = () => {
         height: "244px",
         borderRadius: "5px",
         padding: "20px",
-        // border: "1px  dashed #8a38f5",
         overflow: "hidden",
         bgcolor: "white",
       }}

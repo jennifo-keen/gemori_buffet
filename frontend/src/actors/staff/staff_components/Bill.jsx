@@ -1,22 +1,17 @@
 import React from "react";
-import DeleteOutlineIcon from "../../../assets/Trash.svg?reach";
+import DeleteOutlineIcon from "../../../assets/icon/Trash.svg?reach";
 import { Box, Chip, Stack, Typography } from "@mui/material";
 
 const orderItems = [
-  {
-    id: 1,
-    name: "Ba chỉ bò Mỹ",
-    quantity: 2,
-    status: 0, // 0 = Đã phục vụ
-  },
-  {
-    id: 2,
-    name: "Ba chỉ bò Mỹ",
-    quantity: 2,
-    status: 1, // 1 = Đang làm
-  },
+  { id: 1, name: "Ba chỉ bò Mỹ", quantity: 2, status: 0 },
+  { id: 2, name: "Cá mú đỏ", quantity: 2, status: 1 },
+  { id: 3, name: "Bào ngư Hàn Quốc", quantity: 2, status: 0 },
+  { id: 4, name: "Rau muống", quantity: 2, status: 1 },
+  { id: 5, name: "Sò điệp Nhật", quantity: 2, status: 0 },
+  { id: 6, name: "Ba chỉ heo cuộn nấm", quantity: 2, status: 1 },
+  { id: 7, name: "Ba chỉ bò Mỹ", quantity: 2, status: 0 },
+  { id: 8, name: "Ba chỉ bò Mỹ", quantity: 2, status: 0 },
 ];
-
 // Map trạng thái
 const statusConfig = {
   0: {

@@ -1,5 +1,5 @@
 import React from "react";
-import Ticket from "../../../assets/Ticket.png"
+import Ticket from "../../../assets/img/Ticket.png"
 import { Box, Stack, Typography } from "@mui/material";
 
 export default function PropertyImage() {
@@ -11,7 +11,7 @@ export default function PropertyImage() {
         alignItems: "center",
         justifyContent: "space-between",
         p: "16px",
-        m: "20px 24px 24px 24px",
+        // m: "20px 24px 24px 24px",
         bgcolor: "white",
         borderBottom: "1px solid rgba(177, 65, 53, 0.05)",
       }}

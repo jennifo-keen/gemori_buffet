@@ -1,6 +1,6 @@
 import React from "react";
 import Favorite from "@mui/icons-material/Favorite";
-import PersonAdd from "../../../assets/UserCirclePlus.svg?react";
+import PersonAdd from "../../../assets/icon/UserCirclePlus.svg?react";
 import {
   Box,
   Button,

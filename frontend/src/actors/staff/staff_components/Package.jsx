@@ -1,5 +1,5 @@
 import React from "react";
-import Temp from "../../../assets/Image.png"
+import Temp from "../../../assets/img/Image.png"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import {
   Box,

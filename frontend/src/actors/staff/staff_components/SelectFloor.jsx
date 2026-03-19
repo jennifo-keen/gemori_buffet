@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Paper, Typography } from "@mui/material";
 
 const SelectFloor = ({
@@ -6,7 +7,9 @@ const SelectFloor = ({
   emptyTables,
   pendingTables,
   status,
+  path,
 }) => {
+  const navigate = useNavigate();
   const isActive = status === 1;
 
   const backgroundColor = isActive ? "#b4463c" : "#e5e7eb";
@@ -15,6 +18,7 @@ const SelectFloor = ({
   return (
     <Paper
       elevation={1}
+      onClick={() => path && navigate(path)}
       sx={{
         backgroundColor,
         width:223,
@@ -24,6 +28,9 @@ const SelectFloor = ({
         flexDirection: "column",
         alignItems: "center",
         gap: "4px",
+        cursor: path ? "pointer" : "default",
+        transition: "opacity 0.15s",
+        "&:hover": path ? { opacity: 0.88 } : {},
       }}
     >
       <Typography fontWeight={700} fontSize={16} color={textColor}>
