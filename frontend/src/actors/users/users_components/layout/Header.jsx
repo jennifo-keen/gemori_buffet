@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Box, Typography, Avatar } from "@mui/material";
-import Logo from "../../../assets/img/Logo 1.png"
+import Logo from "../../../../assets/img/Logo 1.png";
+
 export default function Header() {
-  const [active, setActive] = useState("home");
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const menu = [
-    { key: "home", label: "Trang chủ" },
-    { key: "promotion", label: "Khuyến mãi" },
-    { key: "menu", label: "Thực đơn" }
+    { key: "home", label: "Trang chủ", path: "/" },
+    { key: "promotion", label: "Khuyến mãi", path: "/promotion" },
+    { key: "menu", label: "Thực đơn", path: "/menu" },
   ];
 
   return (
@@ -20,39 +23,44 @@ export default function Header() {
         justifyContent: "space-between",
         px: "72px",
         borderBottom: "1px solid #eee",
-        backgroundColor: "#fff"
+        backgroundColor: "#fff",
       }}
     >
       {/* Logo */}
       <Box
-                component="img"
-                src={Logo}
-                alt="Logo"
-                sx={{ 
-                  width:130,
-                  height: "49px",
-                  Color: "#B4463C",
-                  filter: "brightness(0) saturate(100%) invert(32%) sepia(35%) saturate(720%) hue-rotate(335deg)" }}
-              />
+        component="img"
+        src={Logo}
+        alt="Logo"
+        onClick={() => navigate("/")}
+        sx={{
+          width: 130,
+          height: "49px",
+          cursor: "pointer",
+          filter:
+            "brightness(0) saturate(100%) invert(32%) sepia(35%) saturate(720%) hue-rotate(335deg)",
+        }}
+      />
 
       {/* Navigation */}
       <Box
         sx={{
           display: "flex",
-          gap: "40px"
+          gap: "40px",
         }}
       >
         {menu.map((item) => (
           <Typography
             key={item.key}
-            onClick={() => setActive(item.key)}
+            onClick={() => navigate(item.path)}
             sx={{
               fontSize: 16,
-              fontWeight: 500,
+              fontWeight: 700,
               cursor: "pointer",
-              color: active === item.key ? "#B6463A" : "#2c2c2c",
+              color:
+                location.pathname === item.path
+                  ? "#B6463A"
+                  : "#2c2c2c",
               transition: "0.2s",
-              fontWeight: 700
             }}
           >
             {item.label}
@@ -65,7 +73,7 @@ export default function Header() {
         sx={{
           display: "flex",
           alignItems: "center",
-          gap: "12px"
+          gap: "12px",
         }}
       >
         <Avatar
@@ -80,7 +88,10 @@ export default function Header() {
 
           <Typography
             fontSize={12}
-            sx={{ color: "#B6463A", cursor: "pointer" }}
+            sx={{
+              color: "#B6463A",
+              cursor: "pointer",
+            }}
           >
             Xem hồ sơ.
           </Typography>
