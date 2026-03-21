@@ -7,7 +7,12 @@ import { ThemeProvider } from "../../users_components/layout/ThemeProvider";
 const Main = () => {
   return (
     <ThemeProvider>
-      <Box component="main" sx={{ px: 9, py: 4 }}>
+      <Box component="main" 
+            sx={{ 
+              px: 9, 
+              py: 4,
+              backgroundColor: "#F5F5F5",
+                }}>
         <Stack direction="row" spacing={4} alignItems="flex-start">
           <ProfileSidebar />
 
