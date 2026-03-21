@@ -53,7 +53,7 @@ export default function AboutSection() {
               sx={{
                 position: "relative",
                 width: 600,
-                height: { xs: 250, sm: 300, md: 640 },
+                height: { xs: 250, sm: 300, md: 600 },
               }}
             >
               <Box

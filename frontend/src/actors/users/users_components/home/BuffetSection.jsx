@@ -265,7 +265,7 @@ function BuffetSection() {
                     },
                   }}
                 >
-                  Đặt vé ngay
+                  Xem ngay
                 </Button>
               </CardContent>
             </Card>

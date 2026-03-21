@@ -1,89 +1,160 @@
-import React, { useState } from "react";
-import { Box, Typography } from "@mui/material";
+import React from "react";
+import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
+import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
+import {
+  Avatar,
+  Box,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Stack,
+  Typography,
+} from "@mui/material";
+import { useNavigate, useLocation } from "react-router-dom";
 
-import PersonIcon from "@mui/icons-material/Person";
-import LocalOfferIcon from "@mui/icons-material/LocalOffer";
-import HistoryIcon from "@mui/icons-material/History";
-import PasswordIcon from "@mui/icons-material/Password";
+const menuItems = [
+  {
+    id: "profile",
+    label: "Thông tin cá nhân",
+    path: "/profile",
+    icon: <PeopleAltOutlinedIcon sx={{ fontSize: 18 }} />,
+  },
+  {
+    id: "discount",
+    label: "Mã giảm giá",
+    path: "/discount",
+    icon: <LocalOfferOutlinedIcon sx={{ fontSize: 18 }} />,
+  },
+  {
+    id: "history",
+    label: "Lịch sử ăn uống",
+    path: "/history",
+    icon: <HistoryOutlinedIcon sx={{ fontSize: 18 }} />,
+  },
+  {
+    id: "password",
+    label: "Đổi mật khẩu",
+    path: "/password",
+    icon: <LockOutlinedIcon sx={{ fontSize: 18 }} />,
+  },
+];
 
+export const ProfileSidebar = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
 
-// COMPONENT ITEM
-function ProfileMenuItem({ icon, label, active, onClick }) {
   return (
     <Box
-    onClick={onClick}
-    sx={{
-        display: "flex",
-        alignItems: "center",
-        gap: "12px",
-        width: "208px",
-        p: "12px 16px",
-        borderRadius: "8px",
-        cursor: "pointer",
-        backgroundColor: active ? "#B6463A" : "transparent",
-        color: active ? "white" : "#5f6b7a",
-
-        "& svg": {
-        fontSize: 18
-        }
-    }}
+      component="aside"
+      sx={{
+        width: 256,
+        flexShrink: 0,
+        alignSelf: "stretch",
+      }}
     >
-      {icon}
-      <Typography
+      <Box
         sx={{
-          display: "flex",
-          height: "20px",
-          flexDirection: "column",
-          justifyContent: "center",
-          fontSize: 14,
-          fontWeight: 500
+          width: 256,
+          bgcolor: "background.paper",
+          borderRadius: "12px",
+          border: "1px solid rgba(177, 65, 53, 0.1)",
+          p: 3,
+          boxSizing: "border-box",
         }}
       >
-        {label}
-      </Typography>
+        {/* User greeting and avatar */}
+        <Stack direction="row" alignItems="center" spacing={2} mb={2}>
+          <Avatar alt="Hữu Kiên" sx={{ width: 44, height: 44 }} />
+          <Stack spacing={0}>
+            <Typography
+              variant="captionCaption2Medium"
+              sx={{
+                color: "rgba(15, 23, 42, 1)",
+                fontSize: "9px",
+                fontWeight: 500,
+                lineHeight: "17px",
+              }}
+            >
+              Xin chào
+            </Typography>
+            <Typography
+              variant="labelLabel1Bold"
+              sx={{
+                color: "rgba(15, 23, 42, 1)",
+                fontSize: "16px",
+                fontWeight: 700,
+                lineHeight: "24px",
+              }}
+            >
+              Hữu Kiên
+            </Typography>
+          </Stack>
+        </Stack>
+
+        {/* Navigation menu */}
+        <List
+          disablePadding
+          sx={{ display: "flex", flexDirection: "column", gap: "4px" }}
+        >
+          {menuItems.map((item) => {
+            const isActive =
+              item.path === "/history"
+                ? location.pathname.startsWith("/history")
+                : location.pathname === item.path;
+
+            return (
+              <ListItem
+                key={item.id}
+                onClick={() => navigate(item.path)}
+                sx={{
+                  px: 2,
+                  py: 1.5,
+                  borderRadius: "8px",
+                  bgcolor: isActive ? "#b4463c" : "background.paper",
+                  cursor: "pointer",
+                  gap: 1.5,
+                  transition: "0.2s",
+                  "&:hover": {
+                    bgcolor: isActive
+                      ? "#b4463c"
+                      : "rgba(177, 65, 53, 0.05)",
+                  },
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: "unset",
+                    color: isActive ? "#ffffff" : "rgba(71, 85, 105, 1)",
+                  }}
+                >
+                  {item.icon}
+                </ListItemIcon>
+
+                <ListItemText
+                  primary={item.label}
+                  primaryTypographyProps={{
+                    sx: {
+                      fontFamily: '"Be Vietnam Pro", Helvetica, sans-serif',
+                      fontSize: "14px",
+                      fontWeight: 500,
+                      lineHeight: "22px",
+                      letterSpacing: "0px",
+                      color: isActive ? "#ffffff" : "rgba(71, 85, 105, 1)",
+                      whiteSpace: "nowrap",
+                    },
+                  }}
+                  sx={{ m: 0 }}
+                />
+              </ListItem>
+            );
+          })}
+        </List>
+      </Box>
     </Box>
   );
-}
+};
 
-
-// SIDEBAR COMPONENT
-export default function ProfileSidebar() {
-  const [active, setActive] = useState("profile");
-
-  const menu = [
-    {
-      key: "profile",
-      label: "Thông tin cá nhân",
-      icon: <PersonIcon />
-    },
-    {
-      key: "voucher",
-      label: "Mã giảm giá",
-      icon: <LocalOfferIcon />
-    },
-    {
-      key: "history",
-      label: "Lịch sử gọi món",
-      icon: <HistoryIcon sx={{ fontSize: 18}}  />
-    },
-    {
-      key: "password",
-      label: "Đổi mật khẩu",
-      icon: <PasswordIcon />
-    }
-  ];
-
-  return (
-    <Box sx={{ width: "250px" }}>
-      {menu.map((item) => (
-        <ProfileMenuItem
-          key={item.key}
-          icon={item.icon}
-          label={item.label}
-          active={active === item.key}
-          onClick={() => setActive(item.key)}
-        />
-      ))}
-    </Box>
-  );
-}
+export default ProfileSidebar;

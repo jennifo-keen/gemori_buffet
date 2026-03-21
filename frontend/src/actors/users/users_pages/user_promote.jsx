@@ -1,9 +1,9 @@
 import React from "react";
 import { Box } from "@mui/material";
-import { FooterTermsSection } from "../../users_components/promote/FooterTermsSection";
-import { PromotionsCardsSection } from "../../users_components/promote/PromotionsCardsSection";
-import { PromotionsHeaderSection } from "../../users_components/promote/PromotionsHeaderSection";
-import { ThemeProvider } from "./ThemeProvider";
+import { FooterTermsSection } from "../users_components/promote/FooterTermsSection";
+import { PromotionsCardsSection } from "../users_components/promote/PromotionsCardsSection";
+import { PromotionsHeaderSection } from "../users_components/promote/PromotionsHeaderSection";
+import { ThemeProvider } from "../users_components/layout/ThemeProvider";
 
 export const Main = () => {
   return (

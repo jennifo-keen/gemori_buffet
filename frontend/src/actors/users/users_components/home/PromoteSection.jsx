@@ -68,7 +68,7 @@ export default function PromoteSection() {
             </Typography>
 
             <Link
-              href="#"
+              href="/promotion"
               underline="none"
               sx={{
                 display: "inline-flex",
