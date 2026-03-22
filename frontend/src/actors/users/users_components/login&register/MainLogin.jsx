@@ -3,6 +3,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import logo from "../../../../assets/img/Logo 1.png"
 import {
   Box,
   Button,
@@ -51,92 +52,17 @@ export const MainLogin = () => {
         <Stack spacing={2.5} alignItems="center">
           {/* Logo */}
           <Box display="flex" justifyContent="center">
-            <svg
-              width="130"
-              height="50"
-              viewBox="0 0 130 50"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-label="Gemori Logo"
-            >
-              {/* Fork icon */}
-              <g transform="translate(0, 5)">
-                <line
-                  x1="8"
-                  y1="2"
-                  x2="8"
-                  y2="18"
-                  stroke="#1a1a1a"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-                <line
-                  x1="12"
-                  y1="2"
-                  x2="12"
-                  y2="18"
-                  stroke="#1a1a1a"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-                <line
-                  x1="16"
-                  y1="2"
-                  x2="16"
-                  y2="18"
-                  stroke="#1a1a1a"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-                <path
-                  d="M8 8 Q12 12 16 8"
-                  stroke="#1a1a1a"
-                  strokeWidth="1.5"
-                  fill="none"
-                  strokeLinecap="round"
-                />
-                <line
-                  x1="12"
-                  y1="12"
-                  x2="12"
-                  y2="30"
-                  stroke="#1a1a1a"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-                {/* Spoon */}
-                <ellipse
-                  cx="26"
-                  cy="7"
-                  rx="4"
-                  ry="5.5"
-                  stroke="#1a1a1a"
-                  strokeWidth="1.5"
-                  fill="none"
-                />
-                <line
-                  x1="26"
-                  y1="12.5"
-                  x2="26"
-                  y2="30"
-                  stroke="#1a1a1a"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              </g>
-              {/* Gemori text */}
-              <text
-                x="38"
-                y="32"
-                fontFamily='"Be Vietnam Pro", Helvetica, sans-serif'
-                fontSize="22"
-                fontWeight="600"
-                fill="#1a1a1a"
-                fontStyle="italic"
-              >
-                Gemori
-              </text>
-            </svg>
+              <Box
+                component="img"
+                src={logo}
+                alt="Logo"
+                sx={{ 
+                  width: 130, 
+                  height: "49.01px", 
+                  objectFit: "contain",
+                  filter: "brightness(0) saturate(100%) invert(32%) sepia(35%) saturate(720%) hue-rotate(335deg)",
+                }}
+              />
           </Box>
 
           {/* Title */}
