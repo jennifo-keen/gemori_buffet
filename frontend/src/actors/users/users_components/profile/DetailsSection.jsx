@@ -1,46 +1,225 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ConfirmationNumberOutlinedIcon from "@mui/icons-material/ConfirmationNumberOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
-import { Box, Button, Grid, Paper, Stack, Typography } from "@mui/material";
-
-// Profile field data
-const profileFields = [
-  [
-    { label: "Họ và tên", value: "Nguyễn Văn A" },
-    { label: "Email", value: "nguyenvana@example.com" },
-  ],
-  [
-    { label: "Số điện thoại", value: "0 901 234 567" },
-    { label: "Ngày sinh", value: "01/06/2005" },
-  ],
-];
-
-// Stats card data
-const statsCards = [
-  {
-    label: "Đơn hàng",
-    value: "24",
-    icon: (
-      <ShoppingBagOutlinedIcon
-        sx={{ width: 24, height: 24, color: "primary.main" }}
-      />
-    ),
-  },
-  {
-    label: "Voucher",
-    value: "12",
-    icon: (
-      <ConfirmationNumberOutlinedIcon
-        sx={{ width: 24, height: 24, color: "primary.main" }}
-      />
-    ),
-  },
-];
+import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
+import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Grid,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import axios from "axios";
 
 const BORDER_COLOR = "rgba(177, 65, 53, 0.1)";
 
+const API_BASE_URL = "http://localhost:3000/api";
+
+const formatDateForInput = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toISOString().split("T")[0];
+};
+
+const formatDateForDisplay = (dateString) => {
+  if (!dateString) return "Chưa cập nhật";
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return "Chưa cập nhật";
+
+  return date.toLocaleDateString("vi-VN");
+};
+
 export const DetailsSection = () => {
+  const [profile, setProfile] = useState(null);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    dateOfBirth: "",
+    address: "",
+  });
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const token =
+    localStorage.getItem("token") ||
+    localStorage.getItem("accessToken") ||
+    "";
+
+  const authHeaders = useMemo(() => {
+    return token
+      ? {
+          Authorization: `Bearer ${token}`,
+        }
+      : {};
+  }, [token]);
+
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+      setErrorMessage("");
+
+      const response = await axios.get(`${API_BASE_URL}/profile/me`, {
+        headers: authHeaders,
+      });
+
+      const userData = response.data?.data;
+
+      setProfile(userData);
+      setFormData({
+        fullName: userData?.fullName || "",
+        email: userData?.email || "",
+        phone: userData?.phone || "",
+        dateOfBirth: formatDateForInput(userData?.dateOfBirth),
+        address: userData?.address || "",
+      });
+    } catch (error) {
+      console.error("Lỗi lấy profile:", error);
+      setErrorMessage(
+        error?.response?.data?.message || "Không thể tải thông tin hồ sơ"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const handleChange = (field) => (event) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: event.target.value,
+    }));
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+    setSuccessMessage("");
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setSuccessMessage("");
+    setErrorMessage("");
+
+    setFormData({
+      fullName: profile?.fullName || "",
+      email: profile?.email || "",
+      phone: profile?.phone || "",
+      dateOfBirth: formatDateForInput(profile?.dateOfBirth),
+      address: profile?.address || "",
+    });
+  };
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      setErrorMessage("");
+      setSuccessMessage("");
+
+      const payload = {
+        fullName: formData.fullName,
+        phone: formData.phone,
+        dateOfBirth: formData.dateOfBirth || null,
+        address: formData.address,
+      };
+
+      const response = await axios.put(
+        `${API_BASE_URL}/profile/me`,
+        payload,
+        {
+          headers: authHeaders,
+        }
+      );
+
+      const updatedData = response.data?.data;
+
+      setProfile((prev) => ({
+        ...prev,
+        ...updatedData,
+      }));
+
+      setFormData((prev) => ({
+        ...prev,
+        fullName: updatedData?.fullName || "",
+        phone: updatedData?.phone || "",
+        dateOfBirth: formatDateForInput(updatedData?.dateOfBirth),
+        address: updatedData?.address || "",
+      }));
+
+      const userStorage = localStorage.getItem("user");
+      if (userStorage) {
+        try {
+          const parsedUser = JSON.parse(userStorage);
+          parsedUser.fullName = updatedData?.fullName || parsedUser.fullName;
+          localStorage.setItem("user", JSON.stringify(parsedUser));
+        } catch (e) {
+          console.error("Không cập nhật được localStorage user");
+        }
+      }
+
+      setIsEditing(false);
+      setSuccessMessage("Cập nhật hồ sơ thành công");
+    } catch (error) {
+      console.error("Lỗi cập nhật profile:", error);
+      setErrorMessage(
+        error?.response?.data?.message || "Cập nhật hồ sơ thất bại"
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const statsCards = [
+    {
+      label: "Đơn hàng",
+      value: profile?.stats?.orders ?? 0,
+      icon: (
+        <ShoppingBagOutlinedIcon
+          sx={{ width: 24, height: 24, color: "primary.main" }}
+        />
+      ),
+    },
+    {
+      label: "Voucher",
+      value: profile?.stats?.vouchers ?? 0,
+      icon: (
+        <ConfirmationNumberOutlinedIcon
+          sx={{ width: 24, height: 24, color: "primary.main" }}
+        />
+      ),
+    },
+  ];
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          flex: 1,
+          minHeight: 300,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 3 }}>
       <Paper
@@ -54,100 +233,182 @@ export const DetailsSection = () => {
           gap: 4,
         }}
       >
-        {/* Header: Title + Edit Button */}
         <Stack
           direction="row"
           justifyContent="space-between"
           alignItems="center"
+          flexWrap="wrap"
+          gap={2}
         >
           <Box>
-            <Typography variant="h5" color="slate.900">
+            <Typography variant="h5" sx={{ color: "#1f2937", fontWeight: 700 }}>
               Hồ sơ cá nhân
             </Typography>
-            <Typography variant="labelLabel2Regular" color="text.secondary">
+            <Typography sx={{ color: "#6b7280", fontSize: 14 }}>
               Quản lý thông tin tài khoản và bảo mật của bạn
             </Typography>
           </Box>
 
-          <Button
-            variant="contained"
-            startIcon={<EditOutlinedIcon sx={{ width: 18, height: 18 }} />}
-            sx={{
-              backgroundColor: "primary.main",
-              color: "primary.contrastText",
-              px: 1.5,
-              py: 1,
-              borderRadius: "8px",
-              typography: "labelLabel2Medium",
-              "&:hover": { backgroundColor: "primary.main" },
-            }}
-          >
-            Chỉnh sửa
-          </Button>
+          {!isEditing ? (
+            <Button
+              variant="contained"
+              startIcon={<EditOutlinedIcon sx={{ width: 18, height: 18 }} />}
+              onClick={handleEdit}
+              sx={{
+                backgroundColor: "#b14135",
+                px: 2,
+                py: 1,
+                borderRadius: "8px",
+                "&:hover": { backgroundColor: "#99372d" },
+              }}
+            >
+              Chỉnh sửa
+            </Button>
+          ) : (
+            <Stack direction="row" spacing={1}>
+              <Button
+                variant="outlined"
+                startIcon={<CloseOutlinedIcon />}
+                onClick={handleCancel}
+                disabled={saving}
+                sx={{
+                  borderRadius: "8px",
+                }}
+              >
+                Hủy
+              </Button>
+
+              <Button
+                variant="contained"
+                startIcon={<SaveOutlinedIcon />}
+                onClick={handleSave}
+                disabled={saving}
+                sx={{
+                  backgroundColor: "#b14135",
+                  borderRadius: "8px",
+                  "&:hover": { backgroundColor: "#99372d" },
+                }}
+              >
+                {saving ? "Đang lưu..." : "Lưu"}
+              </Button>
+            </Stack>
+          )}
         </Stack>
 
-        {/* Profile Fields */}
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 0, width: "100%" }}>
-          {profileFields.map((row, rowIndex) => (
-            <Grid container spacing={4} key={rowIndex}>
-              {row.map((field) => (
-                <Grid item xs={6} key={field.label} sx={{ display: "flex" }}>
-                  <Box
-                    sx={{
-                      width: "100%",
-                      pb: 2,
-                      borderBottom: `1px solid ${BORDER_COLOR}`,
-                      mb: rowIndex < profileFields.length - 1 ? 3 : 0,
-                    }}
-                  >
-                    <Typography
-                      variant="labelLabel3SemiBold"
-                      color="slate.400"
-                      display="block"
-                    >
-                      {field.label}
-                    </Typography>
+        {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+        {successMessage && <Alert severity="success">{successMessage}</Alert>}
 
-                    <Typography
-                      variant="labelLabel1Medium"
-                      color="slate.900"
-                      display="block"
-                    >
-                      {field.value}
-                    </Typography>
-                  </Box>
-                </Grid>
-              ))}
-            </Grid>
-          ))}
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+          {/* BOX 1 */}
+          <Box sx={{ pb: 2, borderBottom: `1px solid ${BORDER_COLOR}` }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", gap: 4 }}>
+              
+              {/* Họ và tên */}
+              <Box sx={{ width: "50%" }}>
+                <Typography sx={{ fontSize: 13, color: "#9ca3af", mb: 1 }}>
+                  Họ và tên
+                </Typography>
 
-          <Box
-            sx={{
-              width: "100%",
-              pb: 2,
-              borderBottom: `1px solid ${BORDER_COLOR}`,
-              mt: 3,
-            }}
-          >
-            <Typography
-              variant="labelLabel3SemiBold"
-              color="slate.400"
-              display="block"
-            >
+                {isEditing ? (
+                  <TextField
+                    fullWidth
+                    size="small"
+                    value={formData.fullName}
+                    onChange={handleChange("fullName")}
+                  />
+                ) : (
+                  <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
+                    {profile?.fullName || "Chưa cập nhật"}
+                  </Typography>
+                )}
+              </Box>
+
+              {/* Email */}
+              <Box sx={{ width: "50%" }}>
+                <Typography sx={{ fontSize: 13, color: "#9ca3af", mb: 1 }}>
+                  Email
+                </Typography>
+
+                <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
+                  {profile?.email || "Chưa cập nhật"}
+                </Typography>
+              </Box>
+
+            </Box>
+          </Box>
+
+          {/* BOX 2 */}
+          <Box sx={{ pb: 2, borderBottom: `1px solid ${BORDER_COLOR}` }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", gap: 4 }}>
+              
+              {/* SĐT */}
+              <Box sx={{ width: "50%" }}>
+                <Typography sx={{ fontSize: 13, color: "#9ca3af", mb: 1 }}>
+                  Số điện thoại
+                </Typography>
+
+                {isEditing ? (
+                  <TextField
+                    fullWidth
+                    size="small"
+                    value={formData.phone}
+                    onChange={handleChange("phone")}
+                  />
+                ) : (
+                  <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
+                    {profile?.phone || "Chưa cập nhật"}
+                  </Typography>
+                )}
+              </Box>
+
+              {/* Ngày sinh */}
+              <Box sx={{ width: "50%" }}>
+                <Typography sx={{ fontSize: 13, color: "#9ca3af", mb: 1 }}>
+                  Ngày sinh
+                </Typography>
+
+                {isEditing ? (
+                  <TextField
+                    fullWidth
+                    size="small"
+                    type="date"
+                    value={formData.dateOfBirth}
+                    onChange={handleChange("dateOfBirth")}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                ) : (
+                  <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
+                    {formatDateForDisplay(profile?.dateOfBirth)}
+                  </Typography>
+                )}
+              </Box>
+
+            </Box>
+          </Box>
+
+          {/* BOX 3 */}
+          <Box sx={{ pb: 2, borderBottom: `1px solid ${BORDER_COLOR}` }}>
+            <Typography sx={{ fontSize: 13, color: "#9ca3af", mb: 1 }}>
               Địa chỉ
             </Typography>
 
-            <Typography
-              variant="labelLabel1Medium"
-              color="slate.900"
-              display="block"
-            >
-              123 Đường Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh
-            </Typography>
+            {isEditing ? (
+              <TextField
+                fullWidth
+                size="small"
+                multiline
+                minRows={2}
+                value={formData.address}
+                onChange={handleChange("address")}
+              />
+            ) : (
+              <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
+                {profile?.address || "Chưa cập nhật"}
+              </Typography>
+            )}
           </Box>
         </Box>
 
-        {/* Bottom section: Stats + Delete Account */}
         <Box
           sx={{
             pt: 4,
@@ -157,8 +418,7 @@ export const DetailsSection = () => {
             gap: 2,
           }}
         >
-          {/* Stats Cards */}
-          <Stack direction="row" spacing={2}>
+          <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
             {statsCards.map((card) => (
               <Paper
                 key={card.label}
@@ -173,7 +433,6 @@ export const DetailsSection = () => {
                   border: `1px solid ${BORDER_COLOR}`,
                 }}
               >
-                {/* Icon box */}
                 <Box
                   sx={{
                     width: 40,
@@ -191,13 +450,11 @@ export const DetailsSection = () => {
 
                 <Box>
                   <Typography
-                    variant="labelLabel3Bold"
-                    color="slate.500"
-                    display="block"
+                    sx={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}
                   >
                     {card.label}
                   </Typography>
-                  <Typography variant="h6" color="slate.900" display="block">
+                  <Typography sx={{ fontSize: 22, fontWeight: 700 }}>
                     {card.value}
                   </Typography>
                 </Box>
@@ -205,52 +462,37 @@ export const DetailsSection = () => {
             ))}
           </Stack>
 
-          {/* Delete Account Row */}
           <Box
             sx={{
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
+              gap: 2,
               p: 2,
               borderRadius: "12px",
-              backgroundColor: "background.warm",
+              backgroundColor: "#fff7f5",
               border: `1px solid ${BORDER_COLOR}`,
+              flexWrap: "wrap",
             }}
           >
             <Box>
-              <Typography
-                variant="labelLabel1Bold"
-                color="slate.800"
-                display="block"
-              >
+              <Typography sx={{ fontWeight: 700, color: "#374151", mb: 0.5 }}>
                 Xóa tài khoản
               </Typography>
-              <Typography
-                sx={{
-                  fontFamily: '"Be Vietnam Pro", Helvetica',
-                  fontWeight: 400,
-                  fontSize: "12px",
-                  lineHeight: "16px",
-                  color: "text.secondary",
-                }}
-              >
+              <Typography sx={{ fontSize: 13, color: "#6b7280" }}>
                 Một khi bạn xóa tài khoản, mọi dữ liệu sẽ không thể khôi phục.
-                Hãy chắc chắn về điều này.
               </Typography>
             </Box>
 
             <Button
               variant="contained"
               sx={{
-                backgroundColor: "primary.main",
-                color: "primary.contrastText",
+                backgroundColor: "#b14135",
+                color: "#fff",
                 px: 3,
                 py: 1,
                 borderRadius: "8px",
-                typography: "labelLabel2Bold",
-                flexShrink: 0,
-                boxShadow: 4,
-                "&:hover": { backgroundColor: "primary.main" },
+                "&:hover": { backgroundColor: "#99372d" },
               }}
             >
               Xóa tài khoản

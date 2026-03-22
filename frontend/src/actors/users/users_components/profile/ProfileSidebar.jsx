@@ -46,6 +46,9 @@ export const ProfileSidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const user = JSON.parse(localStorage.getItem("user")) || {};
+  const userName = user.full_name || user.name || "Người dùng";
+
   return (
     <Box
       component="aside"
@@ -65,9 +68,8 @@ export const ProfileSidebar = () => {
           boxSizing: "border-box",
         }}
       >
-        {/* User greeting and avatar */}
         <Stack direction="row" alignItems="center" spacing={2} mb={2}>
-          <Avatar alt="Hữu Kiên" sx={{ width: 44, height: 44 }} />
+          <Avatar alt={userName} sx={{ width: 44, height: 44 }} />
           <Stack spacing={0}>
             <Typography
               variant="captionCaption2Medium"
@@ -89,12 +91,11 @@ export const ProfileSidebar = () => {
                 lineHeight: "24px",
               }}
             >
-              Hữu Kiên
+              {userName}
             </Typography>
           </Stack>
         </Stack>
 
-        {/* Navigation menu */}
         <List
           disablePadding
           sx={{ display: "flex", flexDirection: "column", gap: "4px" }}

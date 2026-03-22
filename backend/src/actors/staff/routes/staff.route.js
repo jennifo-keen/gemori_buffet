@@ -10,7 +10,7 @@ const vouchersController = require('../controllers/vouchers.controller');
 
 const router = Router();
 
-router.use(authMiddleware);
+// router.use(authMiddleware);
 
 // ============ CUSTOMERS ROUTES ============
 router.get('/customers/phone/:phone', requireRole('staff', 'admin'), customersController.getByPhone);
