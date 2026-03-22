@@ -58,4 +58,44 @@ const getAllOrders = async ({ status }) => {
   return result.rows;
 };
 
-module.exports = { getOrderById, getAllOrders };
+const createOrder = async ({ tableId, buffetTicketId, ticketQuantity }) => {
+  // Kiểm tra bàn
+  const tableCheck = await pool.query(
+    'SELECT * FROM tables WHERE id = $1', [tableId]
+  );
+  const table = tableCheck.rows[0];
+  if (!table) throw { status: 404, message: 'Bàn không tồn tại' };
+  if (table.status !== 'empty') throw { status: 400, message: 'Bàn không ở trạng thái trống' };
+
+  // Lấy giá vé
+  const ticketCheck = await pool.query(
+    'SELECT * FROM buffet_tickets WHERE id = $1', [buffetTicketId]
+  );
+  const ticket = ticketCheck.rows[0];
+  if (!ticket) throw { status: 404, message: 'Gói buffet không tồn tại' };
+
+  const totalAmount = ticket.price * ticketQuantity;
+
+  // Tạo order
+  const result = await pool.query(
+    `INSERT INTO orders (table_id, buffet_ticket_id, ticket_quantity, status, total_amount)
+     VALUES ($1, $2, $3, 'ordering', $4)
+     RETURNING *`,
+    [tableId, buffetTicketId, ticketQuantity, totalAmount]
+  );
+
+  // Cập nhật trạng thái bàn
+  await pool.query(
+    `UPDATE tables SET status = 'ordering' WHERE id = $1`, [tableId]
+  );
+
+  // Emit socket
+  try {
+    const io = getIO();
+    io.to('staff').emit('table_status_changed', { tableId, status: 'ordering' });
+  } catch (e) { console.error('Socket error:', e.message); }
+
+  return result.rows[0];
+};
+
+module.exports = { getOrderById, getAllOrders, createOrder  };

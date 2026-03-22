@@ -1,15 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { Box, Button, Chip, Stack, TextField, Typography } from "@mui/material";
 
-const statusBadges = [
-  { id: 1, label: "Đã phục vụ" },
-  { id: 2, label: "Đã phục vụ" },
-  { id: 3, label: "Đã phục vụ" },
-  { id: 4, label: "Đã phục vụ" },
-];
+const Nofi = ({
+  title,
+  subtitle,
+  badges = [],
+  onCancel,
+  onConfirm,
+  confirmText = "Tiếp tục",
+  cancelText = "Hủy",
+}) => {
+  const [reason, setReason] = useState('');
 
-const Nofi = () => {
   return (
     <Box
       sx={{
@@ -42,7 +45,7 @@ const Nofi = () => {
               fontWeight: 700,
             }}
           >
-            Tiêu đề thông báo.
+            {title}
           </Typography>
         </Stack>
 
@@ -56,50 +59,41 @@ const Nofi = () => {
               fontWeight: 500,
             }}
         >
-          Tiêu đề phụ của thông báo
+          {subtitle}
         </Typography>
 
         <Stack spacing={1}>
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-            sx={{ width: "100%",p: 0.5, bgcolor: "white" }}
-          >
-            <Typography
-              variant="body2"
-              color="#0f172a"
-              sx={{ 
-                fontSize: "14px", 
-                fontWeight: 500,
-                alignItems: "center",
-              }}
-            >
-          
-              Lý do
-            </Typography>
-
-            <Stack direction="row" spacing={1}>
-              {statusBadges.map((badge) => (
-                <Chip
-                  key={badge.id}
-                  label={badge.label}
-                  sx={{
-                    bgcolor: "#ffe5df",
-                    color: "#166534",
-                    fontWeight: "700",
-                    fontSize: "10px",
-                    height: 28,
-                    borderRadius: 50,
-                    
-                  }}
-                />
-              ))}
+          {/* Lý do + badges */}
+          {badges.length > 0 && (
+            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: "100%", p: 0.5 }}>
+              <Typography variant="body2" sx={{ fontSize: "14px", fontWeight: 500, color: "#0f172a" }}>
+                Lý do
+              </Typography>
+              <Stack direction="row" spacing={1} flexWrap="wrap">
+                {badges.map((badge) => (
+                  <Chip
+                    key={badge.id}
+                    label={badge.label}
+                    onClick={() => setReason(badge.label)}
+                    sx={{
+                      bgcolor: reason === badge.label ? "#b4463c" : "#ffe5df",
+                      color: reason === badge.label ? "white" : "#166534",
+                      fontWeight: 700,
+                      fontSize: "10px",
+                      height: 28,
+                      borderRadius: 50,
+                      cursor: "pointer",
+                    }}
+                  />
+                ))}
+              </Stack>
             </Stack>
-          </Stack>
+          )}
 
           <TextField
             placeholder="Nhập lý do ..."
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
             variant="outlined"
             fullWidth
             sx={{
@@ -122,6 +116,7 @@ const Nofi = () => {
           <Stack direction="row" spacing={2}>
             <Button
               variant="outlined"
+              onClick={onCancel}
               fullWidth
               sx={{
                 borderWidth: 2,
@@ -139,11 +134,12 @@ const Nofi = () => {
                 },
               }}
             >
-              Hủy
+              {cancelText}
             </Button>
 
             <Button
               variant="contained"
+              onClick={() => onConfirm?.(reason)}
               fullWidth
               sx={{
                 bgcolor: "#b4463c",
@@ -158,7 +154,7 @@ const Nofi = () => {
                 },
               }}
             >
-              Tiếp tục
+              {confirmText}
             </Button>
           </Stack>
         </Stack>

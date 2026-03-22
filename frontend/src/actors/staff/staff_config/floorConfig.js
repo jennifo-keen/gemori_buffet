@@ -1,7 +1,7 @@
 export const FLOORS = [
   { title: 'Tầng 1', path: '/staff',    range: ['B01', 'B10'] },
   { title: 'Tầng 2', path: '/staff/f2', range: ['B11', 'B16'] },
-  { title: 'Tầng 3', path: '/staff/f3', range: ['B17', 'B24'] },
+  // { title: 'Tầng 3', path: '/staff/f3', range: ['B17', 'B24'] },
 ];
 
 // ── Tầng 1 ──────────────────────────────────────────────────────

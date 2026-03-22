@@ -1,6 +1,8 @@
 import React from 'react';
-import { AuthStaffProvider } from '../actors/staff/staff_context/AuthStaffContext.jsx'
+import { AuthStaffProvider } from '../actors/staff/staff_context/AuthStaffProvider.jsx'
+import { DialogProvider } from '../actors/staff/staff_context/DialogProvider.jsx'
 import ProtectedStaffRoute from '../actors/staff/staff_context/ProtectedStaffRoute.jsx';
+
 import StaffLayout from '../actors/staff/staff_pages/StaffLayout.jsx';
 import Floor1 from '../actors/staff/staff_pages/Floor1.jsx';
 import Floor2 from '../actors/staff/staff_pages/Floor2.jsx';
@@ -8,6 +10,7 @@ import StaffLogin from '../actors/staff/staff_pages/StaffLogin.jsx';
 import StaffOrders from '../actors/staff/staff_pages/StaffOrders.jsx';
 import StaffCheckOut from '../actors/staff/staff_pages/StaffCheckOut.jsx';
 import StaffPay from '../actors/staff/staff_pages/StaffPay.jsx';
+
 
 const staffRouter = {
   path: "/staff",
@@ -21,7 +24,9 @@ const staffRouter = {
     {
       element: (
         <ProtectedStaffRoute>
-          <StaffLayout />
+          <DialogProvider> 
+            <StaffLayout />
+          </DialogProvider>
         </ProtectedStaffRoute>
       ),
       children: [

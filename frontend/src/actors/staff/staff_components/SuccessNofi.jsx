@@ -2,7 +2,7 @@ import React from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { Box, Button, Stack, Typography } from "@mui/material";
 
-const SuccessNofi = () => {
+const SuccessNofi = ({ title, subtitle, onConfirm, confirmText = "Tiếp tục" }) => {
   return (
     <Box
       sx={{
@@ -41,7 +41,7 @@ const SuccessNofi = () => {
               fontWeight: 700,
             }}
           >
-            Tiêu đề thông báo.
+            {title}
           </Typography>
         </Stack>
 
@@ -56,12 +56,13 @@ const SuccessNofi = () => {
               fontWeight: 500,
             }}
         >
-          Tiêu đề phụ của thông báo
+          {subtitle}
         </Typography>
 
         <Stack width="100%">
           <Button
             variant="contained"
+            onClick={onConfirm}
             fullWidth
             sx={{
               backgroundColor: "#B4463C",
@@ -75,7 +76,7 @@ const SuccessNofi = () => {
               },
             }}
           >
-            Tiếp tục
+            {confirmText}
           </Button>
         </Stack>
       </Stack>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuthStaff } from '../staff_context/AuthStaffContext';
+import  useAuthStaff  from '../staff_hook/useAuthStaff';
 
 const ProtectedStaffRoute = ({ children }) => {
   const { admin } = useAuthStaff();

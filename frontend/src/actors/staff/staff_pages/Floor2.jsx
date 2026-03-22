@@ -1,14 +1,23 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Stack, Box, Typography, CircularProgress } from '@mui/material';
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+
 import SelectFloor from '../staff_components/SelectFloor';
 import SquareTable from '../staff_components/SquareTable';
 import Table_8 from '../staff_components/Table_8';
 import Table_4 from '../staff_components/Table_4';
-import { useAuthStaff } from '../staff_context/AuthStaffContext';
+
+import  useAuthStaff  from '../staff_hook/useAuthStaff';
+import  useDialog  from '../staff_hook/useDialog';
+
+import { handleTableAction } from '../staff_config/tablesActions';
 import { FLOORS, FLOOR2_ROW1, FLOOR2_ROW2 } from '../staff_config/floorConfig';
 
 const Floor2 = () => {
+  const navigate = useNavigate();
+  const { showError } = useDialog();
+
   const {
     tablesLoading, tablesError,
     getTable, getStatus, getTableColor, getChairColor, getFloorTables,
@@ -24,6 +33,14 @@ const Floor2 = () => {
     <Box p={4}><Typography color="error">{tablesError}</Typography></Box>
   );
 
+    const handleClick = (code) => {
+    handleTableAction({
+      table: getTable(code),
+      navigate,
+      showError,
+    });
+  };
+
    const floorStats = FLOORS.map(f => {
     const t = getFloorTables(f.range[0], f.range[1]);
     return {
@@ -37,16 +54,21 @@ const Floor2 = () => {
     const table = getTable(code);
     const status = getStatus(table);
 
-    if (type === 'Table_8') return (
-      <Table_8 key={code} table={{ tableNumber: Number(code), capacity: '8 người', foodStatus: 'Món đã ra: 5/7', status }} />
+    const wrapper = (children) => (
+      <Box key={code} onClick={() => handleClick(code)} sx={{ cursor: 'pointer' }}>
+        {children}
+      </Box>
     );
 
-    if (type === 'Table_4') return (
-      <Table_4 key={code} table={{ tableNumber: Number(code), capacity: '4 người', foodStatus: 'Món đã ra: 5/7', status }} />
+    if (type === 'Table_8') return wrapper(
+      <Table_8 key={code} table={{ tableNumber: code, capacity: '8 người', foodStatus: 'Món đã ra: 5/7', status }} />
     );
- return (
+
+    if (type === 'Table_4') return wrapper (
+      <Table_4 key={code} table={{ tableNumber: code, capacity: '4 người', foodStatus: 'Món đã ra: 5/7', status }} />
+    );
+ return wrapper(
       <SquareTable
-        key={code}
         table={{ tableNumber: code, capacity: (chairTop + chairBottom) + ' người', foodStatus: 'Món đã ra: 5/7', status }}
         tableActiveColor={tableColor || getTableColor(table)}
         chairActiveColor={chairColor || getChairColor(table)}

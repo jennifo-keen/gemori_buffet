@@ -1,9 +1,16 @@
-import React from 'react';
-import { useState } from 'react'
+import React, { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+
 import CardTable from "../staff_components/CardTable"
 import Bill from "../staff_components/Bill"
-import QrCode from "../../../assets/icon/QrCode.svg"
 import InfoCard from "../staff_components/InfoCard"
+
+import QrCode from "../../../assets/icon/QrCode.svg"
+
+import { getTableOrder } from '../../../api/tableApi';
+
+import useAuthStaff from '../staff_hook/useAuthStaff';
+
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import GroupsIcon from "@mui/icons-material/Groups";
 import PersonIcon from "@mui/icons-material/Person";
@@ -14,37 +21,54 @@ import {Box,
         Grid,
         Button,
         SvgIcon,
+        CircularProgress,
       } from "@mui/material"
 
-const tables = [
-  { id: "01", name: "Bàn 01", status: "Có khách", dot: "white", active: true },
-  { id: "02", name: "Bàn 02", status: "Có khách", dot: "green" },
-  { id: "03", name: "Bàn 03", status: "Vắng", dot: null },
-  { id: "04", name: "Bàn 04", status: "Có khách", dot: "green" },
-  { id: "05", name: "Bàn 05", status: "Có khách", dot: "green" },
-  { id: "06", name: "Bàn 06", status: "Bảo trì", dot: null, disabled: true },
-  { id: "07", name: "Bàn 07", status: "Vắng", dot: null },
-  { id: "08", name: "Bàn 08", status: "Có khách", dot: "green" },
-  { id: "09", name: "Bàn 09", status: "Có khách", dot: "green" },
-  { id: "10", name: "Bàn 10", status: "Có khách", dot: "green" },
-  { id: "11", name: "Bàn 11", status: "Có khách", dot: "green" },
-  { id: "12", name: "Bàn 12", status: "Có khách", dot: "green" },
-  { id: "13", name: "Bàn 13", status: "Có khách", dot: "green" },
-  { id: "14", name: "Bàn 14", status: "Có khách", dot: "green" },
-  { id: "15", name: "Bàn 15", status: "Có khách", dot: "green" },
-  { id: "16", name: "Bàn 16", status: "Có khách", dot: "green" },
-];
+const StaffCheckOut = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { admin, tables } = useAuthStaff();
 
-const paymentItems = [
-  { label: "Combo 399K x4", amount: "799.000 VNĐ" },
-  { label: "Tạm tính", amount: "1.400.000 VNĐ" },
-  { label: "Thuế (8%)", amount: "100.000 VNĐ" },
-];
+  const tableId   = searchParams.get('tableId');
+  const tableCode = searchParams.get('tableCode');
 
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  // Lấy order của bàn
+  useEffect(() => {
+    if (!tableId) return;
+    const fetchOrder = async () => {
+      try {
+        setLoading(true);
+        const res = await getTableOrder(tableId);
+        setOrder(res.data);
+      } catch (err) {
+        setError('Không thể tải đơn hàng');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrder();
+  }, [tableId]);
 
-const StaffPayment = () => {
-  const [selectedId,] = useState("01");
+  const formatVND = (amount) =>
+    new Intl.NumberFormat('vi-VN').format(amount || 0) + ' VNĐ';
+
+  const ticketTotal = order
+    ? (order.ticket_price * order.ticket_quantity)
+    : 0;
+
+  if (loading) return (
+    <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+      <CircularProgress sx={{ color: "#b4463c" }} />
+    </Box>
+  );
+
+  if (error) return (
+    <Box p={4}><Typography color="error">{error}</Typography></Box>
+  );
 
   return (
     <Box
@@ -63,7 +87,8 @@ const StaffPayment = () => {
       <Stack
         sx={{
           flexShrink: 0,
-          height: 777,
+          height: "100vh", 
+          overflow: 'hidden',
           alignItems: "flex-start",
           backgroundColor: "#FAFAFA",
           p:"24px",
@@ -85,17 +110,37 @@ const StaffPayment = () => {
                 "&::-webkit-scrollbar-thumb": { backgroundColor: "#e2e8f0", borderRadius: "4px" },
           }}
         >
-          {tables.map((table) => {
-            const isSelected = selectedId === table.id;
+          {tables
+            // Sắp xếp: ordering trước, empty sau
+            .slice().sort((a, b) => {
+              // Cùng nhóm → sort theo số bàn tăng dần (B01, B02, B03...)
+              const numA = parseInt(a.table_code.replace(/\D/g, ''));
+              const numB = parseInt(b.table_code.replace(/\D/g, ''));
+              return numA - numB;
+            })
+              .map(t => {
+              const isOrdering = t.status === 'ordering';
+              const isCurrent  = t.id === tableId;
 
-            return (
-              <CardTable
-                key={table.id}
-                table={table}
-                isSelected={isSelected}
-              />
-            );
-          })}
+              return (
+                <CardTable
+                  key={t.id}
+                  table={{
+                    id: t.table_code,
+                    name: `Bàn ${t.table_code}`,
+                    status: isOrdering ? 'Có khách' : t.status === 'empty' ? 'Trống' : 'Bảo trì',
+                    dot: isOrdering ? '#22c55e' : null,
+                  }}
+                  isSelected={isCurrent}
+                  onClick={isOrdering
+                    ? () => navigate(`/staff/checkout?tableId=${t.id}&tableCode=${t.table_code}`)
+                    : null
+                  }
+                  disabled={!isOrdering}
+                />
+              );
+            })
+          }
         </Stack>
       </Stack>
 
@@ -109,8 +154,8 @@ const StaffPayment = () => {
           <InfoCard
             icon={<RestaurantIcon sx={{ color: "#ef4444", fontSize: 20 }} />}
             label="Trạng thái"
-            title="Có khách"
-            subtitle=""
+            title={tableCode || '---'}
+            subtitle="Có khách"
             statusColor="#22c55e"
           />
         </Grid>
@@ -118,42 +163,43 @@ const StaffPayment = () => {
           <InfoCard
             icon={<GroupsIcon sx={{ color: "#ef4444", fontSize: 20 }} />}
             label="Số khách hàng"
-            title="04 Người"
-            subtitle="Tối đa 6 người"
+            title={order?.ticket_quantity ? `${order.ticket_quantity} người` : '---'}
+            subtitle={`Gói: ${order?.ticket_name || '---'}`}
           />
         </Grid>
         <Grid item xs={12} md={4}>
           <InfoCard
             icon={<PersonIcon sx={{ color: "#ef4444", fontSize: 20 }} />}
             label="Nhân viên trực quầy"
-            title="Phạm Hữu Kiên"
-            subtitle="ID: 123456789"
+            title={admin?.full_name || '---'}
+            subtitle={`ID: ${admin?.id?.slice(0, 8) || '---'}`}
           />
         </Grid>
 
         {/* Hàng 2: Chia đôi cột trái (Đơn hàng) và cột phải (QR + Thanh toán) */}
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} md={7}>
             <Box
               sx={{
-                
                 backgroundColor: "#f5f5f5",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "flex-start",
-                p: "20px",
+                pt: "20px",
               }}
             >
             <Box
               sx={{
+                width:450,
                 backgroundColor: "#fff",
                 borderRadius: "12px",
                 overflow: "hidden",
                 boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+               
               }}
               >
                 <Box sx={{ px: 3, pt: 3, pb: 1 }}>
                   <Typography sx={{ fontSize: "20px", fontWeight: 700, color: "#0f172a" }}>
-                    Đơn hàng hiện tại
+                    Đơn hàng hiện tại — {tableCode}
                   </Typography>
                 </Box>
 
@@ -163,8 +209,7 @@ const StaffPayment = () => {
                     px: 2,
                     py: 1.5,
                     borderBottom: "1px solid #f1f5f9",
-                    backgroundColor: "#F8FAFC",
-                    // Tất cả Typography con sẽ nhận style chung này
+                    backgroundColor: "#F8FAFC",                 
                     "& .MuiTypography-root": {
                       fontSize: "13px",
                       fontWeight: 600,
@@ -198,25 +243,32 @@ const StaffPayment = () => {
                     "&::-webkit-scrollbar-thumb": { backgroundColor: "#e2e8f0", borderRadius: "4px" },
                   }}
                 >
-                  <Bill/>
-                  <Bill/>
-                  <Bill/>
-                  <Bill/>
-                  <Bill/>
-                  <Bill/>
-                  <Bill/>
-                  <Bill/>
-                  <Bill/>
-                  <Bill/>
-                  <Bill/>
+                   {order?.items?.length > 0
+                  ? order.items.map(item => (
+                      <Bill
+                        key={item.id}
+                        item={{
+                          id: item.id,
+                          name: item.menu_name,
+                          quantity: item.quantity,
+                          status: item.status,
+                          image: item.image_url,
+                        }}
+                      />
+                    ))
+                  : (
+                    <Box p={4} textAlign="center">
+                      <Typography color="text.secondary">Chưa có món nào</Typography>
+                    </Box>
+                  )
+                }
                 </Box>
-      
               </Box>
             </Box>
         </Grid>
 
-        <Grid item xs={12} md={4}>
-          <Stack spacing={2} sx={{ height: "100%",p: "20px" }}>
+        <Grid item xs={12} md={5}>
+          <Stack spacing={2} sx={{ height: "100%",p: "20px", minWidth: "50%"}}>
             {/* QR Code */}
                  <Paper
                     variant="outlined"
@@ -239,7 +291,6 @@ const StaffPayment = () => {
                       {/* QR code display area */}
                       <Box
                         sx={{
-                          width: "320px",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -264,7 +315,7 @@ const StaffPayment = () => {
                           <Box
                             component="img"
                             alt="QR Code"
-                            src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=table-qr-code"
+                            src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(tableId || '')}"
                             sx={{
                               width: 160,
                               height: 160,
@@ -288,25 +339,53 @@ const StaffPayment = () => {
 
                   {/* Line items with bottom divider */}
                   <Box pb={3} sx={{ borderBottom: "1px solid", borderColor: "grey.100" }}>
-                    <Stack spacing={1.5}>
-                      {paymentItems.map((item) => (
+                    <Stack spacing={1.5}>                   
                         <Stack
-                          key={item.label}
                           direction="row"
                           justifyContent="space-between"
                           alignItems="center"
                         >
                           <Typography variant="body2" color="text.secondary">
-                            {item.label}
+                            {order?.ticket_name} × {order?.ticket_quantity}
                           </Typography>
                           <Typography variant="body2" fontWeight="500" color="grey.900">
-                            {item.amount}
+                            {formatVND(order?.ticket_price)} × {order?.ticket_quantity}
                           </Typography>
                         </Stack>
-                      ))}
+              
+                        {/* Tạm tính */}
+                    <Stack direction="row" justifyContent="space-between">
+                      <Typography variant="body2" color="text.secondary">
+                        Tạm tính
+                      </Typography>
+                      <Typography variant="body2" fontWeight="500">
+                        {formatVND(ticketTotal)}
+                      </Typography>
+                    </Stack>
+
+                    {/* VAT */}
+                    <Stack direction="row" justifyContent="space-between">
+                      <Typography variant="body2" color="text.secondary">
+                        *Vé đã bao gồm thuế
+                      </Typography>
+                    </Stack>
+
                     </Stack>
                   </Box>
 
+
+                   {/* Voucher nếu có */}
+                    {order?.voucher_code && (
+                      <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <Typography variant="body2" color="text.secondary">
+                          Voucher ({order.voucher_code})
+                        </Typography>
+                        <Typography variant="body2" fontWeight="500" color="#22c55e">
+                          - {formatVND(ticketTotal - order.total_amount)}
+                        </Typography>
+                      </Stack>
+                    )}
+                 
                   {/* Total row */}
                   <Stack
                     direction="row"
@@ -320,13 +399,16 @@ const StaffPayment = () => {
                                 fontSize="20px"
                                 fontWeight="700" 
                                 color="#b4463c">
-                      2.000.000 VNĐ
+                        {formatVND(order?.total_amount || ticketTotal)}
                     </Typography>
                   </Stack>
 
                   {/* Payment button */}
                   <Button
                     variant="contained"
+                     onClick={() => navigate(
+                    `/staff/checkout/pay?tableId=${tableId}&tableCode=${tableCode}&orderId=${order?.id}`
+                  )}
                     startIcon={
                     <SvgIcon 
                       sx={{
@@ -358,4 +440,4 @@ const StaffPayment = () => {
   );
 };
 
-export default StaffPayment;
+export default StaffCheckOut;

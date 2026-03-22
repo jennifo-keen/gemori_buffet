@@ -1,13 +1,47 @@
+import React from "react";
+import { useNavigate } from 'react-router-dom';
 
-import React, { useState } from "react";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PaymentIcon from "@mui/icons-material/Payment";
 import { Box, Stack, Typography } from "@mui/material";
+
 import MenuOption from "./MenuOption.jsx";
 
-export default function MenuStaff({ onLogout }) {
-  const [, setActiveItem] = useState("table-map");
+import useAuthStaff from '../staff_hook/useAuthStaff';
+import useDialog from '../staff_hook/useDialog';
+
+export default function MenuStaff() {
+  const navigate = useNavigate();
+  const { logoutStaff, tables } = useAuthStaff();
+  const { showError } = useDialog();
+
+  const handleLogout = () => {
+    logoutStaff();
+    navigate('/staff/login');
+  };
+
+ const handlePaymentClick = () => {
+    // Tìm bàn ordering đầu tiên
+    const firstOrdering = tables
+      .filter(t => t.status === 'ordering')
+      .sort((a, b) => {
+        const numA = parseInt(a.table_code.replace(/\D/g, ''));
+        const numB = parseInt(b.table_code.replace(/\D/g, ''));
+        return numA - numB;
+      })[0];
+
+    if (!firstOrdering) {
+      showError({
+        title: 'Không có bàn nào đang phục vụ',
+        subtitle: 'Hiện tại chưa có bàn nào có khách để thanh toán',
+        confirmText: 'Đã hiểu',
+      });
+      return;
+    }
+
+    navigate(`/staff/checkout?tableId=${firstOrdering.id}&tableCode=${firstOrdering.table_code}`);
+  };
 
   return (
     <Box
@@ -23,11 +57,22 @@ export default function MenuStaff({ onLogout }) {
       }}
     >
       <MenuOption
-        defaultActiveId="table-map"
-        onSelect={(item) => setActiveItem(item.id)}
         menuItems={[
-          { id: "table-map", label: "Sơ đồ bàn", icon: DashboardIcon },
-          { id: "payment",   label: "Thanh toán", icon: PaymentIcon },
+          {
+            id: "table-map",
+            label: "Sơ đồ bàn",
+            icon: DashboardIcon,
+            path: "/staff",
+            matchPaths: ['/staff', '/staff/f2', '/staff/order'],
+          },
+          {
+            id: "payment",
+            label: "Thanh toán",
+            icon: PaymentIcon,
+            path: "/staff/checkout",
+            matchPaths: ['/staff/checkout'],
+            onClick: handlePaymentClick,
+          },
         ]}
       />
 
@@ -35,7 +80,7 @@ export default function MenuStaff({ onLogout }) {
         direction="row"
         spacing={1.5}
         alignItems="center"
-        onClick={onLogout}
+        onClick={handleLogout}
         sx={{ cursor: "pointer" }}
       >
         <Box

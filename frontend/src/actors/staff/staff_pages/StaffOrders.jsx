@@ -1,10 +1,19 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+
+import Package from '../staff_components/Package.jsx';
+
 import ArrowBackIcon from "../../../assets/icon/ArrowFatLeft.svg";
 import ArrowRightIcon from "../../../assets/icon/ArrowFatRight.svg"; 
-import Package from '../staff_components/Package.jsx';
-import AddIcon from "@mui/icons-material/Add";
 import PeopleAltIcon from "../../../assets/icon/UsersThree.svg";
+
+import { getBuffetTickets } from '../../../api/menuApi';
+import { createOrder } from '../../../api/orderApi';
+
+import useAuthStaff from '../staff_hook/useAuthStaff.js';
+import useDialog from '../staff_hook/useDialog.js';
+
+import AddIcon from "@mui/icons-material/Add";
 import PersonIcon from "@mui/icons-material/Person";
 import RemoveIcon from "@mui/icons-material/Remove";
 import {
@@ -17,25 +26,93 @@ import {
   Toolbar,
   Typography,
   Paper,
+  CircularProgress,
 } from "@mui/material";
 
-const summaryItems = [
-  { label: "Gói chọn", value: "Combo 299K" },
-  { label: "Khách", value: "02 người" },
-];
-
 const StaffOrders = () => {
-    const [count, setCount] = useState(2);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { updateTableStatus } = useAuthStaff();
+  const { showError, showSuccess } = useDialog();
+
+  const tableId   = searchParams.get('tableId');
+  const tableCode = searchParams.get('tableCode');
+
+  const [tickets, setTickets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState(null);
+  const [count, setCount] = useState(2);
+
+  // Lấy danh sách gói buffet
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const res = await getBuffetTickets();
+        setTickets(res.data);
+      } catch (err) {
+        showError({ title: 'Lỗi', subtitle: 'Không thể tải danh sách gói buffet' });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch();
+  }, []);
 
     const handleDecrement = () => setCount((prev) => Math.max(0, prev - 1));
     const handleIncrement = () => setCount((prev) => prev + 1);
+
+   // Tính tổng tiền
+  const totalAmount = selectedTicket
+    ? selectedTicket.price * count
+    : 0;
+
+  // Xác nhận tạo order
+  const handleConfirm = async () => {
+    if (!selectedTicket) {
+      showError({ title: 'Chưa chọn gói', subtitle: 'Vui lòng chọn gói buffet trước khi tiếp tục' });
+      return;
+    }
+    if (count < 1) {
+      showError({ title: 'Số lượng không hợp lệ', subtitle: 'Vui lòng nhập số khách hợp lệ' });
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const res = await createOrder({
+        tableId,
+        buffetTicketId: selectedTicket.id,
+        ticketQuantity: count,
+      });
+
+      // Cập nhật context không cần fetch lại
+      updateTableStatus(tableId, 'ordering');
+
+      showSuccess({
+        title: 'Tạo order thành công!',
+        subtitle: `${tableCode} — ${selectedTicket.name} × ${count} người`,
+        confirmText: 'Xem đơn hàng',
+        onConfirm: () => navigate(`/staff/checkout?tableId=${tableId}&tableCode=${tableCode}`),
+      });
+    } catch (err) {
+      showError({
+        title: 'Tạo order thất bại',
+        subtitle: err.response?.data?.message || 'Có lỗi xảy ra',
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (loading) return (
+    <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+      <CircularProgress sx={{ color: "#b4463c" }} />
+    </Box>
+  );
+
   return (
-  <Box
-    sx={{
-      p: "32px",
-      gap :"22px",
-    }}
-  >
+  <Box sx={{ p: "32px",  gap :"22px" }} >
     <Stack
       position="static"
       elevation={0}
@@ -47,16 +124,19 @@ const StaffOrders = () => {
       }}
     >
       <Toolbar sx={{p: "16px 32px" }}>
-        <IconButton size="medium" sx={{ color: "#b14135" }}>
-          <Box
-           src= {ArrowBackIcon}
-           component= "img"
-          />
+        <IconButton 
+          onClick={() => navigate(-1)}
+          size="medium" 
+          sx={{ color: "#b14135" }}>
+            <Box
+            src= {ArrowBackIcon}
+            component= "img"
+            />
         </IconButton>
 
         <Box display="flex" alignItems="center" gap={2} flex={1}>
           <Chip
-            label="Bàn 08"
+             label={tableCode}
             size="small"
             sx={{
               backgroundColor: "rgba(177, 65, 53, 0.1)",
@@ -79,15 +159,21 @@ const StaffOrders = () => {
       </Toolbar>
     </Stack>
 
+{/* List buffer ticket */}
     <Stack 
       direction="row" 
       alignItems="center" 
       justifyContent="center"
       spacing={1}
     >
-      <Package></Package>
-      <Package></Package>
-      <Package></Package>
+      {tickets.map(ticket => (
+          <Package
+            key={ticket.id}
+            ticket={ticket}
+            isSelected={selectedTicket?.id === ticket.id}
+            onSelect={() => setSelectedTicket(ticket)}
+          />
+        ))}
     </Stack>
 
       <Paper
@@ -102,7 +188,6 @@ const StaffOrders = () => {
         my: 2,
       }}
     >
-
       <Stack direction="row" alignItems="center" spacing={1} mb={3}>
         <Box
         src= {PeopleAltIcon}
@@ -233,7 +318,9 @@ const StaffOrders = () => {
           fontWeight="bold"
           sx={{ color: "white", whiteSpace: "nowrap" }}
         >
-          499.000 VNĐ
+          {totalAmount > 0
+                  ? `${totalAmount.toLocaleString('vi-VN')} VNĐ`
+                  : '---'}
         </Typography>
       </Stack>
 
@@ -250,46 +337,46 @@ const StaffOrders = () => {
 
       {/* Package and guest info */}
       <Stack direction="row" spacing={2}>
-        {summaryItems.map((item) => (
-          <Stack key={item.label} alignItems="center">
+          <Stack  alignItems="center">
             <Typography
               variant="caption"
               sx={{ color: "white", opacity: 0.7, whiteSpace: "nowrap" }}
             >
-              {item.label}
+              {selectedTicket?.name || '---'}
             </Typography>
             <Typography
               variant="body1"
               fontWeight="bold"
               sx={{ color: "white", whiteSpace: "nowrap" }}
             >
-              {item.value}
+               {count} người
             </Typography>
           </Stack>
-        ))}
       </Stack>
     </Stack>
 
         <MuiButton
-      variant="contained"
-      endIcon={
-        <Box
-        src={ArrowRightIcon}
-        component="img"
-        sx={{ color: "#b4463c", width: 24, height: 24 }} />
-      }
-      sx={{
-        backgroundColor: "white",
-        borderRadius: "16px",
-        px: "15px",
-        py: "20px",
-        gap: "12px",
-        boxShadow: "none",
-        "&:hover": {
-          backgroundColor: "white",
-          boxShadow: "none",
-        },
-      }}
+          onClick={handleConfirm}
+          disabled={submitting || !selectedTicket}
+          variant="contained"
+          endIcon={
+                    <Box
+                    src={ArrowRightIcon}
+                    component="img"
+                    sx={{ color: "#b4463c", width: 24, height: 24 }} />
+                  }
+          sx={{
+            backgroundColor: "white",
+            borderRadius: "16px",
+            px: "15px",
+            py: "20px",
+            gap: "12px",
+            boxShadow: "none",
+            "&:hover": {
+              backgroundColor: "white",
+              boxShadow: "none",
+            },
+          }}
     >
       <Typography
         sx={{
@@ -300,7 +387,7 @@ const StaffOrders = () => {
           whiteSpace: "nowrap",
         }}
       >
-        Xác nhận &amp; Bắt đầu
+        {submitting ? 'Đang xử lý...' : 'Xác nhận & Bắt đầu'}
       </Typography>
     </MuiButton>
 

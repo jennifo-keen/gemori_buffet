@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 
-const MemberShip_Inf = () => {
+const MemberShip_Inf = ({ customer, onReset }) => {
   return (
     <Box>
       <Stack
@@ -79,7 +79,7 @@ const MemberShip_Inf = () => {
                       color: "#0F172A",
                     }}
                   >
-                    Nguyễn Văn A
+                    {customer?.full_name}
                   </Typography>
                   <Typography
                     sx={{
@@ -88,10 +88,11 @@ const MemberShip_Inf = () => {
                       color: "#94A3B8",
                     }}
                   >
-                    SĐT: 0914642747
+                    SĐT: {customer?.phone}
                   </Typography>
                 </Stack>
                 <Button
+                  onClick={onReset}
                   sx={{
                     fontSize: 12,
                     fontWeight: 700,

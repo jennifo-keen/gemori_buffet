@@ -2,7 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import SidebarStaff from '../staff_components/MenuStaff.jsx';
 import HeaderStaff from '../staff_components/HeaderStaff.jsx';
-import { Box } from '@mui/material'; // Nếu bạn dùng MUI
+import { Box } from '@mui/material'; 
 
 const StaffLayout = () => {
   return (

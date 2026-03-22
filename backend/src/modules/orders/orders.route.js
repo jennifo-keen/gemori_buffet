@@ -7,5 +7,6 @@ router.use(authMiddleware);
 
 router.get('/', requireRole('admin'), ordersController.getAllOrders);  // Web 4
 router.get('/:id', ordersController.getOrder);                         // Web 3, 4
+router.post('/create', requireRole('staff', 'admin'), ordersController.createOrder);
 
 module.exports = router;

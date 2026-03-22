@@ -1,21 +1,120 @@
-import React, { useState } from 'react'; // Gộp import
-import ShoppingCartOutlined from "@mui/icons-material/ShoppingCartOutlined";
-import ArrowDropDown from "@mui/icons-material/ArrowDropDown";
+import React, { useState, useEffect } from 'react'; 
+import { useSearchParams, useNavigate } from 'react-router-dom';
+
 import MemberShipInput from "../staff_components/MemberShip_Input"
 import Ticket from "../staff_components/Ticket";
 import PaymentMethod from "../staff_components/PaymentMethod"
-import { Box, Stack, Typography, TextField, Button, Grid } from "@mui/material";
+
+import ShoppingCartOutlined from "@mui/icons-material/ShoppingCartOutlined";
+import ArrowDropDown from "@mui/icons-material/ArrowDropDown";
+import { Box, Stack, Typography, TextField, Button, Grid, CircularProgress } from "@mui/material";
+
+import { validateVoucher, checkout } from '../../../api/paymentApi';
+import { getTableOrder } from '../../../api/tableApi';
+
+import useAuthStaff from '../staff_hook/useAuthStaff';
+import useDialog from '../staff_hook/useDialog'
 
 
-const summaryRows = [
-  { label: "Tạm tính (Subtotal)", value: "10.000.000 VNĐ" },
-  { label: "Thuế VAT (8%)", value: "2.000.000 VNĐ" },
-  { label: "Giảm giá", value: "0VNĐ" },
-];
+const StaffPay = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { updateTableStatus } = useAuthStaff();
+  const { showSuccess, showError } = useDialog();
 
-// 2. Tách riêng hoặc xóa bọc CalculationArea nếu không cần thiết
-const StaffMenu = () => {
-  const [discountCode, setDiscountCode] = useState(""); // Đưa state vào đúng component
+  const tableId   = searchParams.get('tableId');
+  const tableCode = searchParams.get('tableCode');
+  const orderId   = searchParams.get('orderId');
+
+  const [order, setOrder]               = useState(null);
+  const [loading, setLoading]           = useState(true);
+  const [submitting, setSubmitting]     = useState(false);
+  const [customer, setCustomer]         = useState(null);
+  const [selectedMethod, setSelectedMethod] = useState('cash');
+  const [voucherCode, setVoucherCode]   = useState('');
+  const [voucherData, setVoucherData]   = useState(null);
+  const [voucherLoading, setVoucherLoading] = useState(false);
+  const [voucherError, setVoucherError] = useState('');
+
+   // Lấy order
+  useEffect(() => {
+    if (!tableId) return;
+    const fetch = async () => {
+      try {
+        const res = await getTableOrder(tableId);
+        setOrder(res.data);
+      } catch {
+        showError({ title: 'Lỗi', subtitle: 'Không thể tải đơn hàng' });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch();
+  }, [tableId]);
+
+  // Tính tiền
+  const ticketTotal    = order ? order.ticket_price * order.ticket_quantity : 0;
+  const discountAmount = voucherData?.discount_amount || 0;
+  const grandTotal     = ticketTotal - discountAmount;
+
+  const formatVND = (amount) =>
+    new Intl.NumberFormat('vi-VN').format(Math.round(amount || 0)) + ' VNĐ';
+
+  // Áp voucher
+  const handleApplyVoucher = async () => {
+    if (!voucherCode.trim()) return;
+    try {
+      setVoucherLoading(true);
+      setVoucherError('');
+      const res = await validateVoucher(voucherCode, ticketTotal);
+      setVoucherData(res.data);
+    } catch (err) {
+      setVoucherError(err.response?.data?.message || 'Mã không hợp lệ');
+      setVoucherData(null);
+    } finally {
+      setVoucherLoading(false);
+    }
+  };
+
+  // Thanh toán
+  const handleConfirm = async () => {
+    if (!selectedMethod) {
+      showError({ title: 'Chưa chọn phương thức', subtitle: 'Vui lòng chọn phương thức thanh toán' });
+      return;
+    }
+    try {
+      setSubmitting(true);
+      await checkout({
+        orderId,
+        paymentMethod: selectedMethod,
+        phone: customer?.phone || null,
+        voucherCode: voucherData ? voucherCode : null,
+      });
+
+      // Cập nhật context
+      updateTableStatus(tableId, 'empty');
+
+      showSuccess({
+        title: 'Thanh toán thành công!',
+        subtitle: `${tableCode} — ${formatVND(grandTotal)}`,
+        confirmText: 'Về sơ đồ bàn',
+        onConfirm: () => navigate('/staff'),
+      });
+    } catch (err) {
+      showError({
+        title: 'Thanh toán thất bại',
+        subtitle: err.response?.data?.message || 'Có lỗi xảy ra',
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (loading) return (
+    <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+      <CircularProgress sx={{ color: "#b4463c" }} />
+    </Box>
+  );
 
   return (
     <Box sx={{ p: "32px", gap: "22px" }}>
@@ -45,7 +144,7 @@ const StaffMenu = () => {
                   fontWeight={500}
                   sx={{ color: "#e26255", whiteSpace: "nowrap" }}
                 >
-                  Bàn 12 - Tầng 1
+                  {tableCode}
                 </Typography>
               </Stack>
             </Stack>
@@ -64,7 +163,7 @@ const StaffMenu = () => {
                 sx={{
                   backgroundColor: "#b4463c",
                   borderBottom: "1px solid #b141350d",
-                  borderRadius: '18px 18px 0 0', // Bo góc trên bạn yêu cầu ở đây
+                  borderRadius: '18px 18px 0 0', 
                   p: 2,
                 }}
               >
@@ -76,8 +175,7 @@ const StaffMenu = () => {
                   Chi tiết đơn hàng
                 </Typography>
               </Stack>
-              <Ticket />
-              <Ticket />
+              {order && <Ticket ticket={order} />}
             </Box>
 
             <Stack
@@ -89,21 +187,25 @@ const StaffMenu = () => {
                 borderTop: "1px solid rgba(177, 65, 53, 0.1)",
               }}
             >
-              {summaryRows.map((row) => (
-                <Stack
-                  key={row.label}
-                  direction="row"
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Typography variant="body2" color="text.primary">
-                    {row.label}
-                  </Typography>
-                  <Typography variant="body2" fontWeight={600} color="text.primary">
-                    {row.value}
-                  </Typography>
-                </Stack>
-              ))}
+               {/* Tạm tính */}
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="body2">Tạm tính</Typography>
+                <Typography variant="body2" fontWeight={600}>{formatVND(ticketTotal)}</Typography>
+              </Stack>
+
+              {/* VAT */}
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="body2">*Vé đã bao gồm thuế</Typography>
+              </Stack>
+
+              {/* Giảm giá */}
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="body2">Giảm giá</Typography>
+                <Typography variant="body2" fontWeight={600} color={discountAmount > 0 ? "#22c55e" : "text.primary"}>
+                  {discountAmount > 0 ? `- ${formatVND(discountAmount)}` : '0 VNĐ'}
+                </Typography>
+              </Stack>
+
 
               <Box sx={{ py: 1 }}>
                 <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -115,9 +217,12 @@ const StaffMenu = () => {
                 }}>
                   <TextField
                     placeholder="Nhập mã ưu đãi..."
-                    value={discountCode}
-                    onChange={(e) => setDiscountCode(e.target.value)}
+                   value={voucherCode}
+                    onChange={(e) => { setVoucherCode(e.target.value); setVoucherData(null); setVoucherError(''); }}
                     size="small"
+                    error={!!voucherError}
+                    helperText={voucherError || (voucherData ? `✓ Giảm ${formatVND(voucherData.discount_amount)}` : '')}
+                    FormHelperTextProps={{ sx: { color: voucherData ? '#22c55e' : '#b4463c' } }}
                     sx={{
                       width: "425px",
                       "& .MuiOutlinedInput-root": {
@@ -129,6 +234,8 @@ const StaffMenu = () => {
                   />
                   <Button
                     variant="contained"
+                    onClick={handleApplyVoucher}
+                    disabled={voucherLoading || !voucherCode.trim()}
                     sx={{
                       bgcolor: "#b4463c",
                       borderRadius: 2,
@@ -137,7 +244,7 @@ const StaffMenu = () => {
                       "&:hover": { bgcolor: "#9a3a31" },
                     }}
                   >
-                    Áp dụng
+                    {voucherLoading ? '...' : 'Áp dụng'}
                   </Button>
                 </Stack>
               </Box>
@@ -155,7 +262,7 @@ const StaffMenu = () => {
                   Tổng cộng
                 </Typography>
                 <Typography variant="h6" fontWeight={700} sx={{ color: "#e26255" }}>
-                  12.000.000 VNĐ
+                 {formatVND(grandTotal)}
                 </Typography>
               </Stack>
             </Stack>
@@ -164,8 +271,13 @@ const StaffMenu = () => {
 
         <Grid size={{ xs: 12, md: 5 }}> {/* Chỉnh lại cột phải to hơn chút cho cân đối */}
           <Box sx={{ p: 2, borderRadius: 2 }}>
-            <MemberShipInput></MemberShipInput>
-            <PaymentMethod></PaymentMethod>
+            <MemberShipInput onCustomerFound={setCustomer} />
+            <PaymentMethod 
+              selectedMethod={selectedMethod}
+              onSelect={setSelectedMethod}
+              onConfirm={handleConfirm}
+              loading={submitting}/>
+            
           </Box>
         </Grid>
       </Grid>
@@ -173,4 +285,4 @@ const StaffMenu = () => {
   );
 };
 
-export default StaffMenu;
+export default StaffPay;

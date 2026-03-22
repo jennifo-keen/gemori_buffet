@@ -1,32 +1,15 @@
 import React from "react";
 import DeleteOutlineIcon from "../../../assets/icon/Trash.svg?reach";
+
+import { ORDER_ITEM_STATUS } from '../staff_config/staticConfig';
+
 import { Box, Chip, Stack, Typography } from "@mui/material";
 
-const orderItems = [
-  { id: 1, name: "Ba chỉ bò Mỹ", quantity: 2, status: 0 },
-  { id: 2, name: "Cá mú đỏ", quantity: 2, status: 1 },
-  { id: 3, name: "Bào ngư Hàn Quốc", quantity: 2, status: 0 },
-  { id: 4, name: "Rau muống", quantity: 2, status: 1 },
-  { id: 5, name: "Sò điệp Nhật", quantity: 2, status: 0 },
-  { id: 6, name: "Ba chỉ heo cuộn nấm", quantity: 2, status: 1 },
-  { id: 7, name: "Ba chỉ bò Mỹ", quantity: 2, status: 0 },
-  { id: 8, name: "Ba chỉ bò Mỹ", quantity: 2, status: 0 },
-];
-// Map trạng thái
-const statusConfig = {
-  0: {
-    label: "Đã phục vụ",
-    bg: "#ffe5df",
-    color: "#166534",
-  },
-  1: {
-    label: "Đang làm ...",
-    bg: "#22c55e",
-    color: "#fff9f4",
-  },
-};
 
-const Bill = () => {
+const Bill = ({ item }) => {
+  if (!item) return null;
+  const status = ORDER_ITEM_STATUS[item.status] || ORDER_ITEM_STATUS.pending;
+
   return (
     <Box
       sx={{
@@ -39,10 +22,6 @@ const Bill = () => {
       }}
     >
       <Stack spacing={2.5}>
-        {orderItems.map((item, index) => {
-          const status = statusConfig[item.status];
-
-          return (
             <Box
               key={item.id}
               sx={{
@@ -51,8 +30,6 @@ const Bill = () => {
                 height: "64px",
                 display: "flex",
                 alignItems: "center",
-                borderBottom:
-                  index === 0 ? "1px solid rgba(177, 65, 53, 0.05)" : "none",
                 width: "434px",
               }}
             >
@@ -144,8 +121,6 @@ const Bill = () => {
                 </Box>
               </Stack>
             </Box>
-          );
-        })}
       </Stack>
     </Box>
   );

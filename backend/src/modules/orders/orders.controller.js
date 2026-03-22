@@ -15,4 +15,15 @@ const getAllOrders = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-module.exports = { getOrder, getAllOrders };
+const createOrder = async (req, res, next) => {
+  try {
+    const { tableId, buffetTicketId, ticketQuantity } = req.body;
+    if (!tableId || !buffetTicketId || !ticketQuantity)
+      return res.status(400).json({ message: 'Thiếu thông tin bắt buộc' });
+
+    const order = await ordersService.createOrder({ tableId, buffetTicketId, ticketQuantity });
+    res.status(201).json(order);
+  } catch (err) { next(err); }
+};
+
+module.exports = { getOrder, getAllOrders, createOrder };

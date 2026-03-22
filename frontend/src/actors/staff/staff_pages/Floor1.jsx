@@ -1,12 +1,24 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Stack, Box, Typography, CircularProgress } from '@mui/material';
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+
 import SelectFloor from '../staff_components/SelectFloor';
 import SquareTable from '../staff_components/SquareTable';
-import { useAuthStaff } from '../staff_context/AuthStaffContext';
+
 import { FLOORS, FLOOR1_ROW1, FLOOR1_ROW2 } from '../staff_config/floorConfig';
+import { handleTableAction } from '../staff_config/tablesActions';
+
+import useAuthStaff from '../staff_hook/useAuthStaff';
+import useDialog  from '../staff_hook/useDialog';
+
+
 
 const Floor1 = () => {
+
+  const navigate = useNavigate();
+  const { showError } = useDialog();
+
   const {
     tablesLoading, tablesError,
     getTable, getStatus, getTableColor, getChairColor, getFloorTables,
@@ -22,6 +34,14 @@ const Floor1 = () => {
     <Box p={4}><Typography color="error">{tablesError}</Typography></Box>
   );
 
+  const handleClick = (code) => {
+      handleTableAction({
+        table: getTable(code),
+        navigate,
+        showError,
+      });
+    };
+
   const floorStats = FLOORS.map(f => {
     const t = getFloorTables(f.range[0], f.range[1]);
     return {
@@ -31,20 +51,25 @@ const Floor1 = () => {
     };
   });
 
-  const renderRow = (row) => row.map(({ code, chairTop, chairBottom }) => (
-    <SquareTable
+const renderRow = (row) => row.map(({ code, chairTop, chairBottom }) => (
+    <Box
       key={code}
-      table={{
-        tableNumber: code,
-        capacity: chairTop + chairBottom + ' người',
-        foodStatus: 'Món đã ra: 5/7',
-        status: getStatus(getTable(code)),
-      }}
-      tableActiveColor={getTableColor(getTable(code))}
-      chairActiveColor={getChairColor(getTable(code))}
-      chairTop={chairTop}
-      chairBottom={chairBottom}
-    />
+      onClick={() => handleClick(code)}
+      sx={{ cursor: 'pointer' }}
+    >
+      <SquareTable
+        table={{
+          tableNumber: code,
+          capacity: chairTop + chairBottom + ' người',
+          foodStatus: 'Món đã ra: 5/7',
+          status: getStatus(getTable(code)),
+        }}
+        tableActiveColor={getTableColor(getTable(code))}
+        chairActiveColor={getChairColor(getTable(code))}
+        chairTop={chairTop}
+        chairBottom={chairBottom}
+      />
+    </Box>
   ));
 
   return (

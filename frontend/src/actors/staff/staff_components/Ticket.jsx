@@ -1,8 +1,11 @@
 import React from "react";
-import Ticket from "../../../assets/img/Ticket.png"
+import TicketImg from "../../../assets/img/Ticket.png"
 import { Box, Stack, Typography } from "@mui/material";
 
-export default function PropertyImage() {
+export default function Ticket({ ticket }) {
+  const formatVND = (amount) =>
+    new Intl.NumberFormat('vi-VN').format(amount || 0) + ' VNĐ';
+
   return (
     <Box
       sx={{
@@ -18,7 +21,7 @@ export default function PropertyImage() {
     >
       <Stack direction="row" spacing={2} alignItems="center">
         <Box
-        src={Ticket}
+        src={ticket?.image_url || TicketImg}
         component="img"
           sx={{
             width: 72,
@@ -38,7 +41,7 @@ export default function PropertyImage() {
               color: "#0F172A",
             }}
           >
-            Buffet Adult x2
+            {ticket?.ticket_name} × {ticket?.ticket_quantity}
           </Typography>
 
           <Typography
@@ -50,7 +53,7 @@ export default function PropertyImage() {
 
             }}
           >
-            399.000 VNĐ/người
+            {formatVND(ticket?.ticket_price)}/người
           </Typography>
         </Stack>
       </Stack>
@@ -63,7 +66,7 @@ export default function PropertyImage() {
           color: "#0F172A",
         }}
       >
-        798.000 VNĐ
+        {formatVND((ticket?.ticket_price || 0) * (ticket?.ticket_quantity || 0))}
       </Typography>
     </Box>
   );

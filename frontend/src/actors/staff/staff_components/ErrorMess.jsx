@@ -1,7 +1,8 @@
 import React from "react";
-import WarningIcon from "../../../assets/Warning.svg?react";
+import WarningIcon from "../../../assets/icon/Warning.svg?react";
 import { Box, Button, Stack, Typography, Paper } from "@mui/material";
-export const ErrorMess = () => {
+
+export const ErrorMess = ({ title, subtitle, onConfirm, confirmText = "Tiếp tục" })=> {
   return (
     <Paper
       elevation={0}
@@ -38,7 +39,7 @@ export const ErrorMess = () => {
                         fontWeight: 700,
                       }}
                     >
-                      Tiêu đề thông báo.
+                      {title}
                     </Typography>
                   </Stack>
           
@@ -53,12 +54,13 @@ export const ErrorMess = () => {
                         fontWeight: 500,
                       }}
                   >
-                    Tiêu đề phụ của thông báo
+                    {subtitle}
                   </Typography>
 
         <Box width="100%">
           <Button
             variant="contained"
+            onClick={onConfirm}
             fullWidth
             sx={{
               backgroundColor: "#B4463C",
@@ -72,7 +74,7 @@ export const ErrorMess = () => {
               },
             }}
           >
-            Tiếp tục
+            {confirmText}
           </Button>
         </Box>
       </Stack>

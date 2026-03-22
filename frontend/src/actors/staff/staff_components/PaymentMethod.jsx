@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Typography, Stack, Button, Paper } from '@mui/material';
 import PaymentIcon from '@mui/icons-material/Payment';
 import PaymentsIcon from '@mui/icons-material/Payments'; // Tiền mặt
@@ -6,8 +6,6 @@ import QrCode2Icon from '@mui/icons-material/QrCode2'; // QR/Chuyển khoản
 import CreditCardIcon from '@mui/icons-material/CreditCard'; // Thẻ
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
-const PaymentMethods = () => {
-  const [selectedMethod, setSelectedMethod] = useState('cash');
 
   const methods = [
     { id: 'cash', label: 'Tiền mặt', sub: 'Cash Payment', icon: <PaymentsIcon /> },
@@ -15,6 +13,8 @@ const PaymentMethods = () => {
     { id: 'card', label: 'Thẻ (Visa/Master)', sub: 'Credit/Debit Card', icon: <CreditCardIcon /> },
   ];
 
+
+const PaymentMethods = ({ selectedMethod, onSelect, onConfirm, loading }) => {
   return (
     <Box sx={{ maxWidth: 400, p: 2, bgcolor: 'white', borderRadius: 4 }}>
       {/* Tiêu đề */}
@@ -32,7 +32,7 @@ const PaymentMethods = () => {
           return (
             <Paper
               key={method.id}
-              onClick={() => setSelectedMethod(method.id)}
+              onClick={() => onSelect(method.id)}
               elevation={0}
               sx={{
                 p: 2,
@@ -73,7 +73,9 @@ const PaymentMethods = () => {
       <Button
         fullWidth
         variant="contained"
+        onClick={onConfirm}
         startIcon={<CheckCircleIcon />}
+        disabled={loading || !selectedMethod}
         sx={{
           mt: 4,
           py: 1.5,

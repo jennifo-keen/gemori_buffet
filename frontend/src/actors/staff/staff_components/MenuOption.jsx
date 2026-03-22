@@ -1,6 +1,6 @@
-// MenuOption.jsx
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Stack, Typography } from "@mui/material";
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const MenuOption = ({
   menuItems = [],
@@ -8,12 +8,30 @@ const MenuOption = ({
   defaultActiveId = null,
   onSelect,
 }) => {
-  const [activeId, setActiveId] = useState(defaultActiveId);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const getActiveId = () => {
+  const match = menuItems.find(item => {
+    if (!item.path) return false;
+    if (item.matchPaths) {
+      return item.matchPaths.some(p => location.pathname.startsWith(p));
+    }
+    return location.pathname.startsWith(item.path);
+  });
+  return match?.id || defaultActiveId;
+};
+
+  const activeId = getActiveId();
 
   const handleClick = (item) => {
-    setActiveId(item.id);
-    if (onSelect) onSelect(item);
-  };
+  if (item.onClick) {
+    item.onClick();
+  } else if (item.path) {
+    navigate(item.path);
+  }
+  if (onSelect) onSelect(item);
+};
 
   const renderIcon = (item, isActive) => {
     const iconSource = item.icon || icon;

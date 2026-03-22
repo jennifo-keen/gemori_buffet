@@ -1,7 +1,7 @@
 import React from "react";
 import Logo1 from "../../../assets/img/Logo 1.png?reach";
 import NotificationsOutlinedIcon from "../../../assets/icon/BellRinging.svg?reach";
-import { useAuthStaff } from "../staff_context/AuthStaffContext.jsx";
+import useAuthStaff  from "../staff_hook/useAuthStaff";
 import {
   Avatar,
   Box,

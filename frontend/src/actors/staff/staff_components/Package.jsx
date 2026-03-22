@@ -12,15 +12,11 @@ import {
   Typography,
 } from "@mui/material";
 
-const comboItems = [
-  "Thịt bò Mỹ nhập khẩu",
-  "Thịt bò Mỹ nhập khẩu",
-  "Thịt bò Mỹ nhập khẩu",
-];
 
-export default function TrngThiKhngChn() {
+export default function Package({ ticket, isSelected, onSelect }) {
   return (
     <Card
+      onClick={onSelect}
       sx={{
         width: "304px",
         height:"453.6px",
@@ -39,7 +35,7 @@ export default function TrngThiKhngChn() {
           sx={{ objectFit: "cover" }}
         />
         <Chip
-          label="299.000 VNĐ"
+          label={`${Number(ticket?.price || 0).toLocaleString('vi-VN')} VNĐ`}
           sx={{
             position: "absolute",
             top: 16,
@@ -69,26 +65,14 @@ export default function TrngThiKhngChn() {
             marginBottom: 2,
           }}
         >
-          Combo 299K
+          {ticket?.name}
         </Typography>
 
         <Stack spacing={2} sx={{ marginBottom: 3 }}>
-          {comboItems.map((item, index) => (
+          {(ticket?.menu_items || []).slice(0, 3).map((item, index) => (
             <Stack key={index} direction="row" spacing={1} alignItems="center">
-              <CheckCircleIcon
-                sx={{
-                  width: 12,
-                  height: 12,
-                  color: "#22c55e",
-                }}
-              />
-              <Typography
-                variant="body2"
-                sx={{
-                  color: "#64748b",
-                  fontSize: "14px",
-                }}
-              >
+              <CheckCircleIcon sx={{ width: 12, height: 12, color: "#22c55e" }} />
+              <Typography variant="body2" sx={{ color: "#64748b", fontSize: "14px" }}>
                 {item}
               </Typography>
             </Stack>
@@ -97,12 +81,13 @@ export default function TrngThiKhngChn() {
 
         <Button
           fullWidth
-          variant="outlined"
+          variant={isSelected ? "contained" : "outlined"}
           sx={{
             borderRadius: 3,
             borderWidth: 2,
             borderColor: "#b4463c",
-            color: "#b4463c",
+            color: isSelected ? "#ffffff" : "#b4463c",
+            backgroundColor: isSelected ?"#b4463c"  : "#ffffff" ,
             padding: "12px 0",
             fontWeight: 700,
             fontSize: "14px",
@@ -114,7 +99,7 @@ export default function TrngThiKhngChn() {
             },
           }}
         >
-          Chọn gói này
+          {isSelected ? "Đã chọn" : "Chọn gói này"}
         </Button>
       </CardContent>
     </Card>

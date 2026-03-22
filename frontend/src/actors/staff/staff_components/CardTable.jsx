@@ -1,25 +1,29 @@
 import React from "react";
 import { Box, Stack, Typography } from "@mui/material";
 
-export default function CardTable({ table }) {
+export default function CardTable({ table, isSelected, onClick, disabled  }) {
   return (
     <Box
+      onClick={!disabled ? onClick : undefined}
       sx={{
         width: "167px",
         display: "flex",
         alignItems: "center",
         p: "20px 12px",
-        bgcolor: "white",
+        bgcolor: disabled ? "#f1f5f9" : isSelected ? "#b4463c" : "#fff",
         borderRadius: "8px",
-        border: "1px solid #E2E8F0",
+        border: isSelected ? "1.5px solid #b4463c" : "1px solid #E2E8F0",
+        cursor: onClick ? "pointer" : "default",
+        transition: "all 0.15s",
+        "&:hover": onClick ? { borderColor: "#b4463c"} : {},
       }}
     >
       <Stack direction="row" alignItems="center" sx={{ flex: 1 }}>
         {/* Circle number */}
         <Box
           sx={{
-            width: 32,
-            height: 32,
+            width: 45 ,
+            height:45,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -43,9 +47,10 @@ export default function CardTable({ table }) {
         <Stack ml={2}>
           <Typography
             sx={{
+              color: isSelected ? "#f0eeee" : "#0F172A",
               fontWeight: 500,
-              color: "#0F172A",
               fontSize: "14px",
+              transition: "all 0.15s",
             }}
           >
             {table.name}
@@ -54,7 +59,7 @@ export default function CardTable({ table }) {
           <Typography
             sx={{
               fontWeight: 400,
-              color: "#64748B",
+              color: isSelected ? "#f0eeee" : "#64748B",
               fontSize: "12px",
             }}
           >
