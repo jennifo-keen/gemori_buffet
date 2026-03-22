@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import logo from "../../../../assets/img/Logo 1.png"
+import logo from "../../../../assets/img/Logo 1.png";
 import {
+  Alert,
   Box,
   Button,
   FormControl,
@@ -16,13 +17,67 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const MainLogin = () => {
+  const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleTogglePassword = () => {
     setShowPassword((prev) => !prev);
+  };
+
+  const handleLogin = async () => {
+    try {
+      setError("");
+
+      if (!email.trim() || !password.trim()) {
+        setError("Vui lòng nhập đầy đủ email và mật khẩu");
+        return;
+      }
+
+      setLoading(true);
+
+      const res = await fetch("http://localhost:3000/api/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          password: password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Đăng nhập thất bại");
+        return;
+      }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      navigate("/");
+    } catch (err) {
+      setError("Không thể kết nối đến máy chủ");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleLogin();
+    }
   };
 
   return (
@@ -48,24 +103,22 @@ export const MainLogin = () => {
           maxWidth: "480px",
         }}
       >
-        {/* Header section: logo, title, subtitle */}
         <Stack spacing={2.5} alignItems="center">
-          {/* Logo */}
           <Box display="flex" justifyContent="center">
-              <Box
-                component="img"
-                src={logo}
-                alt="Logo"
-                sx={{ 
-                  width: 130, 
-                  height: "49.01px", 
-                  objectFit: "contain",
-                  filter: "brightness(0) saturate(100%) invert(32%) sepia(35%) saturate(720%) hue-rotate(335deg)",
-                }}
-              />
+            <Box
+              component="img"
+              src={logo}
+              alt="Logo"
+              sx={{
+                width: 130,
+                height: "49.01px",
+                objectFit: "contain",
+                filter:
+                  "brightness(0) saturate(100%) invert(32%) sepia(35%) saturate(720%) hue-rotate(335deg)",
+              }}
+            />
           </Box>
 
-          {/* Title */}
           <Typography
             variant="h4"
             sx={{
@@ -81,7 +134,6 @@ export const MainLogin = () => {
             Chào mừng trở lại
           </Typography>
 
-          {/* Subtitle */}
           <Typography
             sx={{
               fontFamily: '"Be Vietnam Pro", Helvetica, sans-serif',
@@ -100,9 +152,9 @@ export const MainLogin = () => {
           </Typography>
         </Stack>
 
-        {/* Form fields */}
         <Stack spacing={2.5}>
-          {/* Phone number field */}
+          {error && <Alert severity="error">{error}</Alert>}
+
           <FormControl fullWidth>
             <FormLabel
               sx={{
@@ -115,10 +167,13 @@ export const MainLogin = () => {
                 "&.Mui-focused": { color: "rgba(51, 65, 85, 1)" },
               }}
             >
-              Số điện thoại
+              Email
             </FormLabel>
             <OutlinedInput
-              placeholder="Nguyễn Văn A"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Nhập email của bạn"
               startAdornment={
                 <InputAdornment position="start">
                   <PersonOutlineIcon
@@ -135,7 +190,7 @@ export const MainLogin = () => {
                 fontSize: "16px",
                 fontWeight: 500,
                 lineHeight: "24px",
-                color: "rgba(148, 163, 184, 1)",
+                color: "rgba(15, 23, 42, 1)",
                 borderRadius: "8px",
                 backgroundColor: "#ffffff",
                 "& .MuiOutlinedInput-notchedOutline": {
@@ -163,15 +218,13 @@ export const MainLogin = () => {
                   fontFamily: '"Be Vietnam Pro", Helvetica, sans-serif',
                   fontSize: "16px",
                   fontWeight: 500,
-                  color: "rgba(148, 163, 184, 1)",
+                  color: "rgba(15, 23, 42, 1)",
                 },
               }}
             />
           </FormControl>
 
-          {/* Password field */}
           <FormControl fullWidth>
-            {/* Label row with "Quên mật khẩu?" */}
             <Stack
               direction="row"
               justifyContent="space-between"
@@ -205,9 +258,13 @@ export const MainLogin = () => {
                 Quên mật khẩu?
               </Link>
             </Stack>
+
             <OutlinedInput
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={handleKeyDown}
               type={showPassword ? "text" : "password"}
-              placeholder="Nguyễn Văn A"
+              placeholder="Nhập mật khẩu"
               startAdornment={
                 <InputAdornment position="start">
                   <LockOutlinedIcon
@@ -242,7 +299,7 @@ export const MainLogin = () => {
                 fontSize: "16px",
                 fontWeight: 500,
                 lineHeight: "24px",
-                color: "rgba(148, 163, 184, 1)",
+                color: "rgba(15, 23, 42, 1)",
                 borderRadius: "8px",
                 backgroundColor: "#ffffff",
                 "& .MuiOutlinedInput-notchedOutline": {
@@ -270,17 +327,18 @@ export const MainLogin = () => {
                   fontFamily: '"Be Vietnam Pro", Helvetica, sans-serif',
                   fontSize: "16px",
                   fontWeight: 500,
-                  color: "rgba(148, 163, 184, 1)",
+                  color: "rgba(15, 23, 42, 1)",
                 },
               }}
             />
           </FormControl>
 
-          {/* Login button */}
           <Button
             variant="contained"
             fullWidth
             disableElevation
+            onClick={handleLogin}
+            disabled={loading}
             sx={{
               backgroundColor: "rgba(180, 70, 60, 1)",
               color: "#ffffff",
@@ -295,13 +353,16 @@ export const MainLogin = () => {
               "&:hover": {
                 backgroundColor: "rgba(160, 50, 40, 1)",
               },
+              "&.Mui-disabled": {
+                backgroundColor: "rgba(180, 70, 60, 0.6)",
+                color: "#ffffff",
+              },
             }}
           >
-            Đăng nhập ngay
+            {loading ? "Đang đăng nhập..." : "Đăng nhập ngay"}
           </Button>
         </Stack>
 
-        {/* Footer: register link */}
         <Box sx={{ borderTop: "1px solid rgba(245, 245, 245, 1)", pt: 3 }}>
           <Stack
             direction="row"

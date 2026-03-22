@@ -1,4 +1,4 @@
-const { pool } = require('../../lib/db');
+const { pool } = require('../../config/db');
 
 // Xem chi tiết 1 order — Web 3
 const getOrderById = async (orderId) => {

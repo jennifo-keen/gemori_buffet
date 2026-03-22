@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
-const { initSocket } = require('./lib/socket');
+const { initSocket } = require('./config/socket');
 const { errorMiddleware } = require('./middlewares/error.middleware');
 const routes = require('./routes');
 

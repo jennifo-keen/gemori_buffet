@@ -1,4 +1,4 @@
-const { pool } = require('../../lib/db');
+const { pool } = require('../../config/db');
 
 // Kiểm tra voucher hợp lệ khi thanh toán — Web 3
 const validateVoucher = async (code, baseAmount) => {

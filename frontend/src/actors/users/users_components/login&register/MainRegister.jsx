@@ -1,24 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import PhoneOutlinedIcon from "@mui/icons-material/PhoneOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined"
+import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import {
+  Alert,
   Box,
   Button,
   Checkbox,
   FormControlLabel,
   InputAdornment,
-  Paper,
   Link,
+  Paper,
   Radio,
   RadioGroup,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 
 const genderOptions = [
   { value: "nam", label: "Nam" },
@@ -26,9 +27,23 @@ const genderOptions = [
   { value: "khac", label: "Khác" },
 ];
 
-export const MainRegister = () => {
-  const [gender, setGender] = useState("");
+const MainRegister = () => {
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    full_name: "",
+    email: "",
+    phone: "",
+    birthday: "",
+    gender: "",
+    password: "",
+    confirm_password: "",
+  });
+
   const [agreed, setAgreed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
   const inputSx = {
     "& .MuiOutlinedInput-root": {
@@ -45,7 +60,7 @@ export const MainRegister = () => {
       fontSize: "16px",
       fontWeight: 500,
       lineHeight: "24px",
-      color: "rgba(148, 163, 184, 1)",
+      color: "rgba(15, 23, 42, 1)",
       fontFamily: '"Be Vietnam Pro", Helvetica, sans-serif',
       padding: "14px 0",
     },
@@ -62,6 +77,98 @@ export const MainRegister = () => {
     color: "rgba(51, 65, 85, 1)",
     fontFamily: '"Be Vietnam Pro", Helvetica, sans-serif',
     mb: 0.5,
+  };
+
+  const handleChange = (field) => (event) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: event.target.value,
+    }));
+  };
+
+  const validateForm = () => {
+    if (!formData.email.trim() || !formData.phone.trim() || !formData.password.trim()) {
+      return "Vui lòng nhập email, số điện thoại và mật khẩu";
+    }
+
+    if (formData.password !== formData.confirm_password) {
+      return "Xác nhận mật khẩu không khớp";
+    }
+
+    if (!agreed) {
+      return "Vui lòng đồng ý với điều khoản dịch vụ";
+    }
+
+    return "";
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setErrorMsg("");
+    setSuccessMsg("");
+
+    const validationError = validateForm();
+    if (validationError) {
+      setErrorMsg(validationError);
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const payload = {
+        full_name: formData.full_name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        password: formData.password,
+        confirm_password: formData.confirm_password,
+        birthday: formData.birthday || null,
+        gender: formData.gender || null,
+      };
+
+      const response = await fetch("http://localhost:3000/api/users/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.message || "Đăng ký thất bại");
+      }
+
+      if (data?.token) {
+        localStorage.setItem("token", data.token);
+      }
+
+      if (data?.user) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+      }
+
+      setSuccessMsg(data?.message || "Đăng ký thành công");
+
+      setFormData({
+        full_name: "",
+        email: "",
+        phone: "",
+        birthday: "",
+        gender: "",
+        password: "",
+        confirm_password: "",
+      });
+      setAgreed(false);
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1200);
+    } catch (error) {
+      setErrorMsg(error.message || "Có lỗi xảy ra");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -91,7 +198,6 @@ export const MainRegister = () => {
           backgroundColor: "#fff",
         }}
       >
-        {/* Header */}
         <Box pb={4}>
           <Stack spacing={1}>
             <Typography
@@ -120,16 +226,19 @@ export const MainRegister = () => {
           </Stack>
         </Box>
 
-        {/* Form Fields */}
-        <Box pb={2}>
+        <Box component="form" onSubmit={handleSubmit} pb={2}>
           <Stack spacing={2.5}>
-            {/* Full Name */}
+            {errorMsg && <Alert severity="error">{errorMsg}</Alert>}
+            {successMsg && <Alert severity="success">{successMsg}</Alert>}
+
             <Box>
               <Typography sx={labelSx}>Họ và tên</Typography>
               <TextField
                 fullWidth
                 placeholder="Nguyễn Văn A"
                 variant="outlined"
+                value={formData.full_name}
+                onChange={handleChange("full_name")}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -142,14 +251,16 @@ export const MainRegister = () => {
                 sx={inputSx}
               />
             </Box>
-            {/* Email & Phone */}
-            <Stack direction="row" spacing={2.5}>
+
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2.5}>
               <Box flex={1}>
                 <Typography sx={labelSx}>Email</Typography>
                 <TextField
                   fullWidth
                   placeholder="example@gmail.com"
                   variant="outlined"
+                  value={formData.email}
+                  onChange={handleChange("email")}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -162,12 +273,15 @@ export const MainRegister = () => {
                   sx={inputSx}
                 />
               </Box>
+
               <Box flex={1}>
                 <Typography sx={labelSx}>Số điện thoại</Typography>
                 <TextField
                   fullWidth
                   placeholder="09xx xxx xxx"
                   variant="outlined"
+                  value={formData.phone}
+                  onChange={handleChange("phone")}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -182,14 +296,15 @@ export const MainRegister = () => {
               </Box>
             </Stack>
 
-            {/* Date of Birth & Gender */}
-            <Stack direction="row" spacing={2.5} alignItems="flex-start">
-              <Box flex={1}>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2.5} alignItems="flex-start">
+              <Box flex={1} width="100%">
                 <Typography sx={labelSx}>Ngày tháng năm sinh</Typography>
                 <TextField
                   fullWidth
-                  placeholder="mm/dd/yyyy"
+                  type="date"
                   variant="outlined"
+                  value={formData.birthday}
+                  onChange={handleChange("birthday")}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -199,21 +314,16 @@ export const MainRegister = () => {
                       </InputAdornment>
                     ),
                   }}
-                  sx={{
-                    ...inputSx,
-                    "& .MuiInputBase-input": {
-                      ...inputSx["& .MuiInputBase-input"],
-                      color: "rgba(15, 23, 42, 1)",
-                    },
-                  }}
+                  sx={inputSx}
                 />
               </Box>
-              <Box flex={1}>
+
+              <Box flex={1} width="100%">
                 <Typography sx={labelSx}>Giới tính</Typography>
                 <RadioGroup
                   row
-                  value={gender}
-                  onChange={(e) => setGender(e.target.value)}
+                  value={formData.gender}
+                  onChange={handleChange("gender")}
                   sx={{ pt: 1.5, gap: 1 }}
                 >
                   {genderOptions.map((option) => (
@@ -239,8 +349,7 @@ export const MainRegister = () => {
                             fontWeight: 500,
                             lineHeight: "24px",
                             color: "rgba(51, 65, 85, 1)",
-                            fontFamily:
-                              '"Be Vietnam Pro", Helvetica, sans-serif',
+                            fontFamily: '"Be Vietnam Pro", Helvetica, sans-serif',
                           }}
                         >
                           {option.label}
@@ -253,8 +362,7 @@ export const MainRegister = () => {
               </Box>
             </Stack>
 
-            {/* Password & Confirm Password */}
-            <Stack direction="row" spacing={2.5}>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2.5}>
               <Box flex={1}>
                 <Typography sx={labelSx}>Mật khẩu</Typography>
                 <TextField
@@ -262,6 +370,8 @@ export const MainRegister = () => {
                   type="password"
                   placeholder="••••••••"
                   variant="outlined"
+                  value={formData.password}
+                  onChange={handleChange("password")}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -274,6 +384,7 @@ export const MainRegister = () => {
                   sx={inputSx}
                 />
               </Box>
+
               <Box flex={1}>
                 <Typography sx={labelSx}>Xác nhận mật khẩu</Typography>
                 <TextField
@@ -281,6 +392,8 @@ export const MainRegister = () => {
                   type="password"
                   placeholder="••••••••"
                   variant="outlined"
+                  value={formData.confirm_password}
+                  onChange={handleChange("confirm_password")}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -295,7 +408,6 @@ export const MainRegister = () => {
               </Box>
             </Stack>
 
-            {/* Terms & Conditions Checkbox */}
             <Stack
               direction="row"
               alignItems="flex-start"
@@ -350,16 +462,15 @@ export const MainRegister = () => {
                 >
                   Chính sách bảo mật
                 </Box>{" "}
-                của
-                <br />
-                Gemori.
+                của Gemori.
               </Typography>
             </Stack>
 
-            {/* Submit Button */}
             <Button
               fullWidth
+              type="submit"
               variant="contained"
+              disabled={loading}
               sx={{
                 backgroundColor: "#b4463c",
                 borderRadius: "12px",
@@ -375,14 +486,17 @@ export const MainRegister = () => {
                 "&:hover": {
                   backgroundColor: "#a03d34",
                 },
+                "&.Mui-disabled": {
+                  backgroundColor: "#d6a29d",
+                  color: "#fff",
+                },
               }}
             >
-              Tạo tài khoản ngay
+              {loading ? "Đang đăng ký..." : "Tạo tài khoản ngay"}
             </Button>
           </Stack>
         </Box>
 
-        {/* Login Link */}
         <Box pt={4}>
           <Typography
             align="center"
@@ -396,16 +510,17 @@ export const MainRegister = () => {
           >
             Bạn đã có tài khoản?{" "}
             <Link
-              href="/login"
+              component={RouterLink}
+              to="/login"
               underline="none"
               sx={{
-              fontFamily: '"Be Vietnam Pro", Helvetica, sans-serif',
-              fontSize: "14px",
-              fontWeight: 700,
-              lineHeight: "16px",
-              color: "rgba(180, 70, 60, 1)",
-              whiteSpace: "nowrap",
-              cursor: "pointer",
+                fontFamily: '"Be Vietnam Pro", Helvetica, sans-serif',
+                fontSize: "14px",
+                fontWeight: 700,
+                lineHeight: "16px",
+                color: "rgba(180, 70, 60, 1)",
+                whiteSpace: "nowrap",
+                cursor: "pointer",
               }}
             >
               Đăng nhập

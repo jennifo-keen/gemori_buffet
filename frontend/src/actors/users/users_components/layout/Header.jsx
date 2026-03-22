@@ -26,18 +26,40 @@ export const Header = () => {
   const location = useLocation();
 
   const [isLogin, setIsLogin] = useState(false);
+  const [userName, setUserName] = useState("");
 
-  // check login khi load
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const userData = localStorage.getItem("user");
+
     setIsLogin(!!token);
+
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+
+        // đổi các field này theo đúng backend của bạn
+        const name =
+          user?.full_name ||
+          user?.name ||
+          user?.username ||
+          user?.customer_name ||
+          "Người dùng";
+
+        setUserName(name);
+      } catch (error) {
+        console.error("Lỗi đọc user từ localStorage:", error);
+        setUserName("Người dùng");
+      }
+    }
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
-    setIsLogin(false); // 👉 chỉ update UI, không navigate
+    setIsLogin(false);
+    setUserName("");
+    navigate("/");
   };
 
   return (
@@ -62,14 +84,14 @@ export const Header = () => {
             minHeight: "unset",
           }}
         >
-          {/* Logo */}
           <Box
             component="img"
             src={logo}
             alt="Logo"
             onClick={() => navigate("/")}
             sx={{
-              filter: "brightness(0) saturate(100%) invert(32%) sepia(35%) saturate(720%) hue-rotate(335deg)",
+              filter:
+                "brightness(0) saturate(100%) invert(32%) sepia(35%) saturate(720%) hue-rotate(335deg)",
               width: 130,
               height: "49.01px",
               objectFit: "contain",
@@ -77,7 +99,6 @@ export const Header = () => {
             }}
           />
 
-          {/* Menu */}
           <Stack direction="row" spacing={7.5} alignItems="center">
             {menu.map((item) => {
               const isActive = location.pathname === item.path;
@@ -103,16 +124,16 @@ export const Header = () => {
             })}
           </Stack>
 
-          {/* Right Section */}
           {isLogin ? (
-            // 👉 ĐÃ LOGIN
             <Stack direction="row" alignItems="center" spacing={2}>
               <Stack direction="row" alignItems="center" spacing={1.5}>
                 <Avatar sx={{ width: 40, height: 40 }} />
 
                 <Stack>
-                  <Typography fontSize={14} fontWeight={700}>
-                    Hữu Kiên
+                  <Typography fontSize={15} fontWeight={700} 
+                  sx={{color:"#000000"}}
+                  >
+                    {userName}
                   </Typography>
 
                   <Typography
@@ -133,7 +154,6 @@ export const Header = () => {
               </IconButton>
             </Stack>
           ) : (
-            // 👉 CHƯA LOGIN → NÚT ĐĂNG NHẬP
             <Button
               onClick={() => navigate("/login")}
               startIcon={<PersonIcon />}

@@ -1,5 +1,5 @@
-const { pool } = require('../../lib/db');
-const { getIO } = require('../../lib/socket');
+const { pool } = require('../../config/db');
+const { getIO } = require('../../config/socket');
 
 // Lấy tất cả bàn
 const getAllTables = async () => {

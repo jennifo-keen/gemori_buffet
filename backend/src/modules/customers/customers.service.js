@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const { pool } = require('../../lib/db');
+const { pool } = require('../../config/db');
 
 const getAllCustomers = async () => {
   const result = await pool.query(

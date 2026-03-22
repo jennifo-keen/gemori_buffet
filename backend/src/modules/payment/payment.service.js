@@ -1,4 +1,4 @@
-const { pool } = require('../../lib/db');
+const { pool } = require('../../config/db');
 const { validateVoucher, useVoucher } = require('../vouchers/vouchers.service');
 
 const processPayment = async ({ orderId, paymentMethod, phone, voucherCode }) => {

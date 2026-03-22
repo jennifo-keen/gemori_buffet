@@ -1,5 +1,5 @@
-const { pool } = require('../../lib/db');
-const { getIO } = require('../../lib/socket');
+const { pool } = require('../../config/db');
+const { getIO } = require('../../config/socket');
 
 // Lấy tất cả món đang pending/cooking — Web 3 (Staff theo dõi)
 const getPendingItems = async () => {
