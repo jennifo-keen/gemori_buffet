@@ -1,4 +1,4 @@
-const { pool } = require('../../lib/db');
+const { pool } = require('../../config/db');
 
 const getBuffetTickets = async () => {
   const result = await pool.query(

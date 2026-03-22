@@ -1,39 +1,133 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Box, IconButton, Stack, Typography } from "@mui/material";
-import { useState } from "react";
+import {
+  Box,
+  CircularProgress,
+  IconButton,
+  Stack,
+  Typography,
+} from "@mui/material";
+import axios from "axios";
 
-// Sidebar menu data
-const menu = [
-  {
-    id: "buffet",
-    label: "Buffet",
-    items: [
-      { id: "khoi-dau", label: "Buffet Khởi Đầu", active: true },
-      { id: "dai-du-hoa", label: "Buffet Đài Dư Hoa", active: false },
-      { id: "dai-nguu-tran", label: "Buffet Đài Ngưu Trân", active: false },
-      { id: "phong-van", label: "Buffet Phong Vân", active: false },
-    ],
-  },
-  {
-    id: "mon-don",
-    label: "Món đơn",
-    items: [],
-  },
-];
+const API_BASE_URL = "http://localhost:3000/api/menu";
+const FALLBACK_IMAGE =
+  "https://res.cloudinary.com/dbifhgaic/image/upload/v1771769449/ChatGPT_Image_21_10_29_22_thg_2_2026_yfyu9j.png";
+
+const formatPrice = (price) => {
+  if (price === null || price === undefined) return "0 đ";
+  return `${Number(price).toLocaleString("vi-VN")} đ`;
+};
 
 export const Main = () => {
   const [expandedSections, setExpandedSections] = useState({
     buffet: true,
     "mon-don": false,
   });
-  const [activeItem, setActiveItem] = useState("khoi-dau");
+
+  const [buffetList, setBuffetList] = useState([]);
+  const [activeItem, setActiveItem] = useState("");
+  const [buffetDetail, setBuffetDetail] = useState(null);
+
+  const [loadingList, setLoadingList] = useState(true);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+  const [error, setError] = useState("");
 
   const toggleSection = (sectionId) => {
-    setExpandedSections((prev) => ({ ...prev, [sectionId]: !prev[sectionId] }));
+    setExpandedSections((prev) => ({
+      ...prev,
+      [sectionId]: !prev[sectionId],
+    }));
+  };
+
+  const menu = useMemo(() => {
+    return [
+      {
+        id: "buffet",
+        label: "Buffet",
+        items: buffetList.map((item) => ({
+          id: item.code,
+          label: item.name,
+        })),
+      },
+      {
+        id: "mon-don",
+        label: "Món đơn",
+        items: [],
+      },
+    ];
+  }, [buffetList]);
+
+  useEffect(() => {
+    const fetchBuffetList = async () => {
+      try {
+        setLoadingList(true);
+        setError("");
+
+        const response = await axios.get(
+          `${API_BASE_URL}/buffet-tickets`
+        );
+
+        const list = response?.data?.data || [];
+        setBuffetList(list);
+
+        if (list.length > 0) {
+          setActiveItem(list[0].code);
+        }
+      } catch (err) {
+        console.error("Lỗi lấy danh sách buffet:", err);
+        setError("Không thể tải danh sách buffet");
+      } finally {
+        setLoadingList(false);
+      }
+    };
+
+    fetchBuffetList();
+  }, []);
+
+  useEffect(() => {
+    if (!activeItem) return;
+
+    const fetchBuffetDetail = async () => {
+      try {
+        setLoadingDetail(true);
+
+        const response = await axios.get(
+          `${API_BASE_URL}/buffet-tickets/${activeItem}`
+        );
+
+        setBuffetDetail(response?.data?.data || null);
+      } catch (err) {
+        console.error("Lỗi lấy chi tiết buffet:", err);
+        setBuffetDetail(null);
+      } finally {
+        setLoadingDetail(false);
+      }
+    };
+
+    fetchBuffetDetail();
+  }, [activeItem]);
+
+  const currentIndex = buffetList.findIndex((item) => item.code === activeItem);
+
+  const handlePrev = () => {
+    if (buffetList.length === 0) return;
+
+    const prevIndex =
+      currentIndex <= 0 ? buffetList.length - 1 : currentIndex - 1;
+
+    setActiveItem(buffetList[prevIndex].code);
+  };
+
+  const handleNext = () => {
+    if (buffetList.length === 0) return;
+
+    const nextIndex =
+      currentIndex >= buffetList.length - 1 ? 0 : currentIndex + 1;
+
+    setActiveItem(buffetList[nextIndex].code);
   };
 
   return (
@@ -93,6 +187,7 @@ export const Main = () => {
                     {section.label}
                   </Typography>
                 </Box>
+
                 <ExpandMoreIcon
                   sx={{
                     width: 16,
@@ -107,50 +202,93 @@ export const Main = () => {
               </Stack>
 
               {/* Section Items */}
-              {expandedSections[section.id] && section.items.length > 0 && (
+              {expandedSections[section.id] && (
                 <Stack spacing={2} sx={{ pl: 2, pr: 0, py: 1 }}>
-                  {section.items.map((item, index) => (
+                  {loadingList && section.id === "buffet" ? (
                     <Stack
-                      key={item.id}
                       direction="row"
                       alignItems="center"
-                      justifyContent="space-between"
-                      onClick={() => setActiveItem(item.id)}
-                      sx={{
-                        cursor: "pointer",
-                        pb: index === section.items.length - 1 ? 1 : 0,
-                      }}
+                      spacing={1}
+                      sx={{ py: 1 }}
                     >
+                      <CircularProgress size={16} />
                       <Typography
                         sx={{
                           fontFamily: '"Be Vietnam Pro", Helvetica',
-                          fontSize: "16px",
-                          fontWeight: 500,
-                          lineHeight: "24px",
-                          letterSpacing: "0px",
-                          color: activeItem === item.id ? "#f97316" : "#4b5563",
-                          whiteSpace: "nowrap",
+                          fontSize: "14px",
+                          color: "#64748b",
                         }}
                       >
-                        {item.label}
+                        Đang tải...
                       </Typography>
-                      {activeItem === item.id ? (
-                        /* Active item shows a dash/minus indicator */
-                        <Box
-                          sx={{
-                            width: 16,
-                            height: 2,
-                            bgcolor: "#f97316",
-                            flexShrink: 0,
-                          }}
-                        />
-                      ) : (
-                        <AddIcon
-                          sx={{ width: 16, height: 16, color: "#4b5563" }}
-                        />
-                      )}
                     </Stack>
-                  ))}
+                  ) : error && section.id === "buffet" ? (
+                    <Typography
+                      sx={{
+                        fontFamily: '"Be Vietnam Pro", Helvetica',
+                        fontSize: "14px",
+                        color: "error.main",
+                        py: 1,
+                      }}
+                    >
+                      {error}
+                    </Typography>
+                  ) : section.items.length > 0 ? (
+                    section.items.map((item, index) => (
+                      <Stack
+                        key={item.id}
+                        direction="row"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        onClick={() => setActiveItem(item.id)}
+                        sx={{
+                          cursor: "pointer",
+                          pb: index === section.items.length - 1 ? 1 : 0,
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontFamily: '"Be Vietnam Pro", Helvetica',
+                            fontSize: "16px",
+                            fontWeight: 500,
+                            lineHeight: "24px",
+                            letterSpacing: "0px",
+                            color:
+                              activeItem === item.id ? "#f97316" : "#4b5563",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {item.label}
+                        </Typography>
+
+                        {activeItem === item.id ? (
+                          <Box
+                            sx={{
+                              width: 16,
+                              height: 2,
+                              bgcolor: "#f97316",
+                              flexShrink: 0,
+                            }}
+                          />
+                        ) : (
+                          <AddIcon
+                            sx={{ width: 16, height: 16, color: "#4b5563" }}
+                          />
+                        )}
+                      </Stack>
+                    ))
+                  ) : (
+                    <Typography
+                      sx={{
+                        fontFamily: '"Be Vietnam Pro", Helvetica',
+                        fontSize: "14px",
+                        color: "#94a3b8",
+                        py: 1,
+                      }}
+                    >
+                      Chưa có dữ liệu
+                    </Typography>
+                  )}
                 </Stack>
               )}
             </Box>
@@ -171,14 +309,18 @@ export const Main = () => {
               borderRadius: "16px",
               boxShadow: "0px 1px 2px #0000000d",
               aspectRatio: "0.75",
-                backgroundImage: "url(https://res.cloudinary.com/dbifhgaic/image/upload/v1771769449/ChatGPT_Image_21_10_29_22_thg_2_2026_yfyu9j.png)",              backgroundSize: "cover",
+              backgroundImage: `url(${
+                buffetDetail?.image_url || FALLBACK_IMAGE
+              })`,
+              backgroundSize: "cover",
               backgroundPosition: "50% 50%",
               width: "100%",
+              backgroundColor: "#f8fafc",
             }}
           />
 
-          {/* Left Arrow */}
           <IconButton
+            onClick={handlePrev}
             sx={{
               position: "absolute",
               left: 8,
@@ -193,8 +335,8 @@ export const Main = () => {
             <ChevronLeftIcon sx={{ width: 24, height: 24 }} />
           </IconButton>
 
-          {/* Right Arrow */}
           <IconButton
+            onClick={handleNext}
             sx={{
               position: "absolute",
               right: 8,
@@ -220,66 +362,98 @@ export const Main = () => {
               pb: 1,
             }}
           >
-            {/* Product Title */}
-            <Typography
-              sx={{
-                fontFamily: '"Be Vietnam Pro", Helvetica',
-                fontSize: "32px",
-                fontWeight: 700,
-                lineHeight: "40px",
-                letterSpacing: "0px",
-                color: "#1f2937",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Buffet Vạn Giai Kỳ
-            </Typography>
+            {loadingDetail ? (
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <CircularProgress size={20} />
+                <Typography
+                  sx={{
+                    fontFamily: '"Be Vietnam Pro", Helvetica',
+                    fontSize: "14px",
+                    color: "#64748b",
+                  }}
+                >
+                  Đang tải chi tiết...
+                </Typography>
+              </Stack>
+            ) : (
+              <>
+                {/* Product Title */}
+                <Typography
+                  sx={{
+                    fontFamily: '"Be Vietnam Pro", Helvetica',
+                    fontSize: "32px",
+                    fontWeight: 700,
+                    lineHeight: "40px",
+                    letterSpacing: "0px",
+                    color: "#1f2937",
+                  }}
+                >
+                  {buffetDetail?.name || "Chưa có dữ liệu"}
+                </Typography>
 
-            {/* Price Row */}
-            <Stack direction="row" alignItems="baseline" spacing={0.5}>
-              <Typography
-                sx={{
-                  fontFamily: '"Be Vietnam Pro", Helvetica',
-                  fontSize: "24px",
-                  fontWeight: 700,
-                  lineHeight: "32px",
-                  letterSpacing: "0px",
-                  color: "#1f2937",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                269.000 đ
-              </Typography>
-              <Typography
-                sx={{
-                  fontFamily: '"Be Vietnam Pro", Helvetica',
-                  fontSize: "16px",
-                  fontWeight: 500,
-                  lineHeight: "24px",
-                  letterSpacing: "0px",
-                  color: "#6b7280",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                /người
-              </Typography>
-            </Stack>
+                {/* Price Row */}
+                <Stack direction="row" alignItems="baseline" spacing={0.5}>
+                  <Typography
+                    sx={{
+                      fontFamily: '"Be Vietnam Pro", Helvetica',
+                      fontSize: "24px",
+                      fontWeight: 700,
+                      lineHeight: "32px",
+                      letterSpacing: "0px",
+                      color: "#1f2937",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {formatPrice(buffetDetail?.price)}
+                  </Typography>
 
-            {/* VAT Note */}
-            <Typography
-              component="p"
-              sx={{
-                fontFamily: '"Be Vietnam Pro", Helvetica',
-                fontSize: "12px",
-                fontWeight: 400,
-                lineHeight: "20px",
-                letterSpacing: "0px",
-                color: "#9ca3af",
-                whiteSpace: "nowrap",
-              }}
-            >
-              (Giá chưa bao gồm VAT)
-            </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: '"Be Vietnam Pro", Helvetica',
+                      fontSize: "16px",
+                      fontWeight: 500,
+                      lineHeight: "24px",
+                      letterSpacing: "0px",
+                      color: "#6b7280",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    /người
+                  </Typography>
+                </Stack>
+
+                {/* VAT Note */}
+                <Typography
+                  component="p"
+                  sx={{
+                    fontFamily: '"Be Vietnam Pro", Helvetica',
+                    fontSize: "12px",
+                    fontWeight: 400,
+                    lineHeight: "20px",
+                    letterSpacing: "0px",
+                    color: "#9ca3af",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  (Giá chưa bao gồm VAT)
+                </Typography>
+
+                {/* Description */}
+                <Typography
+                  sx={{
+                    mt: 2,
+                    fontFamily: '"Be Vietnam Pro", Helvetica',
+                    fontSize: "16px",
+                    fontWeight: 400,
+                    lineHeight: "28px",
+                    color: "#4b5563",
+                    whiteSpace: "pre-line",
+                  }}
+                >
+                  {buffetDetail?.description || "Chưa có mô tả"}
+                </Typography>
+              </>
+            )}
           </Box>
         </Box>
       </Stack>
