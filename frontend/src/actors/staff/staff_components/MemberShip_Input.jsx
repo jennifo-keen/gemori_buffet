@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import PersonAdd from "../../../assets/icon/UserCirclePlus.svg?react";
+import PersonAdd from "../../../assets/icon/UserCirclePlus.svg";
 import { getCustomerByPhone } from '../../../api/paymentApi';
 import MemberShipPopUp_In from '../staff_components/MemberShipPopUp_In';
 import MemberShip_Inf from '../staff_components/MemberShip_Inf'
@@ -34,7 +34,7 @@ const MemberShip_Input = ({ onCustomerFound }) => {
       const res = await getCustomerByPhone(phone);
       setCustomer(res.data);
       onCustomerFound?.(res.data);
-    } catch (err) {
+    } catch {
       setError('Không tìm thấy hội viên');
       setCustomer(null);
       onCustomerFound?.(null);

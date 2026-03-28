@@ -8,11 +8,12 @@ const initSocket = (httpServer) => {
   });
 
   io.on('connection', (socket) => {
-    console.log('🔌 Client kết nối:', socket.id);
+    console.log(' Client kết nối:', socket.id);
 
     // Khách QR join room theo bàn
     socket.on('join_table', (tableId) => {
       socket.join(`table_${tableId}`);
+      console.log(`Khách join bàn: ${tableId}`);
     });
 
     // Bếp join room riêng
@@ -26,7 +27,7 @@ const initSocket = (httpServer) => {
     });
 
     socket.on('disconnect', () => {
-      console.log('🔌 Client ngắt kết nối:', socket.id);
+      console.log(' Client ngắt kết nối:', socket.id);
     });
   });
 

@@ -44,7 +44,7 @@ const StaffCheckOut = () => {
         setLoading(true);
         const res = await getTableOrder(tableId);
         setOrder(res.data);
-      } catch (err) {
+      } catch  {
         setError('Không thể tải đơn hàng');
       } finally {
         setLoading(false);
