@@ -10,4 +10,6 @@ router.use('/menu', require('../actors/user/menu/menu.route'));
 router.use('/profile', require('../actors/user/profile/profile.route'));
 router.use('/order', require('../actors/order/routes/order.routes'));
 router.use('/vouchers', require('../actors/user/discount/voucher.routes'));
+router.use('/history', require('../actors/user/history/history.route'));
+router.use('/password', require('../actors/user/password/changePassword.route'));
 module.exports = router;
