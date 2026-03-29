@@ -9,4 +9,5 @@ router.use('/home', require('../actors/user/home/home.router'));
 router.use('/menu', require('../actors/user/menu/menu.route'));
 router.use('/profile', require('../actors/user/profile/profile.route'));
 router.use('/order', require('../actors/order/routes/order.routes'));
+router.use('/vouchers', require('../actors/user/discount/voucher.routes'));
 module.exports = router;

@@ -1,421 +1,418 @@
-import React from "react";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import ConfirmationNumberOutlinedIcon from "@mui/icons-material/ConfirmationNumberOutlined";
-import HistoryIcon from "@mui/icons-material/History";
+import React, { useEffect, useMemo, useState } from "react";
+import axios from "axios";
 import {
   Box,
-  Button,
-  Paper,
-  Stack,
-  Tab,
-  Tabs,
   Typography,
+  Stack,
+  Button,
+  TextField,
+  InputAdornment,
+  CircularProgress,
 } from "@mui/material";
-import { useState } from "react";
-
-const voucherData = [
-  {
-    id: 1,
-    discount: "GIẢM 15%",
-    badge: "Member Only",
-    code: "CODE 123",
-    title: "Giảm 15% tổng hóa đơn (Tối đa 200k)",
-    expiry: "20/12/2023",
-  },
-  {
-    id: 2,
-    discount: "GIẢM 15%",
-    badge: "Member Only",
-    code: "CODE 123",
-    title: "Giảm 15% tổng hóa đơn (Tối đa 200k)",
-    expiry: "20/12/2023",
-  },
-  {
-    id: 3,
-    discount: "GIẢM 15%",
-    badge: "Member Only",
-    code: "CODE 123",
-    title: "Giảm 15% tổng hóa đơn (Tối đa 200k)",
-    expiry: "20/12/2023",
-  },
-  {
-    id: 4,
-    discount: "GIẢM 15%",
-    badge: "Member Only",
-    code: "CODE 123",
-    title: "Giảm 15% tổng hóa đơn (Tối đa 200k)",
-    expiry: "20/12/2023",
-  },
-];
-
-const VoucherCard = ({ voucher }) => {
-  return (
-    <Paper
-      elevation={0}
-      sx={{
-        display: "flex",
-        flex: 1,
-        borderRadius: "12px",
-        overflow: "hidden",
-        boxShadow:
-          "0px 2px 4px -2px rgba(0,0,0,0.1), 0px 4px 6px -1px rgba(0,0,0,0.1)",
-        bgcolor: "background.paper",
-      }}
-    >
-      {/* Left green panel */}
-      <Box
-        sx={{
-          width: 128,
-          flexShrink: 0,
-          bgcolor: "success.main",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          p: 2,
-          position: "relative",
-        }}
-      >
-        {/* Left notch */}
-        <Box
-          sx={{
-            position: "absolute",
-            top: "calc(50% - 8px)",
-            left: -8,
-            width: 16,
-            height: 16,
-            bgcolor: "#f5f5f5",
-            borderRadius: "50%",
-          }}
-        />
-        <ConfirmationNumberOutlinedIcon
-          sx={{ color: "white", width: 32, height: 32 }}
-        />
-        <Typography
-          variant="labelLabel3Bold"
-          sx={{
-            color: "white",
-            mt: 1,
-            textAlign: "center",
-            fontSize: "12px",
-            fontWeight: 700,
-            lineHeight: "20px",
-          }}
-        >
-          {voucher.discount}
-        </Typography>
-        {/* Right notch */}
-        <Box
-          sx={{
-            position: "absolute",
-            top: "calc(50% - 8px)",
-            right: -8,
-            width: 16,
-            height: 16,
-            bgcolor: "background.paper",
-            borderRadius: "50%",
-            zIndex: 2,
-          }}
-        />
-      </Box>
-
-      {/* Right content panel */}
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          flex: 1,
-          p: 2,
-          gap: 3,
-          justifyContent: "space-between",
-        }}
-      >
-        {/* Top info */}
-        <Stack spacing={0.75}>
-          {/* Badge row */}
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="flex-start"
-          >
-            <Box
-              sx={{
-                bgcolor: "slate.200",
-                borderRadius: "4px",
-                px: 1,
-                py: 0.25,
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: "10px",
-                  fontWeight: 700,
-                  lineHeight: "18px",
-                  color: "#475569",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {voucher.badge}
-              </Typography>
-            </Box>
-            <Typography
-              sx={{
-                fontSize: "10px",
-                fontWeight: 500,
-                lineHeight: "18px",
-                color: "#94a3b8",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Mã: {voucher.code}
-            </Typography>
-          </Stack>
-
-          {/* Title */}
-          <Typography
-            sx={{
-              fontSize: "14px",
-              fontWeight: 700,
-              lineHeight: "16px",
-              color: "text.primary",
-            }}
-          >
-            {voucher.title}
-          </Typography>
-
-          {/* Expiry */}
-          <Stack
-            direction="row"
-            alignItems="center"
-            spacing={0.75}
-            sx={{ py: "1px" }}
-          >
-            <AccessTimeIcon sx={{ fontSize: "11.67px", color: "#64748b" }} />
-            <Typography
-              sx={{
-                fontSize: "9px",
-                fontWeight: 500,
-                lineHeight: "17px",
-                color: "#64748b",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Hết hạn: {voucher.expiry}
-            </Typography>
-          </Stack>
-        </Stack>
-
-        {/* Bottom action row */}
-        <Box
-          sx={{
-            borderTop: "1px solid #f5f5f5",
-            pt: 1.5,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <Button
-            variant="text"
-            disableRipple
-            sx={{
-              p: 0,
-              minWidth: "auto",
-              fontSize: "12px",
-              fontWeight: 600,
-              lineHeight: "20px",
-              color: "#475569",
-              "&:hover": { background: "none" },
-            }}
-          >
-            Điều kiện
-          </Button>
-          <Button
-            variant="contained"
-            disableElevation
-            sx={{
-              bgcolor: "#b4463c",
-              borderRadius: "8px",
-              px: 2,
-              py: 1,
-              fontSize: "12px",
-              fontWeight: 700,
-              lineHeight: "20px",
-              color: "white",
-              boxShadow: "0px 1px 2px rgba(0,0,0,0.05)",
-              "&:hover": { bgcolor: "#9e3b32" },
-              minWidth: "auto",
-            }}
-          >
-            Dùng ngay
-          </Button>
-        </Box>
-      </Box>
-    </Paper>
-  );
-};
+import SearchIcon from "@mui/icons-material/Search";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import HistoryIcon from "@mui/icons-material/History";
+import ConfirmationNumberOutlinedIcon from "@mui/icons-material/ConfirmationNumberOutlined";
 
 export const Voucher = () => {
-  const [activeTab, setActiveTab] = useState(0);
+  const [vouchers, setVouchers] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
+  useEffect(() => {
+    const fetchVouchers = async () => {
+      try {
+        const res = await axios.get("http://localhost:3000/api/vouchers/active");
+        setVouchers(res.data.data || []);
+      } catch (error) {
+        console.error("Lỗi lấy voucher:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVouchers();
+  }, []);
+
+  const filteredVouchers = useMemo(() => {
+    const keyword = search.trim().toLowerCase();
+    if (!keyword) return vouchers;
+
+    return vouchers.filter((voucher) =>
+      String(voucher.code || "").toLowerCase().includes(keyword)
+    );
+  }, [search, vouchers]);
+
+  const formatDiscountTitle = (voucher) => {
+    if (voucher.discount_type === "percent") {
+      return `Giảm ${voucher.discount_value}% tổng hóa đơn`;
+    }
+
+    if (voucher.discount_type === "fixed") {
+      return `Giảm ${Number(voucher.discount_value).toLocaleString("vi-VN")}đ tổng hóa đơn`;
+    }
+
+    return `Giảm ${voucher.discount_value}`;
+  };
+
+  const formatLeftValue = (voucher) => {
+    if (voucher.discount_type === "percent") {
+      return `GIẢM ${voucher.discount_value}%`;
+    }
+
+    return `GIẢM ${voucher.discount_value}`;
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "Không giới hạn";
+    return new Date(dateString).toLocaleDateString("vi-VN");
   };
 
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 4,
-        p: 4,
-        bgcolor: "background.paper",
-        borderRadius: "12px",
-        border: "1px solid rgba(177, 65, 53, 0.1)",
         flex: 1,
-        alignSelf: "stretch",
+        backgroundColor: "#FFFFFF",
+        borderRadius: "0px 0px 0px 20px",
+        p: { xs: 2, md: 3 },
       }}
     >
-      {/* Header row */}
       <Stack
-        direction="row"
+        direction={{ xs: "column", lg: "row" }}
         justifyContent="space-between"
-        alignItems="flex-start"
+        alignItems={{ xs: "flex-start", lg: "center" }}
+        spacing={2}
       >
-        {/* Title + subtitle */}
-        <Stack spacing={0}>
-          <Typography variant="h5" sx={{ color: "#0f172a" }}>
-            Kho voucher
-          </Typography>
+        <Box>
           <Typography
             sx={{
-              fontSize: "14px",
-              fontWeight: 400,
-              lineHeight: "22px",
-              color: "#64748b",
+              fontSize: { xs: "26px", md: "32px" },
+              fontWeight: 700,
+              color: "#18243D",
+              lineHeight: 1.2,
+            }}
+          >
+            Kho voucher
+          </Typography>
+
+          <Typography
+            sx={{
+              mt: 0.5,
+              fontSize: { xs: "14px", md: "16px" },
+              color: "#7A86A1",
+              lineHeight: 1.5,
             }}
           >
             Quản lý thông tin tài khoản và bảo mật của bạn
           </Typography>
-        </Stack>
+        </Box>
 
-        {/* Search bar */}
-        <Stack
-          direction="row"
-          alignItems="center"
+        <Box
           sx={{
-            width: 300,
-            bgcolor: "rgba(177, 65, 53, 0.1)",
+            width: { xs: "100%", lg: "360px" },
+            display: "flex",
+            alignItems: "center",
+            backgroundColor: "#F3E7E5",
             borderRadius: "999px",
-            pl: 3,
-            pr: 0.5,
-            py: 0.5,
+            p: "6px",
           }}
         >
-          <Typography
-            sx={{
-              flex: 1,
-              fontSize: "14px",
-              fontWeight: 400,
-              lineHeight: "22px",
-              color: "#64748b",
-              whiteSpace: "nowrap",
+          <TextField
+            fullWidth
+            variant="standard"
+            placeholder="Tìm kiếm voucher ..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            InputProps={{
+              disableUnderline: true,
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ color: "#7A86A1", fontSize: 20 }} />
+                </InputAdornment>
+              ),
             }}
-          >
-            Tìm kiếm voucher ...
-          </Typography>
-          <Button
-            variant="contained"
             sx={{
-              bgcolor: "#b4463c",
+              px: 1,
+              "& .MuiInputBase-input": {
+                fontSize: "15px",
+                color: "#667085",
+              },
+            }}
+          />
+
+          <Button
+            sx={{
+              minWidth: "62px",
+              height: "38px",
               borderRadius: "999px",
-              px: 2,
-              py: 1,
-              fontSize: "14px",
-              fontWeight: 600,
-              lineHeight: "22px",
-              color: "white",
-              minWidth: "auto",
+              backgroundColor: "#BF4B3D",
+              color: "#FFFFFF",
+              fontWeight: 700,
+              fontSize: "15px",
+              textTransform: "none",
               boxShadow: "none",
-              "&:hover": { bgcolor: "#9e3b32", boxShadow: "none" },
+              "&:hover": {
+                backgroundColor: "#AA4034",
+                boxShadow: "none",
+              },
             }}
           >
             Tìm
           </Button>
+        </Box>
+      </Stack>
+
+      <Stack
+        direction="row"
+        spacing={4}
+        sx={{
+          mt: 4,
+          borderBottom: "1px solid #E9D9D4",
+        }}
+      >
+        <Stack
+          direction="row"
+          spacing={1}
+          alignItems="center"
+          sx={{
+            pb: 1.5,
+            borderBottom: "3px solid #BF4B3D",
+          }}
+        >
+          <CheckCircleOutlineIcon sx={{ color: "#BF4B3D", fontSize: 18 }} />
+          <Typography
+            sx={{
+              color: "#BF4B3D",
+              fontWeight: 700,
+              fontSize: "15px",
+            }}
+          >
+            Đang hiệu lực ({filteredVouchers.length})
+          </Typography>
+        </Stack>
+
+        <Stack direction="row" spacing={1} alignItems="center" sx={{ pb: 1.5 }}>
+          <HistoryIcon sx={{ color: "#7A86A1", fontSize: 18 }} />
+          <Typography
+            sx={{
+              color: "#7A86A1",
+              fontWeight: 600,
+              fontSize: "15px",
+            }}
+          >
+            Đã dùng (12)
+          </Typography>
         </Stack>
       </Stack>
 
-      {/* Tabs */}
-      <Tabs
-        value={activeTab}
-        onChange={handleTabChange}
-        sx={{
-          borderBottom: "1px solid rgba(177, 65, 53, 0.1)",
-          minHeight: "auto",
-          "& .MuiTabs-indicator": {
-            bgcolor: "#b4463c",
-            height: "2px",
-          },
-          "& .MuiTab-root": {
-            minHeight: "auto",
-            px: 3,
-            py: 1.5,
-            textTransform: "none",
-          },
-        }}
-      >
-        <Tab
-          icon={<CheckCircleOutlineIcon sx={{ fontSize: 15 }} />}
-          iconPosition="start"
-          label="Đang hiệu lực (5)"
+      {loading ? (
+        <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Box
           sx={{
-            fontSize: "14px",
-            fontWeight: activeTab === 0 ? 700 : 500,
-            lineHeight: "22px",
-            color: activeTab === 0 ? "#b4463c" : "#64748b",
-            gap: 1,
-            "&.Mui-selected": {
-              color: "#b4463c",
+            mt: 4,
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              xl: "1fr 1fr",
             },
+            gap: 2.5,
           }}
-        />
-        <Tab
-          icon={<HistoryIcon sx={{ fontSize: 13.5 }} />}
-          iconPosition="start"
-          label="Đã dùng (12)"
-          sx={{
-            fontSize: "14px",
-            fontWeight: activeTab === 1 ? 700 : 500,
-            lineHeight: "22px",
-            color: activeTab === 1 ? "#b4463c" : "#64748b",
-            gap: 1,
-            "&.Mui-selected": {
-              color: "#b4463c",
-            },
-          }}
-        />
-      </Tabs>
+        >
+          {filteredVouchers.map((voucher) => (
+            <Box
+              key={voucher.id}
+              sx={{
+                display: "flex",
+                minHeight: "180px",
+                backgroundColor: "#FFFFFF",
+                borderRadius: "16px",
+                overflow: "hidden",
+                boxShadow: "0 4px 14px rgba(16, 24, 40, 0.08)",
+              }}
+            >
+              <Box
+                sx={{
+                  width: "128px",
+                  backgroundColor: "#29C85A",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  position: "relative",
+                  flexShrink: 0,
+                }}
+              >
+                <Box
+                  sx={{
+                    position: "absolute",
+                    left: "-9px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    width: "18px",
+                    height: "18px",
+                    borderRadius: "50%",
+                    backgroundColor: "#fff",
+                  }}
+                />
+                <Box
+                  sx={{
+                    position: "absolute",
+                    right: "-9px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    width: "18px",
+                    height: "18px",
+                    borderRadius: "50%",
+                    backgroundColor: "#fff",
+                  }}
+                />
 
-      {/* Voucher grid */}
-      <Box sx={{ overflowY: "auto" }}>
-        <Stack spacing={1.5}>
-          {/* Row 1 */}
-          <Stack direction="row" spacing={1.5}>
-            {voucherData.slice(0, 2).map((voucher) => (
-              <VoucherCard key={voucher.id} voucher={voucher} />
-            ))}
-          </Stack>
-          {/* Row 2 */}
-          <Stack direction="row" spacing={1.5}>
-            {voucherData.slice(2, 4).map((voucher) => (
-              <VoucherCard key={voucher.id} voucher={voucher} />
-            ))}
-          </Stack>
-        </Stack>
-      </Box>
+                <Stack spacing={1} alignItems="center">
+                  <ConfirmationNumberOutlinedIcon
+                    sx={{ color: "#fff", fontSize: 34 }}
+                  />
+                  <Typography
+                    sx={{
+                      color: "#fff",
+                      fontWeight: 800,
+                      fontSize: "12px",
+                      lineHeight: 1.1,
+                      textAlign: "center",
+                    }}
+                  >
+                    {formatLeftValue(voucher)}
+                  </Typography>
+                </Stack>
+              </Box>
+
+              <Box
+                sx={{
+                  flex: 1,
+                  p: 2.25,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Box>
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="flex-start"
+                    spacing={2}
+                  >
+                    <Box
+                      sx={{
+                        px: 1.5,
+                        py: 0.5,
+                        backgroundColor: "#E4EAF3",
+                        borderRadius: "6px",
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontSize: "12px",
+                          color: "#58657E",
+                          fontWeight: 700,
+                          lineHeight: 1.2,
+                        }}
+                      >
+                        Member Only
+                      </Typography>
+                    </Box>
+
+                    <Typography
+                      sx={{
+                        fontSize: "13px",
+                        color: "#96A3BB",
+                        fontWeight: 500,
+                      }}
+                    >
+                      Mã: {voucher.code}
+                    </Typography>
+                  </Stack>
+
+                  <Typography
+                    sx={{
+                      mt: 1.2,
+                      fontSize: "16px",
+                      fontWeight: 700,
+                      color: "#18243D",
+                      lineHeight: 1.45,
+                    }}
+                  >
+                    {formatDiscountTitle(voucher)}
+                  </Typography>
+
+                  <Stack
+                    direction="row"
+                    spacing={0.8}
+                    alignItems="center"
+                    sx={{ mt: 1 }}
+                  >
+                    <AccessTimeIcon sx={{ fontSize: 15, color: "#72809A" }} />
+                    <Typography
+                      sx={{
+                        fontSize: "13px",
+                        color: "#72809A",
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      Hết hạn: {formatDate(voucher.end_date)}
+                    </Typography>
+                  </Stack>
+                </Box>
+
+                <Box
+                  sx={{
+                    mt: 2,
+                    pt: 1.75,
+                    borderTop: "1px solid #ECECEC",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 2,
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      color: "#4E5B73",
+                    }}
+                  >
+                    Còn lại: {voucher.quantity}
+                  </Typography>
+
+                  <Button
+                    sx={{
+                      minWidth: "96px",
+                      height: "38px",
+                      px: 2.5,
+                      backgroundColor: "#BF4B3D",
+                      color: "#FFFFFF",
+                      borderRadius: "8px",
+                      textTransform: "none",
+                      fontWeight: 700,
+                      fontSize: "15px",
+                      boxShadow: "none",
+                      "&:hover": {
+                        backgroundColor: "#AA4034",
+                        boxShadow: "none",
+                      },
+                    }}
+                  >
+                    Dùng ngay
+                  </Button>
+                </Box>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+      )}
     </Box>
   );
 };
-
-export default Voucher;
