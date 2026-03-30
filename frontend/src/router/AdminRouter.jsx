@@ -1,6 +1,8 @@
 import React from "react";
+import { Route, Routes } from "react-router-dom";
 import AdminLayout from "../actors/admin/AdminLayout"; // Đường dẫn tới file layout trên
-import AdminHome from "../actors/admin/admin_pages/AdminHome"; // Trang Dashboard/Tổng quan
+import AdminHome from "../actors/admin/admin_pages/AdminHome";
+import ContentAdAi from "../actors/admin/admin_pages/ContentAdAi";
 
 const AdminRouter =
 {
@@ -12,8 +14,8 @@ const AdminRouter =
             element: <AdminHome />,
         },
         {
-            path: "quan-ly-ve",
-            element: <div>Trang Quản lý vé Buffet</div>, // Thay bằng component thật sau
+            path: "ai-thong-ke",
+            element: <ContentAdAi />,
         },
         {
             path: "quan-ly-menu",

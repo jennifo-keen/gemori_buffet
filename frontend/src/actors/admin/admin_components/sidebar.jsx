@@ -24,6 +24,7 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import TableRestaurantOutlinedIcon from "@mui/icons-material/TableRestaurantOutlined";
 import WarehouseOutlinedIcon from "@mui/icons-material/WarehouseOutlined";
+import logo from "../../../assets/img/Logo 1.png";
 
 const navSections = [
     {
@@ -97,14 +98,21 @@ export const AdminSidebar = () => {
         >
             {/* Logo section */}
             <Box
-                sx={{ px: 3, py: 3, borderBottom: "1px solid", borderColor: "divider", display: "flex", alignItems: "center", cursor: 'pointer' }}
+                sx={{ px: 3, py: 2, borderBottom: "1px solid", borderColor: "divider", display: "flex", alignItems: "center", cursor: 'pointer' }}
                 onClick={() => navigate("/admin")}
             >
-                <Box
-                    component="img"
-                    src="https://via.placeholder.com/130x49?text=Gemori"
+                <Box component="img"
+                    src={logo}   // đường dẫn tuyệt đối từ thư mục public
                     alt="Logo"
-                    sx={{ width: 130, height: 49, objectFit: "contain" }}
+                    sx={{
+                        filter:
+                            "invert(10%) sepia(85%) saturate(5000%) hue-rotate(352deg) brightness(60%) contrast(120%)",
+                        maxWidth: 200,
+                        maxHeight: 100,
+                        width: "40%",
+                        height: "auto",
+                        objectFit: "contain"
+                    }}
                 />
             </Box>
 
