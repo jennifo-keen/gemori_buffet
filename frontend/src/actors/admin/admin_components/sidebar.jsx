@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; // Thêm 2 hook này
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
     Avatar,
     Box,
@@ -10,9 +10,8 @@ import {
     Stack,
     Typography,
 } from "@mui/material";
-import { useState } from "react";
 
-// Import icons... (giữ nguyên dàn icon cũ của bạn)
+// Import icons
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 import CampaignOutlinedIcon from "@mui/icons-material/CampaignOutlined";
 import ConfirmationNumberOutlinedIcon from "@mui/icons-material/ConfirmationNumberOutlined";
@@ -64,7 +63,12 @@ export const AdminSidebar = () => {
     const location = useLocation();
     const [activeItem, setActiveItem] = useState("tong-quan");
 
-    // Tự động cập nhật nút active khi URL thay đổi (VD: bấm nút back trên trình duyệt)
+    // Các biến màu để đồng bộ toàn bộ sidebar
+    const baseColor = "#B14135";
+    const bgLight = "rgba(177, 65, 53, 0.05)"; // Nền sidebar 5%
+    const bgActive = "rgba(177, 65, 53, 0.1)"; // Item đang chọn 10%
+    const scrollbarThumb = "rgba(177, 65, 53, 0.2)"; // Thanh trượt đậm hơn chút để dễ thấy
+
     useEffect(() => {
         const currentPath = location.pathname;
         navSections.forEach(section => {
@@ -78,7 +82,7 @@ export const AdminSidebar = () => {
 
     const handleItemClick = (id, path) => {
         setActiveItem(id);
-        navigate(path); // Chuyển hướng trang
+        navigate(path);
     };
 
     return (
@@ -89,24 +93,31 @@ export const AdminSidebar = () => {
                 flexDirection: "column",
                 width: 288,
                 height: "100vh",
-                position: "sticky", // Giữ sidebar cố định khi cuộn trang nội dung
+                position: "sticky",
                 top: 0,
-                bgcolor: "background.paper",
+                bgcolor: bgLight,
                 borderRight: "1px solid",
-                borderColor: "divider",
+                borderColor: "rgba(0, 0, 0, 0.08)",
             }}
         >
             {/* Logo section */}
             <Box
-                sx={{ px: 3, py: 2, borderBottom: "1px solid", borderColor: "divider", display: "flex", alignItems: "center", cursor: 'pointer' }}
+                sx={{
+                    px: 3,
+                    py: 2,
+                    borderBottom: "1px solid",
+                    borderColor: "rgba(0, 0, 0, 0.05)",
+                    display: "flex",
+                    alignItems: "center",
+                    cursor: 'pointer'
+                }}
                 onClick={() => navigate("/admin")}
             >
                 <Box component="img"
-                    src={logo}   // đường dẫn tuyệt đối từ thư mục public
+                    src={logo}
                     alt="Logo"
                     sx={{
-                        filter:
-                            "invert(10%) sepia(85%) saturate(5000%) hue-rotate(352deg) brightness(60%) contrast(120%)",
+                        filter: "invert(24%) sepia(51%) saturate(1478%) hue-rotate(346deg) brightness(88%) contrast(91%)",
                         maxWidth: 200,
                         maxHeight: 100,
                         width: "40%",
@@ -116,8 +127,32 @@ export const AdminSidebar = () => {
                 />
             </Box>
 
-            {/* Navigation sections */}
-            <Box sx={{ flex: 1, px: 2, py: 2, overflowY: "auto" }}>
+            {/* Navigation sections với Custom Scrollbar */}
+            <Box
+                sx={{
+                    flex: 1,
+                    px: 2,
+                    py: 2,
+                    overflowY: "auto",
+                    // Tùy chỉnh Scrollbar cho Chrome, Edge, Safari
+                    '&::-webkit-scrollbar': {
+                        width: '6px', // Độ rộng thanh cuộn
+                    },
+                    '&::-webkit-scrollbar-track': {
+                        backgroundColor: 'transparent', // Để lộ nền sidebar phía dưới
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                        backgroundColor: scrollbarThumb,
+                        borderRadius: '10px',
+                        '&:hover': {
+                            backgroundColor: 'rgba(108, 13, 10, 0.4)', // Đây là màu #6C0D0A với alpha 0.4
+                        }
+                    },
+                    // Tùy chỉnh cho Firefox
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: `${scrollbarThumb} transparent`,
+                }}
+            >
                 {navSections.map((section) => (
                     <Box key={section.sectionLabel} sx={{ pb: 2 }}>
                         <Box sx={{ px: 1.5, pb: 1 }}>
@@ -126,9 +161,10 @@ export const AdminSidebar = () => {
                                     fontFamily: '"Be Vietnam Pro", sans-serif',
                                     fontSize: "12px",
                                     fontWeight: 700,
-                                    color: "#bc4d42",
+                                    color: baseColor,
                                     textTransform: "uppercase",
                                     letterSpacing: "0.5px",
+                                    opacity: 0.8
                                 }}
                             >
                                 {section.sectionLabel}
@@ -147,10 +183,10 @@ export const AdminSidebar = () => {
                                             py: 1.25,
                                             borderRadius: 2,
                                             cursor: "pointer",
-                                            bgcolor: isActive ? "rgba(138, 0, 0, 0.08)" : "transparent",
-                                            color: isActive ? "#a21a16" : "#334155",
+                                            bgcolor: isActive ? bgActive : "transparent",
+                                            color: isActive ? baseColor : "#334155",
                                             "&:hover": {
-                                                bgcolor: isActive ? "rgba(138, 0, 0, 0.1)" : "rgba(0, 0, 0, 0.04)",
+                                                bgcolor: isActive ? bgActive : "rgba(177, 65, 53, 0.08)",
                                             },
                                             mb: 0.25,
                                             transition: "all 0.2s ease",
@@ -183,11 +219,11 @@ export const AdminSidebar = () => {
             </Box>
 
             {/* User profile section */}
-            <Box sx={{ borderTop: "1px solid", borderColor: "divider", p: 2 }}>
+            <Box sx={{ borderTop: "1px solid", borderColor: "rgba(0, 0, 0, 0.05)", p: 2 }}>
                 <Stack direction="row" alignItems="center" spacing={1.5} sx={{ px: 1.5, py: 1 }}>
                     <Avatar
                         src="/admin.png"
-                        sx={{ width: 40, height: 40, bgcolor: "rgba(138, 0, 0, 0.2)" }}
+                        sx={{ width: 40, height: 40, bgcolor: "rgba(177, 65, 53, 0.2)" }}
                     />
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Typography noWrap sx={{ fontSize: "14px", fontWeight: 700 }}>
@@ -198,10 +234,11 @@ export const AdminSidebar = () => {
                         </Typography>
                     </Box>
                     <LogoutOutlinedIcon
-                        onClick={() => navigate("/login")} // Ví dụ chuyển về login
+                        onClick={() => navigate("/login")}
                         sx={{
                             cursor: "pointer",
-                            "&:hover": { color: "#8a0000" },
+                            transition: "color 0.2s",
+                            "&:hover": { color: baseColor },
                         }}
                     />
                 </Stack>

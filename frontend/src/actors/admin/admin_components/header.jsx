@@ -1,5 +1,4 @@
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
-import { ThemeProvider } from "../../users/users_components/layout/ThemeProvider";
 import SearchIcon from "@mui/icons-material/Search";
 import {
     AppBar,
@@ -12,8 +11,24 @@ import {
 } from "@mui/material";
 
 export const AdminHeader = () => {
+    // Màu đỏ đô gốc
+    const mainRed = "#8A0000";
+    // Màu đỏ đô 10% (Alpha 0.1)
+    const lightRed = "rgba(138, 0, 0, 0.1)";
+    // Màu xám theo yêu cầu
+    const greyText = "#94A3B8";
+    // Màu trắng 98%
+    const white98 = "#FAFAFA";
+
     return (
-        <AppBar position="static" elevation={0}>
+        <AppBar
+            position="static"
+            elevation={0}
+            sx={{
+                backgroundColor: white98, // Cập nhật nền trắng 98%
+                borderBottom: `1px solid ${lightRed}`, // Viền 10% màu đỏ
+            }}
+        >
             <Toolbar
                 sx={{
                     height: 64,
@@ -38,11 +53,15 @@ export const AdminHeader = () => {
                                     ...params.InputProps,
                                     startAdornment: (
                                         <SearchIcon
-                                            sx={{ color: "text.secondary", mr: 1, fontSize: 24 }}
+                                            sx={{
+                                                color: greyText,
+                                                mr: 1,
+                                                fontSize: 24
+                                            }}
                                         />
                                     ),
                                     sx: {
-                                        backgroundColor: "background.search",
+                                        backgroundColor: lightRed, // Khung search vẫn giữ đỏ đô 10% để nổi bật trên nền trắng 98%
                                         borderRadius: "8px",
                                         "& fieldset": { border: "none" },
                                         "& input": {
@@ -50,8 +69,12 @@ export const AdminHeader = () => {
                                             fontSize: "14px",
                                             fontWeight: 400,
                                             lineHeight: "22px",
-                                            color: "text.secondary",
+                                            color: greyText,
                                             py: "11px",
+                                            "&::placeholder": {
+                                                color: greyText,
+                                                opacity: 1,
+                                            }
                                         },
                                         py: 0,
                                     },
@@ -61,28 +84,30 @@ export const AdminHeader = () => {
                     />
                 </Box>
 
-                {/* Notification icon with badge */}
-                <IconButton sx={{ p: 1 }}>
-                    <Badge
-                        variant="dot"
-                        sx={{
-                            "& .MuiBadge-dot": {
-                                backgroundColor: "primary.main",
-                                width: 8,
-                                height: 8,
-                                borderRadius: "50%",
-                                border: "2px solid white",
-                                minWidth: "unset",
-                                top: 2,
-                                right: 2,
-                            },
-                        }}
-                    >
-                        <NotificationsNoneOutlinedIcon
-                            sx={{ color: "text.primary", fontSize: 20 }}
-                        />
-                    </Badge>
-                </IconButton>
+                {/* Notification icon */}
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <IconButton sx={{ p: 1 }}>
+                        <Badge
+                            variant="dot"
+                            sx={{
+                                "& .MuiBadge-dot": {
+                                    backgroundColor: mainRed,
+                                    width: 8,
+                                    height: 8,
+                                    borderRadius: "50%",
+                                    border: `2px solid ${white98}`, // Viền của chấm đỏ tiệp màu nền mới
+                                    minWidth: "unset",
+                                    top: 2,
+                                    right: 2,
+                                },
+                            }}
+                        >
+                            <NotificationsNoneOutlinedIcon
+                                sx={{ color: mainRed, fontSize: 20 }}
+                            />
+                        </Badge>
+                    </IconButton>
+                </Box>
             </Toolbar>
         </AppBar>
     );

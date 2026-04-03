@@ -2,12 +2,20 @@ import React from "react";
 import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import AdminSidebar from "./admin_components/sidebar";
-// 1. Nhớ import Header của ông vào đây nè
-import AdminHeader from "./admin_components/header"; // Kiểm tra lại đường dẫn cho đúng nha
+import AdminHeader from "./admin_components/header";
 
 const AdminLayout = () => {
+    // Định nghĩa màu trắng 98% (Off-white)
+    const white98 = "#FAFAFA";
+
     return (
-        <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#f8f9fa" }}>
+        <Box
+            sx={{
+                display: "flex",
+                minHeight: "100vh",
+                bgcolor: white98 // Đổi nền tổng thể thành trắng 98%
+            }}
+        >
             {/* Sidebar cố định bên trái */}
             <AdminSidebar />
 
@@ -16,20 +24,22 @@ const AdminLayout = () => {
                 sx={{
                     flexGrow: 1,
                     display: "flex",
-                    flexDirection: "column", // Để Header nằm trên, Content nằm dưới
-                    width: { sm: `calc(100% - 288px)` }, // Trừ đi chiều rộng sidebar
+                    flexDirection: "column",
+                    // Đảm bảo phần này không bị tràn chiều rộng
+                    width: { sm: `calc(100% - 288px)` },
                 }}
             >
-                {/* 2. Bỏ Header vào đây */}
+                {/* Header đã có nền white98 bên trong file AdminHeader */}
                 <AdminHeader />
 
-                {/* 3. Nội dung chính (Trang con) */}
+                {/* Nội dung chính (Trang con) */}
                 <Box
                     component="main"
                     sx={{
-                        p: 3, // Padding cho nội dung
+                        p: 3,
                         flexGrow: 1,
-                        overflow: "auto", // Để nếu nội dung dài thì scroll trong phần này thôi
+                        overflow: "auto",
+                        bgcolor: white98, // Đồng bộ nền nội dung với layout
                     }}
                 >
                     <Outlet />
