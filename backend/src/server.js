@@ -6,6 +6,8 @@ const { initSocket } = require('./config/socket');
 const { errorMiddleware } = require('./middlewares/error.middleware');
 const routes = require('./routes');
 
+require('./actors/admin/ai/cron/forecastCron');
+
 const app = express();
 const httpServer = http.createServer(app);
 

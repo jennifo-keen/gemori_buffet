@@ -3,6 +3,7 @@ const { Router } = require('express');
 const router = Router();
 
 router.use('/admin/report', require('../actors/admin/report/report.route'));
+router.use('/forecast', require('../actors/admin/ai/forecastRoutes'));
 
 //hong bit của bên nào...
 router.use('/auth', require('../actors/admin/auth/auth.route'));
