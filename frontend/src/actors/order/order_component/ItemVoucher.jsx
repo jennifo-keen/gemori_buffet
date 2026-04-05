@@ -3,7 +3,17 @@ import React from "react";
 import PercentIcon from "@mui/icons-material/Percent";
 import { Box, Paper, Stack, Typography } from "@mui/material";
 
-const Order_ItemVoucher = () => {
+const formatDiscount = (voucher) => {
+  if (voucher.discount_type === 'percent') return `Giảm ${voucher.discount_value}%`;
+  return `Giảm ${Number(voucher.discount_value).toLocaleString('vi-VN')}đ`;
+};
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return null;
+  return new Date(dateStr).toLocaleDateString('vi-VN');
+};
+
+const Order_ItemVoucher = ({ voucher }) => {
   return (
     <Paper
       variant="outlined"
@@ -42,7 +52,7 @@ const Order_ItemVoucher = () => {
               wordBreak: "break-word", // FIX: xuống dòng
             }}
           >
-            Giảm 100k cho hóa đơn 1tr
+            {voucher ? formatDiscount(voucher) : '---'}
           </Typography>
 
           <Typography
@@ -52,7 +62,9 @@ const Order_ItemVoucher = () => {
               fontSize: 11,
             }}
           >
-            Hết hạn: 31/12/2023
+            {voucher?.code && `Mã: ${voucher.code}`}
+            {voucher?.end_date && ` · Hết hạn: ${formatDate(voucher.end_date)}`}
+            {voucher?.quantity !== null && voucher?.quantity !== undefined && ` · Còn ${voucher.quantity} lượt`}
           </Typography>
         </Stack>
       </Stack>

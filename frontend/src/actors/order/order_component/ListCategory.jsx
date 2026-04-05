@@ -1,18 +1,10 @@
 import React from "react";
 import { Box, List, ListItem, Typography } from "@mui/material";
-import { useState } from "react";
+import { useOrder } from '../order_context/OrderContext';
 
-const categories = [
-  "THỊT NHÚNG LẦU",
-  "HẢI SẢN",
-  "NỘI TẠNG",
-  "MÌ - VIÊN THẢ LẦU",
-  "RAU - NẤM",
-  "CAO CẤP",
-];
 
 export const ListCategory = () => {
-  const [selected, setSelected] = useState(null);
+  const { menu, selectedCategory, setSelectedCategory } = useOrder();
 
   return (
     <Box
@@ -24,7 +16,7 @@ export const ListCategory = () => {
         p: 1.25,
         bgcolor: "#fff7f4",
         border: "0.5px solid #bc4d42",
-        minHeight: 734,
+        minHeight: "100%",
         width: 130,
       }}
     >
@@ -32,12 +24,12 @@ export const ListCategory = () => {
         disablePadding
         sx={{ display: "flex", flexDirection: "column", gap: 1.25 }}
       >
-        {categories.map((category) => {
-          const isSelected = selected === category;
+        {menu.categories.map(({ name }) => {
+          const isSelected = selectedCategory === name;
           return (
             <ListItem
-              key={category}
-              onClick={() => setSelected(category)}
+              key={name}
+              onClick={() => setSelectedCategory(name)}
               disablePadding
               sx={{
                 width: 110,
@@ -55,8 +47,7 @@ export const ListCategory = () => {
                 sx={{
                   width: 4,
                   alignSelf: "stretch",
-                  bgcolor: isSelected ? "#bc4d42" : "#fff7f4",
-                  borderRadius: "10px",
+                  bgcolor: isSelected ? "#EAB308" : "#fff7f4",
                   flexShrink: 0,
                 }}
               />
@@ -68,25 +59,25 @@ export const ListCategory = () => {
                   p: 1,
                   flex: 1,
                   alignSelf: "stretch",
-                  bgcolor: isSelected ? "#fce8e2" : "#fff7f4",
-                  borderRadius: "10px",
+                  bgcolor: isSelected ? "#A21A16" : "#fff7f4",
                   overflow: "hidden",
                 }}
               >
                 <Typography
                   variant="body2"
                   sx={{
-                    color: "#334155",
+                    color:  isSelected ? "#ffffff" : "#000000",
                     fontSize: 12,
-                    fontWeight: isSelected ? 600 : 400,
+                    fontWeight: 600,
                     lineHeight: 1.4,
                     flex: 1,
                     alignSelf: "stretch",
                     display: "flex",
                     alignItems: "center",
+                    textTransform: "uppercase",
                   }}
                 >
-                  {category}
+                  {name}
                 </Typography>
               </Box>
             </ListItem>

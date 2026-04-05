@@ -39,7 +39,7 @@ const closeTable = async (tableId) => {
     `UPDATE tables SET status = 'empty' WHERE id = $1 RETURNING *`, [tableId]
   );
   if (!result.rows[0]) throw { status: 404, message: 'Bàn không tồn tại' };
-   // ✅ Emit realtime
+   //  Emit realtime
  try {
     const io = getIO();
     io.to('staff').emit('table_status_changed', { tableId, status: 'empty' });

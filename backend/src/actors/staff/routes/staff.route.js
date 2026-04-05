@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const { authMiddleware, requireRole } = require('../../../middlewares/auth.middleware');
+const authController = require('../../admin/auth/auth.controller');
 const customersController = require('../controllers/customers.controller');
 const kitchenController = require('../controllers/kitchen.controller');
 const menuController = require('../controllers/menu.controller');
@@ -10,7 +11,10 @@ const vouchersController = require('../controllers/vouchers.controller');
 
 const router = Router();
 
-// router.use(authMiddleware);
+// ============ AUTH ROUTES (no auth required) ============
+router.post('/auth/login', authController.login);
+
+router.use(authMiddleware);
 
 // ============ CUSTOMERS ROUTES ============
 router.get('/customers/phone/:phone', requireRole('staff', 'admin'), customersController.getByPhone);

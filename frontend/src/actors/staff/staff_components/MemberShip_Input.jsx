@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import PersonAdd from "../../../assets/icon/UserCirclePlus.svg";
-import { getCustomerByPhone } from '../../../api/paymentApi';
+import { getCustomerByPhone } from '../staff_api/paymentApi';
 import MemberShipPopUp_In from '../staff_components/MemberShipPopUp_In';
 import MemberShip_Inf from '../staff_components/MemberShip_Inf'
 
@@ -30,7 +30,7 @@ const MemberShip_Input = ({ onCustomerFound }) => {
     try {
       setLoading(true);
       setError('');
-      const { getCustomerByPhone } = await import('../../../api/paymentApi');
+      const { getCustomerByPhone } = await import('../staff_api/paymentApi');
       const res = await getCustomerByPhone(phone);
       setCustomer(res.data);
       onCustomerFound?.(res.data);

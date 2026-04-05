@@ -1,10 +1,9 @@
 const { pool } = require('../../../config/db');
 
-
 // Xác thực bàn khi quét QR — trả về thông tin bàn + order hiện tại
-const verifyTable = async (tableId) => {
+const verifyTable = async (tableCode) => {
   const tableResult = await pool.query(
-    'SELECT * FROM tables WHERE id = $1', [tableId]
+    'SELECT * FROM tables WHERE table_code = $1', [tableCode]
   );
 
  const table = tableResult.rows[0];

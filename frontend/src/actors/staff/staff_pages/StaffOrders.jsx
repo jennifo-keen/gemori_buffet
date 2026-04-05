@@ -7,8 +7,8 @@ import ArrowBackIcon from "../../../assets/icon/ArrowFatLeft.svg";
 import ArrowRightIcon from "../../../assets/icon/ArrowFatRight.svg"; 
 import PeopleAltIcon from "../../../assets/icon/UsersThree.svg";
 
-import { getBuffetTickets } from '../../../api/menuApi';
-import { createOrder } from '../../../api/orderApi';
+import { getBuffetTickets } from '../staff_api/menuApi';
+import { createOrder } from '../staff_api/orderApi.js';
 
 import useAuthStaff from '../staff_hook/useAuthStaff.js';
 import useDialog from '../staff_hook/useDialog.js';
@@ -50,7 +50,7 @@ const StaffOrders = () => {
       try {
         const res = await getBuffetTickets();
         setTickets(res.data);
-      } catch (err) {
+      } catch  {
         showError({ title: 'Lỗi', subtitle: 'Không thể tải danh sách gói buffet' });
       } finally {
         setLoading(false);

@@ -2,7 +2,7 @@ import React from 'react';
 import AccountBalanceWallet from "@mui/icons-material/AccountBalanceWallet";
 import { Box, Paper, Stack, Typography } from "@mui/material";
 
-export const Order_ItemAcc = () => {
+export const Order_ItemAcc = ({ count = 0 }) => {
   return (
     <Paper
       elevation={0}
@@ -10,8 +10,7 @@ export const Order_ItemAcc = () => {
         border: "1px solid rgba(138, 0, 0, 0.1)",
         borderRadius: 3,
         p: "8px",
-        height: 98,
-        width: 240,
+        height: 100,
       }}
     >
       <Stack
@@ -23,8 +22,8 @@ export const Order_ItemAcc = () => {
         {/* Wallet icon with circular background */}
         <Box
           sx={{
-            width: 44,
-            height: 47,
+            width: 40,
+            height: 40,
             borderRadius: "50%",
             backgroundColor: "rgba(138, 0, 0, 0.05)",
             display: "flex",
@@ -51,7 +50,7 @@ export const Order_ItemAcc = () => {
             textAlign="center"
             sx={{ color: "#94a3b8", fontSize: 12, lineHeight: "15px" }}
           >
-            12 ưu đãi
+            {count} ưu đãi
           </Typography>
         </Stack>
       </Stack>

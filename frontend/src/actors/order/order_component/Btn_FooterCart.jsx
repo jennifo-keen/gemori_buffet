@@ -1,9 +1,27 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import SendIcon from "@mui/icons-material/Send";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography, CircularProgress } from "@mui/material";
+import { useOrder } from '../order_context/OrderContext';
+import { useState } from 'react';
 
 export const BtOrdCart = () => {
-  return (
+  const navigate = useNavigate();
+    const { cart, order, submitOrder, cartTotal, tableCode } = useOrder();
+    const [loading, setLoading] = useState(false);
+  
+   const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      await submitOrder();
+      navigate(`/order/${tableCode}/menu`);
+    } catch (err) {
+      console.error('Gọi món thất bại:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+    return (
     <Box
       component="section"
       sx={{
@@ -34,13 +52,13 @@ export const BtOrdCart = () => {
             color="text.secondary"
             sx={{ fontWeight: 500 }}
           >
-            Tạm tính (4 món):
+            Tạm tính ({cartTotal} món):
           </Typography>
           <Typography
             variant="body1"
             sx={{ fontWeight: 700, color: "#8a0000" }}
           >
-            Buffet Khởi Đầu
+            {order?.ticket_name || '---'}
           </Typography>
         </Stack>
 
@@ -48,7 +66,9 @@ export const BtOrdCart = () => {
         <Button
           variant="contained"
           fullWidth
-          endIcon={<SendIcon />}
+          endIcon={loading ? <CircularProgress size={16} color="inherit" /> : <SendIcon />}
+          onClick={handleSubmit}
+          disabled={loading || cart.length === 0}
           sx={{
             backgroundColor: "#a21a16",
             borderRadius: "12px",
@@ -66,7 +86,7 @@ export const BtOrdCart = () => {
             },
           }}
         >
-          GỌI MÓN NGAY
+          {loading ? 'ĐANG GỬI...' : 'GỌI MÓN NGAY'}
         </Button>
       </Stack>
     </Box>

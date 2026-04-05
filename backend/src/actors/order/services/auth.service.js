@@ -63,17 +63,87 @@ const customerRegister = async ({ full_name, phone, email, password, birthday, g
   return { token, customer };
 };
 
-// Xem thông tin thành viên
+// Lấy profile + stats
 const getProfile = async (customerId) => {
-  const result = await pool.query(
+  const customerResult = await pool.query(
     `SELECT id, full_name, phone, email, birthday, gender, address, created_at
      FROM customers WHERE id = $1`,
     [customerId]
   );
-
-  const customer = result.rows[0];
+  const customer = customerResult.rows[0];
   if (!customer) throw { status: 404, message: 'Không tìm thấy thành viên' };
-  return customer;
+
+  // Đếm số đơn hàng từ payments
+  const paymentResult = await pool.query(
+    `SELECT COUNT(*) AS total
+     FROM payments p
+     LEFT JOIN orders o ON p.order_id = o.id
+     WHERE o.customer_id = $1`,
+    [customerId]
+  );
+
+  // Đếm số voucher available (chưa dùng = quantity > 0 hoặc null, còn hạn)
+  const voucherResult = await pool.query(
+    `SELECT COUNT(*) AS total FROM vouchers
+     WHERE is_active = true
+       AND (quantity IS NULL OR quantity > 0)
+       AND (end_date IS NULL OR end_date >= CURRENT_DATE)
+       AND (start_date IS NULL OR start_date <= CURRENT_DATE)`
+  );
+
+  return {
+    ...customer,
+    stats: {
+      orders:   parseInt(paymentResult.rows[0].total),
+      vouchers: parseInt(voucherResult.rows[0].total),
+    },
+  };
 };
 
-module.exports = { customerLogin, customerRegister, getProfile };
+// Cập nhật profile
+const updateProfile = async (customerId, data) => {
+  const { full_name, email, birthday, gender, address } = data;
+
+  const check = await pool.query('SELECT id FROM customers WHERE id = $1', [customerId]);
+  if (!check.rows[0]) throw { status: 404, message: 'Thành viên không tồn tại' };
+
+  const fields = []; const values = []; let i = 1;
+  if (full_name) { fields.push(`full_name = $${i++}`); values.push(full_name); }
+  if (email)     { fields.push(`email = $${i++}`);     values.push(email); }
+  if (birthday)  { fields.push(`birthday = $${i++}`);  values.push(birthday); }
+  if (gender)    { fields.push(`gender = $${i++}`);    values.push(gender); }
+  if (address)   { fields.push(`address = $${i++}`);   values.push(address); }
+
+  if (!fields.length) throw { status: 400, message: 'Không có gì để cập nhật' };
+
+  values.push(customerId);
+  const result = await pool.query(
+    `UPDATE customers SET ${fields.join(', ')} WHERE id = $${i}
+     RETURNING id, full_name, phone, email, birthday, gender, address`,
+    values
+  );
+  return result.rows[0];
+};
+
+// Xóa tài khoản
+const deleteAccount = async (customerId) => {
+  const check = await pool.query('SELECT id FROM customers WHERE id = $1', [customerId]);
+  if (!check.rows[0]) throw { status: 404, message: 'Thành viên không tồn tại' };
+  await pool.query('DELETE FROM customers WHERE id = $1', [customerId]);
+};
+
+// Lấy vouchers available — hiện cho tất cả user
+const getAvailableVouchers = async () => {
+  const result = await pool.query(
+    `SELECT id, code, discount_type, discount_value, quantity, start_date, end_date
+     FROM vouchers
+     WHERE is_active = true
+       AND (quantity IS NULL OR quantity > 0)
+       AND (end_date IS NULL OR end_date >= CURRENT_DATE)
+       AND (start_date IS NULL OR start_date <= CURRENT_DATE)
+     ORDER BY discount_value DESC`
+  );
+  return result.rows;
+};
+
+module.exports = { customerLogin, customerRegister, getProfile, updateProfile, deleteAccount, getAvailableVouchers };

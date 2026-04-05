@@ -7,7 +7,7 @@ import InfoCard from "../staff_components/InfoCard"
 
 import QrCode from "../../../assets/icon/QrCode.svg"
 
-import { getTableOrder } from '../../../api/tableApi';
+import { getTableOrder } from '../staff_api/tableApi';
 
 import useAuthStaff from '../staff_hook/useAuthStaff';
 
@@ -315,7 +315,7 @@ const StaffCheckOut = () => {
                           <Box
                             component="img"
                             alt="QR Code"
-                            src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(tableId || '')}"
+                            src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(`http://localhost:5173/order/${tableCode}`)}`}
                             sx={{
                               width: 160,
                               height: 160,

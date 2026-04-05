@@ -2,7 +2,12 @@ const { pool } = require('../../../config/db');
 const { getIO } = require('../../../config/socket');
 
 // Lấy order + danh sách món realtime — Web 1
-const getOrderByTable = async (tableId) => {
+const getOrderByTable = async (tableCode) => {
+  // tableCode từ route /tables/:tableCode/order
+  const tableResult = await pool.query('SELECT * FROM tables WHERE table_code = $1', [tableCode]);
+  const table = tableResult.rows[0];
+  if (!table) return null;
+
   const orderResult = await pool.query(
     `SELECT o.id, o.ticket_quantity, o.status, o.order_time,
        bt.name AS ticket_name, bt.price AS ticket_price
@@ -10,7 +15,7 @@ const getOrderByTable = async (tableId) => {
      LEFT JOIN buffet_tickets bt ON o.buffet_ticket_id = bt.id
      WHERE o.table_id = $1 AND o.status = 'ordering'
      LIMIT 1`,
-    [tableId]
+    [table.id]
   );
  
   const order = orderResult.rows[0];
@@ -30,15 +35,19 @@ const getOrderByTable = async (tableId) => {
 };
 
 // Gọi món — gửi bếp realtime
-const addItems = async (tableId, items) => {
+const addItems = async (tableCode, items) => {
   // items = [{ menuId, quantity }]
   if (!items || !items.length)
     throw { status: 400, message: 'Danh sách món không được rỗng' };
 
+  const tableResult = await pool.query('SELECT * FROM tables WHERE table_code = $1', [tableCode]);
+  const table = tableResult.rows[0];
+  if (!table) throw { status: 404, message: 'Bàn không tồn tại' };
+
   // Lấy order đang chạy
   const orderResult = await pool.query(
     `SELECT id FROM orders WHERE table_id = $1 AND status = 'ordering' LIMIT 1`,
-    [tableId]
+    [table.id]
   );
 
   const order = orderResult.rows[0];
@@ -80,8 +89,8 @@ const menuResult = await pool.query(
   // Emit realtime đến bếp và staff
 try {
     const io = getIO();
-    io.to('kitchen').emit('new_order_item', { tableId, orderId: order.id, items: inserted });
-    io.to('staff').emit('new_order_item', { tableId, orderId: order.id, items: inserted });
+    io.to('kitchen').emit('new_order_item', { tableId: table.id, tableCode, orderId: order.id, items: inserted });
+    io.to('staff').emit('new_order_item', { tableId: table.id, tableCode, orderId: order.id, items: inserted });
   } catch (e) { console.error('Socket error:', e.message); }
  
   return inserted;
@@ -115,7 +124,11 @@ const check = await pool.query(
 };
 
 // Hóa đơn tạm tính — Web 1
-const getBill = async (tableId) => {
+const getBill = async (tableCode) => {
+  const tableResult = await pool.query('SELECT * FROM tables WHERE table_code = $1', [tableCode]);
+  const table = tableResult.rows[0];
+  if (!table) throw { status: 404, message: 'Bàn không tồn tại' };
+
   const orderResult = await pool.query(
     `SELECT o.id, o.ticket_quantity, o.total_amount, o.order_time,
        bt.name AS ticket_name, bt.price AS ticket_price
@@ -123,7 +136,7 @@ const getBill = async (tableId) => {
      LEFT JOIN buffet_tickets bt ON o.buffet_ticket_id = bt.id
      WHERE o.table_id = $1 AND o.status = 'ordering'
      LIMIT 1`,
-    [tableId]
+    [table.id]
   );
  
   const order = orderResult.rows[0];

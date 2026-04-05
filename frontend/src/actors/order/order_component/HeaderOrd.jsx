@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; 
 import AvtIcon  from "../../../assets/icon/UserCircleDashed.svg?react";
 import ChatIcon from "../../../assets/icon/Chats.svg?react";
 import CookingPotIcon  from "../../../assets/icon/CookingPot.svg?react";
@@ -11,9 +12,23 @@ import {
   IconButton,
   Toolbar,
   Typography,
+  Snackbar, Alert, Avatar
 } from "@mui/material";
+import { useOrder } from '../order_context/OrderContext';
+import { useState } from 'react';
 
 export const Order_HeaderOrd = () => {
+  const navigate = useNavigate();
+  const { tableCode, customer } = useOrder(); 
+  const [showAlert, setShowAlert] = useState(false);
+
+  const handleAvatarClick = () => {
+    if (customer) {
+      navigate(`/order/${tableCode}/profilebuffer`);
+    } else {
+      setShowAlert(true); 
+    }
+  };
   return (
     <AppBar
       position="static"
@@ -58,49 +73,16 @@ export const Order_HeaderOrd = () => {
               "&:hover": { bgcolor: "grey.300" },
             }}
           >
-            Bàn 01
+            Bàn  {tableCode || '...'}
           </Button>
 
-          {/* Góp ý pill button */}
-          <Button
-            variant="contained"
-            disableElevation
-            startIcon={
-              <ChatIcon
-                sx={{ width: 16, height: 16, color: "#190600" }}
-              />
-            }
-            sx={{
-              bgcolor: "#ca9600",
-              color: "#190600",
-              borderRadius: "999px",
-              height: 34,
-              minWidth: 88,
-              fontWeight: "bold",
-              fontSize: "0.8rem",
-              textTransform: "none",
-              px: 2,
-              gap: 0.5,
-              "&:hover": { bgcolor: "#b58500" },
-            }}
-          >
-            <Typography
-              sx={{
-                fontWeight: "bold",
-                fontSize: "0.8rem",
-                color: "#190600",
-                lineHeight: 1,
-              }}
-            >
-              Góp ý
-            </Typography>
-          </Button>
         </Box>
 
         {/* Right section: cart and user icon buttons */}
         <Box display="flex" alignItems="center" gap={1} px={1}>
           {/* Shopping cart icon button */}
           <IconButton
+          onClick ={() => navigate(`/order/${tableCode}/cart`)}
             sx={{
               bgcolor: "grey.200",
               borderRadius: "999px",
@@ -114,22 +96,37 @@ export const Order_HeaderOrd = () => {
             />
           </IconButton>
 
-          {/* User circle icon button */}
-          <IconButton
-            sx={{
-              bgcolor: "grey.200",
-              borderRadius: "999px",
-              width: 32,
-              height: 32,
-              "&:hover": { bgcolor: "grey.300" },
-            }}
+          <IconButton onClick={handleAvatarClick}
+            sx={{ bgcolor: "grey.200", borderRadius: "999px", width: 32, height: 32, p: 0, "&:hover": { bgcolor: "grey.300" } }}
           >
-            <AvtIcon 
-              sx={{ width: 24, height: 24, color: "#000000" }}
-            />
+            {customer ? (
+              <Avatar sx={{ width: 32, height: 32, bgcolor: "#a21a16", fontSize: 14, fontWeight: 700 }}>
+                {customer.full_name?.charAt(0).toUpperCase()}
+              </Avatar>
+            ) : (
+              <AvtIcon sx={{ width: 24, height: 24, color: "#000000" }} />
+            )}
           </IconButton>
         </Box>
       </Toolbar>
+
+      {/* Snackbar thông báo chưa đăng nhập */}
+      <Snackbar
+        open={showAlert}
+        autoHideDuration={3000}
+        onClose={() => setShowAlert(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert severity="info" onClose={() => setShowAlert(false)}
+          action={
+            <Button size="small" color="inherit" onClick={() => { setShowAlert(false); navigate(`/order/${tableCode}/login`); }}>
+              Đăng nhập
+            </Button>
+          }
+        >
+          Bạn chưa đăng nhập 
+        </Alert>
+      </Snackbar>
     </AppBar>
   );
 };

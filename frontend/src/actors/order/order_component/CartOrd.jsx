@@ -7,9 +7,24 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-
+import { useOrder } from '../order_context/OrderContext';
+import { useNavigate } from 'react-router-dom';
 
 export const OrdMenus = () => {
+  const { cartTotal, submitOrder, cart, tableCode } = useOrder();
+  const navigate = useNavigate();
+
+
+  if (cartTotal === 0) return null; // ẩn khi giỏ trống
+
+  const handleSubmit = async () => {
+    try {
+      await submitOrder();
+    } catch (err) {
+      console.error('Gọi món thất bại:', err);
+    }
+  };
+
   return (
     <Box sx={{ width: "100%", display: "flex", justifyContent: "center", mb:"15px", mt:"10px" }}>
       <Stack
@@ -85,7 +100,7 @@ export const OrdMenus = () => {
                   lineHeight: "13.5px",
                 }}
               >
-                5
+                {cartTotal}
               </Typography>
             </Box>
           </Box>
@@ -94,13 +109,14 @@ export const OrdMenus = () => {
             variant="body2"
             sx={{ fontWeight: 500, color: "grey.900", fontSize: 14 }}
           >
-            5 Món
+            {cartTotal} Món
           </Typography>
         </Stack>
 
         {/* Xem giỏ hàng button */}
         <Button
           variant="contained"
+          onClick={() => navigate(`/order/${tableCode}/cart`)}
           endIcon={<ArrowForwardIcon sx={{ width: 14, height: 14 }} />}
           sx={{
             bgcolor: "#ca9600",
@@ -124,6 +140,7 @@ export const OrdMenus = () => {
         {/* Gọi món button */}
         <Button
           variant="contained"
+          onClick={handleSubmit}
           sx={{
             bgcolor: "#a21a16",
             color: "white",

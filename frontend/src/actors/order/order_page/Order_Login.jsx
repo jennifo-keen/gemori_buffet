@@ -1,13 +1,18 @@
 import React from 'react';
-
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useOrder } from '../order_context/OrderContext';
+import { customerLogin } from '../order_api/customerApi';
 import HeaderLogin from "../order_component/HeaderLogin"
 import Footer from "../order_component/Footer"
 import PasswordIcon from "@mui/icons-material/Password";
 import PhoneIcon from "@mui/icons-material/PhoneAndroid";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import {
+  Alert,
   Box,
   Button,
+  CircularProgress,
   InputAdornment,
   Link,
   Stack,
@@ -16,6 +21,41 @@ import {
 } from "@mui/material";
 
 export const LoginLayout = () => {
+  const navigate = useNavigate();
+  const { loginCustomer, tableCode } = useOrder();
+  
+
+  const [phone, setPhone]               = useState('');
+  const [password, setPassword]         = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading]           = useState(false);
+  const [error, setError]               = useState('');
+
+  const handleLogin = async () => {
+    if (!phone.trim() || !password.trim()) {
+      setError('Vui lòng nhập số điện thoại và mật khẩu');
+      return;
+    }
+    try {
+      setLoading(true);
+      setError('');
+
+      if (loginCustomer) {
+        await loginCustomer(phone, password);
+      } else {
+        const res = await customerLogin(phone, password);
+        localStorage.setItem('customer_token', res.data.token);
+        localStorage.setItem('customer_info', JSON.stringify(res.data.customer));
+      }
+      navigate(`/order/${tableCode}/menu`);
+      
+    } catch (err) {
+      setError(err.response?.data?.message || 'Đăng nhập thất bại');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -28,7 +68,8 @@ export const LoginLayout = () => {
         width: "100%",
       }}
     >
-<HeaderLogin></HeaderLogin>
+      <HeaderLogin/>
+
       {/* Header section */}
       <Stack alignItems="center" spacing={1}>
         <Typography
@@ -53,6 +94,9 @@ export const LoginLayout = () => {
 
       {/* Form fields */}
       <Stack spacing={2.5} sx={{px:3}}>
+
+        {error && <Alert severity="error" sx={{ borderRadius: 2 }}>{error}</Alert>}
+
         {/* Phone number field */}
         <Stack spacing={0.5}>
           <Typography variant="body2" fontWeight={600} color="grey.700">
@@ -62,6 +106,9 @@ export const LoginLayout = () => {
             fullWidth
             placeholder="Số điện thoại"
             variant="outlined"
+             value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -107,7 +154,10 @@ export const LoginLayout = () => {
             fullWidth
             placeholder="Mật khẩu"
             variant="outlined"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -142,6 +192,8 @@ export const LoginLayout = () => {
         <Button
           fullWidth
           variant="contained"
+          onClick={handleLogin}
+          disabled={loading}
           sx={{
             bgcolor: "#a21a16",
             color: "white",
@@ -157,8 +209,9 @@ export const LoginLayout = () => {
             },
           }}
         >
-          Đăng nhập ngay
+           {loading ? <CircularProgress size={24} color="inherit" /> : 'Đăng nhập ngay'}
         </Button>
+
       </Stack>
 
       {/* Footer section */}
@@ -176,6 +229,7 @@ export const LoginLayout = () => {
           <Link
             href="#"
             underline="none"
+            onClick={() => navigate(`/order/${tableCode}/register`)}
             sx={{ color: "#b4463c", fontWeight: 700, fontSize: "0.875rem" }}
           >
             Đăng ký thành viên

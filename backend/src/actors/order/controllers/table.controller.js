@@ -7,4 +7,4 @@ const verifyTable = async (req, res, next) => {
   } catch (err) { next(err); }
 };
  
-module.exports.tableController = { verifyTable };
+module.exports = { verifyTable };

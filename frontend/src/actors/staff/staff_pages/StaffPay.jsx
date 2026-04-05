@@ -9,8 +9,8 @@ import ShoppingCartOutlined from "@mui/icons-material/ShoppingCartOutlined";
 import ArrowDropDown from "@mui/icons-material/ArrowDropDown";
 import { Box, Stack, Typography, TextField, Button, Grid, CircularProgress } from "@mui/material";
 
-import { validateVoucher, checkout } from '../../../api/paymentApi';
-import { getTableOrder } from '../../../api/tableApi';
+import { validateVoucher, checkout } from '../staff_api/paymentApi';
+import { getTableOrder } from '../staff_api/tableApi';
 
 import useAuthStaff from '../staff_hook/useAuthStaff';
 import useDialog from '../staff_hook/useDialog'

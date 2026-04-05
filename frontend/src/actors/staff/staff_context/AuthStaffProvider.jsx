@@ -1,10 +1,10 @@
 import React from 'react';
-import { useState, useEffect, useRef, useCallback } from 'react'; // ← thêm useCallback
+import { useState, useEffect, useRef, useCallback } from 'react'; 
 import { Outlet } from 'react-router-dom';
 import { io } from 'socket.io-client';
-import axiosInstance from '../../../api/axiosInstance';
-import { getAllTables } from '../../../api/tableApi';
-import { AuthStaffContext } from './AuthStaffContext'; // ← thêm import
+import axiosInstance from '../staff_api/axiosInstance';
+import { getAllTables } from '../staff_api/tableApi';
+import { AuthStaffContext } from './AuthStaffContext'; 
 
 export const AuthStaffProvider = ({ children }) => {
   const [admin, setAdmin] = useState(() => {
@@ -62,7 +62,7 @@ export const AuthStaffProvider = ({ children }) => {
     socket.on('disconnect', () => {
       console.log(' Socket disconnected');
     });
-  }, [fetchTables]); // ← fetchTables là dependency
+  }, [fetchTables]); 
 
   useEffect(() => {
     const saved = localStorage.getItem('staff_info');
@@ -71,7 +71,7 @@ export const AuthStaffProvider = ({ children }) => {
       initSocket();
     }
     return () => destroySocket();
-  }, [fetchTables, initSocket, destroySocket]); // ← đủ dependencies
+  }, [fetchTables, initSocket, destroySocket]); 
 
   const loginStaff = async (username, password) => {
     const res = await axiosInstance.post('/auth/login', { username, password });

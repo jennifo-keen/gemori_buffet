@@ -4,9 +4,12 @@ import CloseIcon from "@mui/icons-material/Close";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { AppBar, Box, IconButton, Stack, Toolbar, Typography } from "@mui/material";
 import logo from "../../../assets/img/Logo 1.png"
-
+import { useNavigate } from "react-router-dom";
+import { useOrder } from '../order_context/OrderContext';
 
 export const Order_Navbar = () => {
+  const navigate = useNavigate();
+  const {tableCode } = useOrder();
   return (
     <AppBar
       position="static"
@@ -17,10 +20,10 @@ export const Order_Navbar = () => {
       <Toolbar sx={{ minHeight: 48, px: 1, justifyContent: "space-between" }}>
         {/* Left: Back and Close icons */}
         <Stack direction="row" spacing={1} alignItems="center">
-          <IconButton size="small" aria-label="go back">
+          <IconButton onClick={() => navigate(-1)} size="small" aria-label="go back">
             <ChevronLeftIcon />
           </IconButton>
-          <IconButton size="small" aria-label="close">
+          <IconButton onClick={() => navigate(`/order/${tableCode}`)} size="small" aria-label="close">
             <CloseIcon />
           </IconButton>
         </Stack>

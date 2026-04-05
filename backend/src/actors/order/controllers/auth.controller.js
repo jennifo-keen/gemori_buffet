@@ -24,6 +24,25 @@ const getProfile = async (req, res, next) => {
     res.json(result);
   } catch (err) { next(err); }
 };
- 
-module.exports.authController = { customerLogin, customerRegister, getProfile };
+
+const updateProfile = async (req, res, next) => {
+  try {
+    res.json(await authService.updateProfile(req.customer.id, req.body));
+  } catch (err) { next(err); }
+};
+
+const deleteAccount = async (req, res, next) => {
+  try {
+    await authService.deleteAccount(req.customer.id);
+    res.json({ message: 'Tài khoản đã được xóa' });
+  } catch (err) { next(err); }
+};
+
+const getAvailableVouchers = async (req, res, next) => {
+  try {
+    res.json(await authService.getAvailableVouchers());
+  } catch (err) { next(err); }
+};
+
+module.exports = { customerLogin, customerRegister, getProfile, updateProfile, deleteAccount, getAvailableVouchers };
  

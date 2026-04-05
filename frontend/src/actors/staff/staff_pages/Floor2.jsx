@@ -14,7 +14,7 @@ import  useDialog  from '../staff_hook/useDialog';
 import { handleTableAction } from '../staff_config/tablesActions';
 import { FLOORS, FLOOR2_ROW1, FLOOR2_ROW2 } from '../staff_config/floorConfig';
 
-const Floor2 = () => {
+const Floor2 = ({ onTableClick }) => {
   const navigate = useNavigate();
   const { showError } = useDialog();
 
@@ -33,12 +33,13 @@ const Floor2 = () => {
     <Box p={4}><Typography color="error">{tablesError}</Typography></Box>
   );
 
-    const handleClick = (code) => {
-    handleTableAction({
-      table: getTable(code),
-      navigate,
-      showError,
-    });
+  const handleClick = (code) => {
+    const table = getTable(code);
+    if (onTableClick) {
+      onTableClick(table);
+    } else {
+      handleTableAction({ table, navigate, showError });
+    }
   };
 
    const floorStats = FLOORS.map(f => {

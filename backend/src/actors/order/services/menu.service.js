@@ -19,20 +19,37 @@ const getBuffetTickets = async () => {
 };
 
 // Lấy menu theo gói buffet của bàn — Web 1
-const getMenuByTable = async (tableId) => {
-  // Lấy buffet_ticket_id từ order đang chạy
+const getMenuByTable = async (tableCode) => {
+  const tableResult = await pool.query('SELECT * FROM tables WHERE table_code = $1', [tableCode]);
+  const table = tableResult.rows[0];
+  if (!table) throw { status: 404, message: 'Bàn không tồn tại' };
+
+  // Lấy buffet_ticket_id từ order đang chạy (nếu có)
   const orderResult = await pool.query(
     `SELECT o.buffet_ticket_id, bt.name AS ticket_name
      FROM orders o
      LEFT JOIN buffet_tickets bt ON o.buffet_ticket_id = bt.id
      WHERE o.table_id = $1 AND o.status = 'ordering'
      LIMIT 1`,
-    [tableId]
+    [table.id]
   );
- 
 
-  const order = orderResult.rows[0];
-  if (!order) throw { status: 400, message: 'Bàn chưa có đơn hàng' };
+  let buffetTicketId;
+  let ticketName;
+
+  if (orderResult.rows[0]) {
+    buffetTicketId = orderResult.rows[0].buffet_ticket_id;
+    ticketName = orderResult.rows[0].ticket_name;
+  } else {
+    // Fallback: nếu chưa có order, dùng gói buffet mặc định first active
+    const ticketResult = await pool.query(
+      `SELECT id, name FROM buffet_tickets WHERE is_active = true ORDER BY price ASC LIMIT 1`
+    );
+    const ticket = ticketResult.rows[0];
+    if (!ticket) throw { status: 404, message: 'Chưa có gói buffet nào' };
+    buffetTicketId = ticket.id;
+    ticketName = ticket.name;
+  }
 
   // Lấy tất cả món thuộc gói buffet này
   const menuResult = await pool.query(
@@ -42,7 +59,7 @@ const getMenuByTable = async (tableId) => {
      WHERE btm.buffet_ticket_id = $1
        AND m.status = true
      ORDER BY m.category ASC, m.name ASC`,
-    [order.buffet_ticket_id]
+    [buffetTicketId]
   );
 
   // Group theo category
@@ -54,7 +71,7 @@ const grouped = {};
   }
  
   return {
-    ticket_name: order.ticket_name,
+    ticket_name: ticketName,
     categories: Object.entries(grouped).map(([name, items]) => ({ name, items })),
   };
 };

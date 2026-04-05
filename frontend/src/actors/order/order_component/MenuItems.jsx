@@ -1,9 +1,13 @@
 import React from 'react';
 import AddIcon from "@mui/icons-material/Add";
 import { Box, IconButton, Stack, Typography } from "@mui/material";
-import image from "../../../assets/img/Image.png"
+import defaultImage from "../../../assets/img/Image.png"
+import { useOrder } from '../order_context/OrderContext';
+import RemoveIcon from "@mui/icons-material/Remove";
 
-export const MenuItems = () => {
+export const MenuItems = ({ item }) => {
+  const { addToCart, removeFromCart, getCartQty } = useOrder();
+  const qty = getCartQty(item.id);
   return (
     <Stack 
       direction="row" 
@@ -15,8 +19,9 @@ export const MenuItems = () => {
       }}
       >
       <Box
-        src={image}
         component="img"
+        src={item.image_url || defaultImage}
+        alt={item.name}
         sx={{
           width: 88,
           height: 88,
@@ -52,7 +57,7 @@ export const MenuItems = () => {
               color: "#0f172a",
             }}
           >
-            Thịt nhúng lẩu
+            {item.name}
           </Typography>
 
           <Typography
@@ -64,25 +69,34 @@ export const MenuItems = () => {
               lineHeight: "1.25rem",
             }}
           >
-            Buffet
+            {item.category}
           </Typography>
         </Stack>
 
         {/* Add button */}
-        <IconButton
-          size="small"
-          sx={{
-            bgcolor: "#a21a16",
-            color: "white",
-            borderRadius: "999px",
-            p: 0.5,
-            "&:hover": {
-              bgcolor: "#8b1512",
-            },
-          }}
-        >
-          <AddIcon sx={{ width: 18, height: 18 }} />
-        </IconButton>
+        {qty === 0 ? (
+          <IconButton size="small" onClick={() => addToCart(item)}
+            sx={{ bgcolor: "#a21a16", color: "white", borderRadius: "999px", p: 0.5, "&:hover": { bgcolor: "#8b1512" } }}
+          >
+            <AddIcon sx={{ width: 18, height: 18 }} />
+          </IconButton>
+        ) : (
+          <Stack direction="row" alignItems="center" spacing={0.5}>
+            <IconButton size="small" onClick={() => removeFromCart(item.id)}
+              sx={{ bgcolor: "grey.200", borderRadius: "999px", p: 0.5 }}
+            >
+              <RemoveIcon sx={{ width: 16, height: 16 }} />
+            </IconButton>
+            <Typography sx={{ fontWeight: 700, fontSize: 13, minWidth: 16, textAlign: 'center' }}>
+              {qty}
+            </Typography>
+            <IconButton size="small" onClick={() => addToCart(item)}
+              sx={{ bgcolor: "#a21a16", color: "white", borderRadius: "999px", p: 0.5, "&:hover": { bgcolor: "#8b1512" } }}
+            >
+              <AddIcon sx={{ width: 16, height: 16 }} />
+            </IconButton>
+          </Stack>
+        )}
       </Stack>
     </Stack>
   );

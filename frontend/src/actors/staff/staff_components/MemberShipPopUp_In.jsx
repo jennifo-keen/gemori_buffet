@@ -13,7 +13,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 
-import axiosInstance from '../../../api/axiosInstance';
+import axiosInstance from '../staff_api/axiosInstance';
 
 export const MemberShipPopUp_In = ({ onSuccess, onClose }) => {
   const [customerName, setCustomerName] = useState("");

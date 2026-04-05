@@ -1,15 +1,17 @@
 import React from "react";
 import { createBrowserRouter } from "react-router-dom";
 import UserRouter from "../router/UserRouter.jsx";
-import staffRouter from "./StaffRouter.jsx";
+import StaffRouter from "./StaffRouter.jsx";
 import AdminRouter from "./AdminRouter.jsx"
-import orderRouter from "./OrderRouter.jsx"
+import OrderRouter from "./OrderRouter.jsx"
+import KitchenRouter from "./KitchenRouter.jsx";
 
 const router = createBrowserRouter([
   ...UserRouter,
-  staffRouter,
+  StaffRouter,
   AdminRouter,
-  ...orderRouter,
+  ...OrderRouter,
+  ...KitchenRouter
 ]);
 
 export default router;

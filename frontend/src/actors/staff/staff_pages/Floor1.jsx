@@ -14,11 +14,9 @@ import useDialog  from '../staff_hook/useDialog';
 
 
 
-const Floor1 = () => {
-
+const Floor1 = ({ onTableClick }) => {
   const navigate = useNavigate();
   const { showError } = useDialog();
-
   const {
     tablesLoading, tablesError,
     getTable, getStatus, getTableColor, getChairColor, getFloorTables,
@@ -35,12 +33,15 @@ const Floor1 = () => {
   );
 
   const handleClick = (code) => {
-      handleTableAction({
-        table: getTable(code),
-        navigate,
-        showError,
-      });
-    };
+    const table = getTable(code);
+    if (onTableClick) {
+      // Kitchen 
+      onTableClick(table);
+    } else {
+      // Staff 
+      handleTableAction({table, navigate, showError });
+    }
+  };
 
   const floorStats = FLOORS.map(f => {
     const t = getFloorTables(f.range[0], f.range[1]);

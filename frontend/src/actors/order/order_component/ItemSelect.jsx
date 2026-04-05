@@ -1,7 +1,8 @@
 import React from "react";
-import { Box, IconButton, Stack, Typography } from "@mui/material";
-import { useState } from "react";
+import { Box, IconButton, Stack, Typography, Chip } from "@mui/material";
+import { useOrder } from '../order_context/OrderContext';
 import image from "../../../assets/img/Image.png"
+import { STATUS_CONFIG } from '../order_config/statusConfig';
 
 // Quantity counter component for reusability
 const QuantityCounter = ({ value, onDecrement, onIncrement }) => (
@@ -69,11 +70,10 @@ const QuantityCounter = ({ value, onDecrement, onIncrement }) => (
   </Stack>
 );
 
-const Order_ItemSelect= () => {
-  const [quantity, setQuantity] = useState(1);
-
-  const handleDecrement = () => setQuantity((prev) => Math.max(0, prev - 1));
-  const handleIncrement = () => setQuantity((prev) => prev + 1);
+const Order_ItemSelect = ({ item, mode = 'cart' }) => {
+  const { addToCart, removeFromCart, getCartQty } = useOrder();
+  const qty = mode === 'cart' ? (item.quantity || getCartQty(item.id)) : item.quantity;
+  const status = STATUS_CONFIG[item.status];
 
   return (
     <Stack
@@ -93,8 +93,8 @@ const Order_ItemSelect= () => {
       <Stack direction="row" alignItems="center" spacing={2} flex={1}>
         <Box
           component="img"
-          src={image}
-          alt="Thịt bò Wagyu"
+          src={item.image_url || image}
+          alt={item.menu_name || item.name}
           sx={{
             width: 72,
             height: 72,
@@ -115,7 +115,7 @@ const Order_ItemSelect= () => {
               lineHeight: 1.4,
             }}
           >
-            Thịt bò Wagyu
+            {item.menu_name || item.name}
           </Typography>
 
           <Typography
@@ -127,18 +127,33 @@ const Order_ItemSelect= () => {
               lineHeight: 1.4,
             }}
           >
-            Buffet
+            {item.category || 'Buffet'}
           </Typography>
         </Stack>
       </Stack>
 
       {/* Right section: quantity counter */}
       <Stack justifyContent="center" alignSelf="stretch" sx={{ width: 101 }}>
-        <QuantityCounter
-          value={quantity}
-          onDecrement={handleDecrement}
-          onIncrement={handleIncrement}
-        />
+        {mode === 'cart' ? (
+          // Giỏ hàng — cho chỉnh số lượng
+          <QuantityCounter
+            value={qty}
+            onDecrement={() => removeFromCart(item.id)}
+            onIncrement={() => addToCart(item)}
+          />
+        ) : (
+          // Món đã gọi — hiện trạng thái
+          <Stack alignItems="flex-end" spacing={0.5}>
+            <Typography sx={{ fontWeight: 700, fontSize: 13, color: "#1e293b" }}>
+              x{qty}
+            </Typography>
+            {status && (
+              <Chip label={status.label} size="small"
+                sx={{ bgcolor: status.bg, color: status.color, fontWeight: 600, fontSize: 11, height: 22 }}
+              />
+            )}
+          </Stack>
+        )}
       </Stack>
     </Stack>
   );

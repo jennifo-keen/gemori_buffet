@@ -1,8 +1,20 @@
 import React from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Img from '../../../assets/img/ord_intro.png'
 import { Box, Button, Divider, Paper, Stack, Typography } from "@mui/material";
 
 export const Order_Home= () => {
+  const navigate = useNavigate();
+  const { tableCode } = useParams();
+
+const handleOrderNow = () => {
+  navigate(`/order/${tableCode}/menu`);
+};
+
+const handleLogin = () => {
+  navigate(`/order/${tableCode}/login`);
+};
+
   return (
     <Box
       sx={{
@@ -71,10 +83,11 @@ export const Order_Home= () => {
 
         <Divider sx={{ my: 1 }} />
 
-        {/* Button */}
+        {/* Gọi món ngay button */}
         <Button
           variant="contained"
           fullWidth
+          onClick={handleOrderNow}
           sx={{
             backgroundColor: "#000",
             color: "#fff",
@@ -89,6 +102,29 @@ export const Order_Home= () => {
           }}
         >
           Gọi món ngay
+        </Button>
+
+        {/* Đăng nhập button */}
+        <Button
+          variant="outlined"
+          fullWidth
+          onClick={handleLogin}
+          sx={{
+            backgroundColor: "transparent",
+            color: "#000",
+            borderColor: "#000",
+            borderRadius: 3,
+            height: 54, 
+            fontWeight: 700,
+            fontSize: 16,
+            textTransform: "none",
+            "&:hover": {
+              backgroundColor: "rgba(0, 0, 0, 0.04)",
+              borderColor: "#000",
+            },
+          }}
+        >
+          Đăng nhập thành viên
         </Button>
       </Paper>
     </Box>
