@@ -1,7 +1,11 @@
 import React from 'react';
 import { Box, Chip, Paper, Stack, Typography } from "@mui/material";
+import {getPriorityLabel, formatOrderTime} from "../kitchen_utils/Component/OrdCardUntil"
 
-export const OrdStatusHeader = () => {
+export const OrdStatusHeader = ({ tableData }) => {
+  const items         = tableData?.items || [];
+  const priorityLabel = getPriorityLabel(items);
+  const firstTime     =formatOrderTime(items[0]?.item_order_time);
   return (
     <Paper
       variant="outlined"
@@ -26,10 +30,11 @@ export const OrdStatusHeader = () => {
               fontWeight="bold"
               sx={{ color: "#b14135", lineHeight: 1.2 }}
             >
-              Bàn 05
+              Bàn {tableData?.table_code}
             </Typography>
+            {priorityLabel && (
             <Chip
-              label="Ưu tiên"
+              label={priorityLabel}
               size="small"
               sx={{
                 backgroundColor: "#b141351a",
@@ -41,11 +46,12 @@ export const OrdStatusHeader = () => {
                 height: 28,
               }}
             />
+            )}
           </Stack>
 
           {/* Subtitle */}
           <Typography variant="body2" color="text.secondary" sx={{ pt: 1 }}>
-            Mã đơn: #GM-8829 • 12 món 
+            Mã đơn: #{items?.id?.slice(0, 4)} • {items.length} món 
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ pt: 1 }}>
             • Nhân viên: Nguyễn Văn A
@@ -80,7 +86,7 @@ export const OrdStatusHeader = () => {
             color="text.primary"
             sx={{ lineHeight: 1.2 }}
           >
-            12:45
+            {firstTime}
           </Typography>
         </Box>
       </Stack>

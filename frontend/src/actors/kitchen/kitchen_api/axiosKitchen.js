@@ -1,28 +1,28 @@
 import axios from 'axios';
 
-const axiosInstance = axios.create({
-  baseURL: `${import.meta.env.VITE_SOCKET_URL}/staff`,
+const axiosKitchen = axios.create({
+  baseURL: `${import.meta.env.VITE_SOCKET_URL}/kitchen`,
   timeout: 10000,
 });
 
-axiosInstance.interceptors.request.use((config) => {
+axiosKitchen.interceptors.request.use((config) => {
   const token = localStorage.getItem('staff_token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-axiosInstance.interceptors.response.use(
+axiosKitchen.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      if (!window.location.pathname.includes('/staff/login')) {
+      if (!window.location.pathname.includes('/kitchen/login')) {
         localStorage.removeItem('staff_token');
         localStorage.removeItem('staff_info');
-        window.location.href = '/staff/login';
+        window.location.href = '/kitchen/login';
       }
     }
     return Promise.reject(error);
   }
 );
 
-export default axiosInstance;
+export default axiosKitchen;

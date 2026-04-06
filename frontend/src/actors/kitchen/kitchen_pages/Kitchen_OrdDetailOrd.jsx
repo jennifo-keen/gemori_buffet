@@ -1,11 +1,74 @@
-import React from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import OrdStatusHeader  from "../kitchen_components/OrdStatusHeader"
 import OrderTable from '../kitchen_components/OrderTable';
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import CloseIcon from "@mui/icons-material/Close";
-import { Box, Button, Stack } from "@mui/material";
+import { Box, Button, Stack, CircularProgress, Typography } from "@mui/material";
+
+import { fetchPendingItems, updateItemStatus, completeTableStatus } from '../kitchen_api/kitchenApi';
+import { useTableSocket } from '../kitchen_hook/useTableSocket';
 
 export default function Kitchen_OrdDetailOrd() {
+  const { tableCode } = useParams();
+  const navigate = useNavigate();
+
+  const [tableData, setTableData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [completing, setCompleting] = useState(false)
+
+  // Load data logic
+  const loadData = useCallback(async () => {
+    try {
+      const res = await fetchPendingItems();
+      const found = res.data.find(t => t.table_code === tableCode);
+      setTableData(found || null);
+    } catch (err) {
+      console.error("Lỗi tải dữ liệu bàn:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [tableCode]);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  // Realtime logic
+  useTableSocket(tableCode, loadData, setTableData);
+
+  // Handlers
+  const handleUpdateItem = async (itemId, status) => {
+    try {
+      await updateItemStatus(itemId, status);
+    } catch (err) {
+      console.error("Lỗi cập nhật món:", err);
+    }
+  };
+
+  const handleCompleteAll = async () => {
+    try {
+      setCompleting(true);
+      await completeTableStatus(tableCode);
+      navigate('/kitchen/all');
+    } catch (err) {
+      console.error("Lỗi hoàn tất bàn:", err);
+    } finally {
+      setCompleting(false);
+    }
+  };
+
+  if (loading) return (
+    <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+      <CircularProgress sx={{ color: "#b4463c" }} />
+    </Box>
+  );
+
+  if (!tableData) return (
+    <Box p={4} textAlign="center">
+      <Typography color="text.secondary">Không có món nào đang chờ cho bàn {tableCode}</Typography>
+      <Button onClick={() => navigate('/kitchen/all')} sx={{ mt: 2, color: "#b4463c" }}>Quay lại</Button>
+    </Box>
+  );
+
   return (
     <Box
       sx={{
@@ -16,8 +79,11 @@ export default function Kitchen_OrdDetailOrd() {
         justifyContent: "center",
         zoom: "0.75",
       }}>
-        <OrdStatusHeader/>
-        <OrderTable/>
+        <OrdStatusHeader tableData={tableData} />
+        <OrderTable 
+          items={tableData.items}
+          onUpdateItem={handleUpdateItem}
+        />
 
         <Box
           component="footer"
@@ -33,6 +99,7 @@ export default function Kitchen_OrdDetailOrd() {
             {/* Close details button */}
             <Button
               variant="contained"
+              onClick={() => navigate('/kitchen/all')}
               startIcon={<CloseIcon sx={{ width: 24, height: 24 }} />}
               sx={{
                 backgroundColor: "grey.100",
@@ -56,7 +123,9 @@ export default function Kitchen_OrdDetailOrd() {
             {/* Complete order button */}
             <Button
               variant="contained"
-              startIcon={<CheckBoxIcon sx={{ width: 32, height: 32 }} />}
+              startIcon={completing ? <CircularProgress size={20} color="inherit" /> : <CheckBoxIcon />}
+              onClick={handleCompleteAll}
+              disabled={completing}
               sx={{
                 backgroundColor: "#b14135",
                 borderRadius: "12px",
@@ -72,7 +141,7 @@ export default function Kitchen_OrdDetailOrd() {
                 },
               }}
             >
-              HOÀN TẤT ĐƠN
+              {completing ? 'ĐANG XỬ LÝ...' : 'HOÀN TẤT ĐƠN'}
             </Button>
           </Stack>
         </Box>
