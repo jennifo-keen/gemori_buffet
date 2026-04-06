@@ -19,6 +19,6 @@ router.patch('/items/:id/status', requireRole('kitchen', 'admin', 'staff'), kitc
 
 // ── Cập nhật tất cả món của 1 bàn ────────────────────────────────
 // Body: { status: 'cooking' | 'done' }
-router.patch('/tables/:tableCode/status', requireRole('kitchen', 'admin', 'staff'), kitchenController.updateAllByTable);
+router.patch('/:tableCode/status', requireRole('kitchen', 'admin', 'staff'), kitchenController.updateAllByTable);
 
 module.exports = router;

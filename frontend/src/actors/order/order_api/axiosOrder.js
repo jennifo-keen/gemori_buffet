@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosOrder = axios.create({
-  baseURL: 'http://localhost:3000/api/order',
+  baseURL: `${import.meta.env.VITE_SOCKET_URL}/order`,
   timeout: 10000,
 });
 

@@ -1,8 +1,23 @@
 import React from "react";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import { Box, Button, Card, Chip, Stack, Typography } from "@mui/material";
+import { STATUS_CONFIG } from "../kitchen_config/StatusOrdConfig";
+import { getRelativeTime, getPriorityStatus, 
+        getPriorityLabel, formatOrderTime 
+      } from "../kitchen_utils/Component/OrdCardUntil";
 
-export const OrdCard = () => {
+export const OrdCard = ({ tableData, onViewDetail }) => {
+  if (!tableData) return null;
+
+  const { table_code, items } = tableData;
+  const firstItem      = items[0];
+  const otherCount     = items.length - 1;
+  const priorityStatus = getPriorityStatus(items);
+  const priorityLabel  = getPriorityLabel(items);
+  const statusCfg      = STATUS_CONFIG[priorityStatus] || STATUS_CONFIG.pending;
+  
+  const relTime        = getRelativeTime(firstItem?.item_order_time);
+  const orderTime      = formatOrderTime(firstItem?.item_order_time);
   return (
     <Card
       variant="outlined"
@@ -36,15 +51,13 @@ export const OrdCard = () => {
               color="slate.900"
               sx={{ color: "#0f172a", lineHeight: 1.3 }}
             >
-              Bàn số 05
+              Bàn {table_code}
             </Typography>
-            <Typography
-              variant="body2"
-              fontWeight={600}
-              sx={{ color: "#b4463c" }}
-            >
-              Ưu tiên cao
-            </Typography>
+            {priorityLabel && (
+              <Typography variant="body2" fontWeight={600} sx={{ color: "#b4463c" }}>
+                {priorityLabel}
+              </Typography>
+            )}
           </Stack>
 
           {/* Right: Time + relative time */}
@@ -54,10 +67,10 @@ export const OrdCard = () => {
               fontWeight="bold"
               sx={{ color: "#b4463c", fontSize: "1.1rem" }}
             >
-              12:45
+              {orderTime}
             </Typography>
             <Typography variant="caption" sx={{ color: "text.secondary" }}>
-              12 phút trước
+              {relTime}
             </Typography>
           </Stack>
         </Stack>
@@ -82,7 +95,7 @@ export const OrdCard = () => {
               fontWeight="bold"
               sx={{ color: "#b4463c", lineHeight: "2rem" }}
             >
-              x2
+              x{firstItem?.quantity}
             </Typography>
             <Stack spacing={0.25}>
               <Typography
@@ -90,10 +103,10 @@ export const OrdCard = () => {
                 fontWeight="bold"
                 sx={{ color: "#0f172a" }}
               >
-                Ba chỉ bò Mỹ
+                {firstItem?.menu_name}
               </Typography>
               <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                Ghi chú: Cắt mỏng
+                {firstItem?.category}
               </Typography>
             </Stack>
           </Stack>
@@ -102,16 +115,13 @@ export const OrdCard = () => {
           <Chip
             icon={
               <FiberManualRecordIcon
-                sx={{ fontSize: 10, color: "#f4ca66 !important" }}
-              />
-            }
-            label="Đang chế biến"
-           
+                sx={{ fontSize: 10, color: `${STATUS_CONFIG[firstItem?.status]?.dot || statusCfg.dot} !important` }} />}
+            label={STATUS_CONFIG[firstItem?.status]?.label || 'Đang chờ'}
             sx={{
-              bgcolor: "#ffeed1",
-              border: "1px solid #f4ca66",
+              bgcolor: STATUS_CONFIG[firstItem?.status]?.bg || statusCfg.bg,
+              border: `1px solid ${STATUS_CONFIG[firstItem?.status]?.border || statusCfg.border}`,
               borderRadius: "999px",
-              color: "#b4463c",
+              color: STATUS_CONFIG[firstItem?.status]?.color || statusCfg.color,
               fontWeight: 700,
               fontSize: "12px",
               px: 0.5,
@@ -125,6 +135,7 @@ export const OrdCard = () => {
       </Box>
 
       {/* "... and 3 more items waiting" */}
+      {otherCount > 0 && (
       <Box
         sx={{
           py: 1,
@@ -138,14 +149,15 @@ export const OrdCard = () => {
           variant="body2"
           sx={{ color: "text.secondary", textAlign: "center" }}
         >
-          ... và 3 món khác đang chờ
+          ... và {otherCount} món khác đang chờ
         </Typography>
       </Box>
-
+    )}
       {/* Footer with action button */}
       <Box sx={{ bgcolor: "grey.50", p: 1.5 }}>
         <Button
           variant="contained"
+          onClick={() => onViewDetail?.(tableData)}
           fullWidth
           sx={{
             bgcolor: "#b4463c",

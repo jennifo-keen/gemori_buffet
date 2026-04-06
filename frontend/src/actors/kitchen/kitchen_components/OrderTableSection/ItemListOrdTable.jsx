@@ -2,47 +2,9 @@ import React from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { Box, Button, Chip, Stack, Typography } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import { STATUS_CONFIG} from "../../kitchen_config/StatusOrdConfig";
 
-
-const orderItems = [
-  {
-    id: 1,
-    name: "Bò Mỹ sốt Gemori",
-    subtitle: "Bò Mỹ sốt Gemori",
-    quantity: 2,
-    status: "Đang chế biến",
-  },
-  {
-    id: 2,
-    name: "Bò Mỹ sốt Gemori",
-    subtitle: "Bò Mỹ sốt Gemori",
-    quantity: 2,
-    status: "Đang chế biến",
-  },
-  {
-    id: 3,
-    name: "Bò Mỹ sốt Gemori",
-    subtitle: "Bò Mỹ sốt Gemori",
-    quantity: 2,
-    status: "Đang chế biến",
-  },
-  {
-    id: 4,
-    name: "Bò Mỹ sốt Gemori",
-    subtitle: "Bò Mỹ sốt Gemori",
-    quantity: 2,
-    status: "Đang chế biến",
-  },
-  {
-    id: 5,
-    name: "Bò Mỹ sốt Gemori",
-    subtitle: "Bò Mỹ sốt Gemori",
-    quantity: 2,
-    status: "Đang chế biến",
-  },
-];
-
-export const ItemListOrdTable = () => {
+export const ItemListOrdTable = ({ items = [], onUpdateItem }) => {
   return (
     <Box
       component="section"
@@ -55,7 +17,9 @@ export const ItemListOrdTable = () => {
         position: "relative",
       }}
     >
-      {orderItems.map((item) => (
+      {items.map((item) => {
+        const cfg = STATUS_CONFIG[item.status] || STATUS_CONFIG.pending;
+        return (
         <Stack
           key={item.id}
           direction="row"
@@ -75,14 +39,14 @@ export const ItemListOrdTable = () => {
               color="text.primary"
               sx={{ lineHeight: 1.5 }}
             >
-              {item.name}
+              {item.menu_name}
             </Typography>
             <Typography
               variant="caption"
               color="text.disabled"
               sx={{ lineHeight: 1.5 }}
             >
-              {item.subtitle}
+              {item.category}
             </Typography>
           </Box>
 
@@ -127,7 +91,7 @@ export const ItemListOrdTable = () => {
             }}
           >
             <Chip
-              label={item.status}
+              label={cfg.label}
               size="small"
               icon={
                 <Box
@@ -161,6 +125,7 @@ export const ItemListOrdTable = () => {
 
           {/* Action button */}
           <Box
+          
             sx={{
               display: "flex",
               alignItems: "center",
@@ -170,9 +135,11 @@ export const ItemListOrdTable = () => {
               minWidth: 168,
             }}
           >
+            {item.status === 'pending' && (
             <Button
               variant="contained"
               size="small"
+              onClick={() => onUpdateItem?.(item.id, 'cooking')}
               sx={{
                 bgcolor: "#b14135",
                 borderRadius: 2,
@@ -185,27 +152,32 @@ export const ItemListOrdTable = () => {
                 },
               }}
             >
-              Xong món
+              Bắt đầu làm
             </Button>
-          </Box>
-        </Stack>
-      ))}
+            )}
+         {item.status === 'cooking' && (
+                <Button variant="contained" size="small"
+                  onClick={() => onUpdateItem?.(item.id, 'done')}
+                  sx={{ bgcolor: "#b14135", borderRadius: 2, fontWeight: "bold", textTransform: "none", whiteSpace: "nowrap", "&:hover": { bgcolor: "#9a3830" } }}
+                >
+                  Xong món
+                </Button>
+              )}
+              {item.status === 'done' && (
+                <Typography variant="body2" color="success.main" fontWeight={600}>✓ Hoàn thành</Typography>
+              )}
+            </Box>
+          </Stack>
+        );
+      })}
 
       {/* Caret down indicator */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          py: 1,
-        }}
-      >
-        <KeyboardArrowDownIcon
-          sx={{ width: 32, height: 32, color: "text.secondary" }}
-        />
+     <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 1 }}>
+        <KeyboardArrowDownIcon sx={{ width: 32, height: 32, color: "text.secondary" }} />
       </Box>
     </Box>
   );
 };
+
 
 export default ItemListOrdTable;

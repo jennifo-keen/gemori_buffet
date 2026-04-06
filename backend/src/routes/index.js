@@ -5,9 +5,10 @@ const router = Router();
 router.use('/admin/report', require('../actors/admin/report/report.route'));
 router.use('/admin/forecast', require('../actors/admin/ai/forecastRoutes'));
 
+router.use('/auth',      require('../actors/admin/auth/auth.route'));
+router.use('/staff',    require('../actors/staff/routes/staff.route'));
+router.use('/kitchen',  require('../actors/kitchen/routes/kitchen.routes'));
 //user_member
-router.use('/auth', require('../actors/admin/auth/auth.route'));
-router.use('/staff', require('../actors/staff/routes/staff.route'));
 router.use('/users', require('../actors/user/auth/customerAuth.route'));
 router.use('/home', require('../actors/user/home/home.router'));
 router.use('/menu', require('../actors/user/menu/menu.route'));
