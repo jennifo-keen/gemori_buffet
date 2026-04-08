@@ -90,6 +90,15 @@ const updateItemStatus = async (itemId, status) => {
       menu_name: item.menu_name,
     });
 
+    // → Bếp (Web 2)
+    io.to('kitchen').emit('item_status_updated', {
+      itemId,
+      status,
+      tableId:   item.table_id,
+      tableCode: item.table_code,
+      menu_name: item.menu_name,
+    });
+
     // → Staff (Web 3)
     io.to('staff').emit('item_status_updated', {
       itemId,
@@ -148,6 +157,12 @@ const updateAllItemsByTable = async (tableCode, status) => {
     const io = getIO();
     io.to(`table_${table.id}`).emit('table_items_updated', {
       tableCode,
+      status,
+      itemIds,
+    });
+    io.to('kitchen').emit('table_items_updated', {
+      tableCode,
+      tableId: table.id,
       status,
       itemIds,
     });
