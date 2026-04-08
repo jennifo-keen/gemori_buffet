@@ -33,7 +33,7 @@ const KitchenRouter = [
       children: [
         { index: true, element: <Floor1 /> },
         { path: "f2", element: <Floor2 /> },
-        { path: "ord_table", element: <OrdDetailTable  /> },
+        { path: ":tableCode/ord_table", element: <OrdDetailTable  /> },
         { path: ":tableCode/ord_ord", element: <OrdDetailOrd  /> },
         { path: "all", element: <OrdAll /> },
         { path: "detail", element: <OrdDetail /> },
