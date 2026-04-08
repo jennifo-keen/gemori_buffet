@@ -12,7 +12,7 @@ const KitchenFloor1 = () => {
     }
   };
 
-  return <Floor1 onTableClick={handleTableClick} />;
+  return <Floor1 onTableClick={handleTableClick} basePath="/kitchen" />;
 };
 
 export default KitchenFloor1;

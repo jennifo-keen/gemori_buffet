@@ -1,124 +1,61 @@
-import React from 'react';
-import { Box } from "@mui/material";
+import React, { useEffect, useState, useCallback } from 'react';
+import { Box, CircularProgress, Typography } from "@mui/material";
 import TableCard from '../kitchen_components/TableCardOpt';
 
-const tables = [
-  {
-    id: 1,
-    tableNumber: "01",
-    priority: "normal", // normal | high
-    time: "18:05",
-    createdAt: "5 phút trước",
-    items: [
-      {
-        id: 1,
-        name: "Ba chỉ bò Mỹ",
-        quantity: 2,
-        note: "Cắt mỏng",
-        status: "cooking", // waiting | cooking | done
-      },
-      {
-        id: 2,
-        name: "Nạc vai heo",
-        quantity: 1,
-        note: "",
-        status: "waiting",
-      },
-    ],
-  },
-  {
-    id: 2,
-    tableNumber: "02",
-    priority: "high",
-    time: "18:00",
-    createdAt: "10 phút trước",
-    items: [
-      {
-        id: 1,
-        name: "Thịt bò hảo hạng",
-        quantity: 3,
-        note: "Ít mỡ",
-        status: "cooking",
-      },
-      {
-        id: 2,
-        name: "Hải sản tổng hợp",
-        quantity: 1,
-        note: "",
-        status: "waiting",
-      },
-      {
-        id: 3,
-        name: "Kim chi",
-        quantity: 2,
-        note: "",
-        status: "waiting",
-      },
-    ],
-  },
-  {
-    id: 3,
-    tableNumber: "03",
-    priority: "normal",
-    time: "18:10",
-    createdAt: "2 phút trước",
-    items: [
-      {
-        id: 1,
-        name: "Ba chỉ bò Mỹ",
-        quantity: 1,
-        note: "",
-        status: "done",
-      },
-      {
-        id: 2,
-        name: "Sườn heo",
-        quantity: 2,
-        note: "Nướng kỹ",
-        status: "cooking",
-      },
-    ],
-  },
-  {
-    id: 4,
-    tableNumber: "04",
-    priority: "high",
-    time: "17:55",
-    createdAt: "20 phút trước",
-    items: [
-      {
-        id: 1,
-        name: "Thịt bò Wagyu",
-        quantity: 1,
-        note: "Medium rare",
-        status: "cooking",
-      },
-      {
-        id: 2,
-        name: "Nấm nướng",
-        quantity: 2,
-        note: "",
-        status: "waiting",
-      },
-      {
-        id: 3,
-        name: "Rau tổng hợp",
-        quantity: 1,
-        note: "",
-        status: "waiting",
-      },
-      {
-        id: 4,
-        name: "Cơm trắng",
-        quantity: 2,
-        note: "",
-        status: "waiting",
-      },
-    ],
-  },
-];
+import { fetchPendingItems, updateItemStatus, completeTableStatus } from '../kitchen_api/kitchenApi';
+import { useKitchenSocket } from '../kitchen_hook/useKitchenSocket';
 
 export default function Kitchen_OrdDetail() {
+  const [tables, setTables] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // 1. Logic tải dữ liệu
+  const loadData = useCallback(async () => {
+    try {
+      const res = await fetchPendingItems();
+      setTables(res.data);
+    } catch (err) {
+      console.error('Lỗi tải dữ liệu bếp:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  // 2. Sử dụng custom hook để xử lý Realtime
+  useKitchenSocket(loadData);
+
+  // 3. Các hàm xử lý sự kiện
+  const handleCompleteTable = async (tableCode) => {
+    try {
+      await completeTableStatus(tableCode);
+      await loadData();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleUpdateItem = async (itemId, status) => {
+    try {
+      await updateItemStatus(itemId, status);
+      await loadData();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  if (loading) return (
+    <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+      <CircularProgress sx={{ color: "#b4463c" }} />
+    </Box>
+  );
+
+  if (tables.length === 0) return (
+    <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+      <Typography color="text.secondary">Không có món nào đang chờ</Typography>
+    </Box>
+  );
   return (
     <Box
       sx={{
@@ -140,9 +77,13 @@ export default function Kitchen_OrdDetail() {
         },
       }}
     >
-      {tables.map((item, index) => (
-        <Box key={index} sx={{ flex: "0 0 auto" }}>
-          <TableCard data={item} />
+      {tables.map((tableData) => (
+        <Box key={tableData.table_code} sx={{ flex: "0 0 auto" }}>
+          <TableCard 
+            data={tableData}
+            onComplete={() => handleCompleteTable(tableData.table_code)}
+            onUpdateItem={handleUpdateItem}
+          />
         </Box>
       ))}
     </Box>

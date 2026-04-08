@@ -33,12 +33,13 @@ export default function Kitchen_OrdDetailOrd() {
   useEffect(() => { loadData(); }, [loadData]);
 
   // Realtime logic
-  useTableSocket(tableCode, loadData, setTableData);
+  useTableSocket(tableCode, loadData);
 
   // Handlers
   const handleUpdateItem = async (itemId, status) => {
     try {
       await updateItemStatus(itemId, status);
+      await loadData();
     } catch (err) {
       console.error("Lỗi cập nhật món:", err);
     }

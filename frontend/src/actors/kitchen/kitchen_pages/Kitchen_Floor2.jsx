@@ -1,5 +1,5 @@
 import React from 'react';
-import Floor2 from '../../staff/staff_pages/Floor1';
+import Floor2 from '../../staff/staff_pages/Floor2';
 import { useNavigate } from 'react-router-dom';
 
 const KitchenFloor2 = () => {
@@ -12,7 +12,7 @@ const KitchenFloor2 = () => {
     }
   };
 
-  return <Floor2 onTableClick={handleTableClick} />;
+  return <Floor2 onTableClick={handleTableClick} basePath="/kitchen" />;
 };
 
 export default KitchenFloor2;

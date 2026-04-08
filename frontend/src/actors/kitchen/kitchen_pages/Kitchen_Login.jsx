@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import  useAuthStaff  from '../../staff/staff_hook/useAuthStaff';
 
@@ -40,6 +40,7 @@ const GemoriLogo = () => (
 
 const KitchenLogin = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { loginStaff } = useAuthStaff();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -63,8 +64,8 @@ const KitchenLogin = () => {
 
       const admin = await loginStaff(username, password);
 
-      // Redirect theo role
-      if (admin.role === 'kitchen') {
+      // Redirect theo URL hiện tại - nếu từ /kitchen/login thì vô /kitchen, /staff/login thì vô /staff
+      if (location.pathname.includes('/kitchen')) {
         navigate('/kitchen');
       } else {
         navigate('/staff');
