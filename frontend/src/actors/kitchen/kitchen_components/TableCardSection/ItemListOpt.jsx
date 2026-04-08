@@ -1,26 +1,12 @@
 import React from "react";
-import { Box, List, ListItem, Typography } from "@mui/material";
+import { Box, List, ListItem, Typography, Chip, Button   } from "@mui/material";
 
-// Order items data
-const orderItems = [
-  { id: 1, index: 1, name: "Thịt bò hảo hạn", quantity: "x1" },
-  { id: 2, index: 1, name: "Thịt bò hảo hạn", quantity: "x1" },
-  { id: 3, index: 2, name: "Thịt bò hảo hạn", quantity: "x1" },
-  { id: 4, index: 3, name: "Thịt bò hảo hạn", quantity: "x1" },
-  { id: 5, index: 4, name: "Thịt bò hảo hạn", quantity: "x1" },
-  { id: 6, index: 5, name: "Thịt bò hảo hạn", quantity: "x1" },
-  { id: 7, index: 6, name: "Thịt bò hảo hạn", quantity: "x1" },
-  { id: 8, index: 7, name: "Thịt bò hảo hạn", quantity: "x1" },
-  { id: 9, index: 8, name: "Thịt bò hảo hạn", quantity: "x1" },
-];
-
-export const ItemListOpt = () => {
+export const ItemListOpt = ({ items = [] }) => {
   return (
     <List disablePadding sx={{ width: "100%", overflow: "hidden" }}>
-      {orderItems.map((item) => (
+      {items.map((item, index) => (
         <ListItem
           key={item.id}
-          onClick={() => {}}
           sx={{
             justifyContent: "space-between",
             px: 2,
@@ -47,7 +33,7 @@ export const ItemListOpt = () => {
                 variant="body2"
                 sx={{ color: "text.secondary", fontWeight: 500 }}
               >
-                {item.index}
+                {index + 1}
               </Typography>
             </Box>
 
@@ -60,7 +46,7 @@ export const ItemListOpt = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              {item.name}
+              {item.menu_name}
             </Typography>
           </Box>
 
@@ -85,9 +71,34 @@ export const ItemListOpt = () => {
                 whiteSpace: "nowrap",
               }}
             >
-              {item.quantity}
+              x{item.quantity}
             </Typography>
           </Box>
+
+                    {/* Nút hành động */}
+          {/* <Box sx={{ flexShrink: 0 }}>
+            {item.status === 'pending' && (
+              <Button size="small" variant="contained"
+                onClick={() => onUpdateItem?.(item.id, 'cooking')}
+                sx={{ bgcolor: "#f59e0b", borderRadius: 2, textTransform: "none", fontWeight: 600, fontSize: 12, whiteSpace: "nowrap", "&:hover": { bgcolor: "#d97706" } }}
+              >
+                Bắt đầu
+              </Button>
+            )}
+            {item.status === 'cooking' && (
+              <Button size="small" variant="contained"
+                onClick={() => onUpdateItem?.(item.id, 'done')}
+                sx={{ bgcolor: "#b4463c", borderRadius: 2, textTransform: "none", fontWeight: 600, fontSize: 12, whiteSpace: "nowrap", "&:hover": { bgcolor: "#9a3830" } }}
+              >
+                Xong món
+              </Button>
+            )}
+            {item.status === 'done' && (
+              <Typography variant="body2" color="success.main" fontWeight={600} sx={{ whiteSpace: "nowrap" }}>
+                ✓ Xong
+              </Typography>
+            )}
+          </Box> */}
         </ListItem>
       ))}
     </List>

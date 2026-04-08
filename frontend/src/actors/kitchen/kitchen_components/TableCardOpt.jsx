@@ -6,7 +6,7 @@ import { HeaderOpt } from "./TableCardSection/HeaderOpt";
 import { ItemListOpt } from "./TableCardSection/ItemListOpt";
 import { TitleOpt } from "./TableCardSection/TitleOpt";
 
-const TableCard = () => {
+const TableCard = ({ data, onComplete, onUpdateItem }) => {
   return (
     <Paper
       elevation={0}
@@ -22,14 +22,14 @@ const TableCard = () => {
       }}
     >
       {/* Order Header Section */}
-      <HeaderOpt />
+      <HeaderOpt tableData={data}/>
 
       {/* Order Table Header Section */}
       <TitleOpt />
 
       {/* Order Item List Section */}
       <Box sx={{ flex: 1 }}>
-        <ItemListOpt />
+        <ItemListOpt items={data?.items || []} onUpdateItem={onUpdateItem} />
       </Box>
 
       {/* Caret Down Icon */}
@@ -53,6 +53,7 @@ const TableCard = () => {
         <Button
           variant="contained"
           fullWidth
+          onClick={onComplete}
           startIcon={<CheckCircleIcon sx={{ width: 20, height: 20 }} />}
           sx={{
             backgroundColor: "#b4463c",
