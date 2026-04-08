@@ -11,3 +11,4 @@ cron.schedule("0 */2 * * *", async () => {
     await runForecast();
 
 });
+console.log("✅ forecastCron loaded");

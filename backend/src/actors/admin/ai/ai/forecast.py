@@ -30,24 +30,21 @@ model.fit(X, y)
 
 # ===== PREDICT 1H TỚI =====
 now = datetime.now()
-future_times = [
-    (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)  # chỉ dự đoán cho giờ kế tiếp
-]
-
+next_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
+future_times = [next_hour]   # ✅ thêm dòng này
 
 results = []
 
 for time in future_times:
     for menu_id in df['menu_id'].unique():
         encoded = le.transform([menu_id])[0]
-
         pred = model.predict([[time.hour, time.day, time.weekday(), encoded]])[0]
-
         results.append({
             "menu_id": menu_id,
             "forecast_date": time.strftime("%Y-%m-%d %H:00:00"),
             "quantity": max(0, int(pred))
         })
+
 
 # ===== TÍNH % =====
 final = []

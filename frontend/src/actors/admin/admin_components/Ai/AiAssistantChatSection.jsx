@@ -1,6 +1,7 @@
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import SendIcon from "@mui/icons-material/Send";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import {
     Box,
     IconButton,
@@ -8,59 +9,31 @@ import {
     Paper,
     Stack,
     Typography,
+    Collapse,
 } from "@mui/material";
 import { useState } from "react";
 
+// Dữ liệu mẫu cho tin nhắn
 const messages = [
     {
         id: 1,
         sender: "ai",
-        content: (
-            <>
-                Chào Admin, tôi là trợ lý Gemori. Tôi có thể
-                <br />
-                giúp gì cho việc quản lý
-                <br />
-                nhà hàng hôm nay?
-            </>
-        ),
+        content: "Chào Admin, tôi là trợ lý Gemori. Tôi có thể giúp gì cho việc quản lý nhà hàng hôm nay?",
     },
     {
         id: 2,
         sender: "user",
-        content: (
-            <>
-                Doanh thu hôm nay thế nào
-                <br />
-                so với cùng kỳ tháng trước?
-            </>
-        ),
+        content: "Doanh thu hôm nay thế nào so với cùng kỳ tháng trước?",
     },
     {
         id: 3,
         sender: "ai",
         content: (
             <>
-                <Typography
-                    component="p"
-                    variant="body2"
-                    sx={{ color: "slate.900", mb: 0.5 }}
-                >
-                    <Box component="span" sx={{ color: "text.primary" }}>
-                        Doanh thu hôm nay (đến 14:00) đạt{" "}
-                    </Box>
-                    <Box component="span" sx={{ color: "primary.main" }}>
-                        128.4M VNĐ
-                    </Box>
-                    <Box component="span" sx={{ color: "text.primary" }}>
-                        .
-                    </Box>
+                <Typography component="p" variant="body2" sx={{ mb: 0.5 }}>
+                    Doanh thu hôm nay đạt <Box component="span" sx={{ color: "primary.main", fontWeight: 700 }}>128.4M VNĐ</Box>.
                 </Typography>
-                <Typography variant="body2" sx={{ color: "text.primary" }}>
-                    Tăng trưởng 8.4% so với
-                    <br />
-                    trung bình trước.
-                </Typography>
+                <Typography variant="body2">Tăng trưởng 8.4% so với trung bình trước.</Typography>
             </>
         ),
     },
@@ -72,249 +45,166 @@ const AiAvatar = () => (
             width: 32,
             height: 32,
             borderRadius: "50%",
-            bgcolor: "primary.main",
+            bgcolor: "#a21a16",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             flexShrink: 0,
         }}
     >
-        <Typography
-            sx={{
-                fontFamily: "'Epilogue-Regular', Helvetica",
-                fontWeight: 400,
-                color: "#fff",
-                fontSize: "10px",
-                lineHeight: "15px",
-            }}
-        >
-            AI
-        </Typography>
+        <Typography sx={{ color: "#fff", fontSize: "10px", fontWeight: 700 }}>AI</Typography>
     </Box>
 );
 
 export const AiAssistantChatSection = () => {
     const [inputValue, setInputValue] = useState("");
+    const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <Stack direction="column" sx={{ flex: 1, alignSelf: "stretch" }}>
-            {/* Header */}
-            <Stack direction="row" alignItems="center" spacing={1.5}>
-                <Box
-                    sx={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: "50%",
-                        bgcolor: "rgba(177, 65, 53, 0.1)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                    }}
-                >
-                    <SmartToyOutlinedIcon
-                        sx={{ width: 24, height: 24, color: "primary.main" }}
-                    />
-                </Box>
-                <Typography
-                    variant="h6"
-                    sx={{
-                        color: "#230f0f",
-                        lineHeight: "28px",
-                        whiteSpace: "nowrap",
-                    }}
-                >
-                    AI Trợ lý
-                </Typography>
-            </Stack>
-
-            {/* Chat Card */}
-            <Box sx={{ flex: 1, pt: 2, display: "flex", flexDirection: "column" }}>
-                <Paper
-                    elevation={5}
-                    sx={{
-                        flex: 1,
-                        display: "flex",
-                        flexDirection: "column",
-                        borderRadius: 3,
-                        overflow: "hidden",
-                        border: "1px solid rgba(138, 0, 0, 0.1)",
-                        boxShadow:
-                            "0px 4px 6px -4px rgba(0,0,0,0.1), 0px 10px 15px -3px rgba(0,0,0,0.1)",
-                        bgcolor: "background.paper",
-                    }}
-                >
-                    {/* Chat Header */}
-                    <Stack
-                        direction="row"
-                        alignItems="center"
-                        justifyContent="space-between"
-                        sx={{
-                            px: 2,
-                            py: 2,
-                            bgcolor: "rgba(177, 65, 53, 0.05)",
-                            borderBottom: "1px solid rgba(177, 65, 53, 0.1)",
-                            flexShrink: 0,
-                        }}
-                    >
-                        <Stack direction="row" alignItems="center" spacing={1}>
-                            <Box
-                                sx={{
-                                    width: 8,
-                                    height: 8,
-                                    borderRadius: "50%",
-                                    bgcolor: "success.main",
-                                }}
-                            />
-                            <Typography
-                                variant="labelLabel3Bold"
-                                sx={{
-                                    color: "primary.main",
-                                    fontWeight: 700,
-                                    fontSize: "12px",
-                                    lineHeight: "20px",
-                                    whiteSpace: "nowrap",
-                                }}
-                            >
-                                TRỰC TUYẾN
-                            </Typography>
-                        </Stack>
-                        <IconButton size="small" sx={{ p: 0 }}>
-                            <HistoryOutlinedIcon
-                                sx={{ width: 16, height: 16, color: "text.secondary" }}
-                            />
-                        </IconButton>
-                    </Stack>
-
-                    {/* Messages Area */}
+        <Stack
+            direction="column"
+            sx={{
+                flex: 1,
+                alignSelf: "stretch",
+                position: { lg: "sticky" },
+                top: { lg: "24px" },
+                height: "fit-content",
+                zIndex: 10,
+            }}
+        >
+            {/* Header điều khiển đóng mở */}
+            <Stack
+                direction="row"
+                alignItems="center"
+                justifyContent="space-between"
+                onClick={() => setIsOpen(!isOpen)}
+                sx={{
+                    cursor: "pointer",
+                    p: 1,
+                    borderRadius: "12px",
+                    transition: "0.2s",
+                    "&:hover": { bgcolor: "rgba(162, 26, 22, 0.05)" }
+                }}
+            >
+                <Stack direction="row" alignItems="center" spacing={1.5}>
                     <Box
                         sx={{
-                            flex: 1,
-                            overflowY: "auto",
-                            p: 2,
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: 2,
+                            width: 40, height: 40, borderRadius: "50%",
+                            bgcolor: "rgba(162, 26, 22, 0.1)",
+                            display: "flex", alignItems: "center", justifyContent: "center",
                         }}
                     >
-                        {messages.map((msg) =>
-                            msg.sender === "ai" ? (
+                        <SmartToyOutlinedIcon sx={{ width: 24, height: 24, color: "#a21a16" }} />
+                    </Box>
+                    <Typography variant="h6" sx={{ fontWeight: 700, color: "#230f0f" }}>
+                        AI Trợ lý
+                    </Typography>
+                </Stack>
+
+                <IconButton size="small">
+                    <KeyboardArrowDownIcon
+                        sx={{
+                            transform: isOpen ? "rotate(0deg)" : "rotate(-90deg)",
+                            transition: "0.3s",
+                            color: "#a21a16"
+                        }}
+                    />
+                </IconButton>
+            </Stack>
+
+            {/* Nội dung cửa sổ Chat */}
+            <Collapse in={isOpen}>
+                <Box sx={{ pt: 2, display: "flex", flexDirection: "column", height: "550px" }}>
+                    <Paper
+                        elevation={5}
+                        sx={{
+                            flex: 1,
+                            display: "flex",
+                            flexDirection: "column",
+                            borderRadius: "16px",
+                            overflow: "hidden",
+                            border: "1px solid rgba(162, 26, 22, 0.1)",
+                            bgcolor: "#fff",
+                        }}
+                    >
+                        {/* Status Bar */}
+                        <Stack
+                            direction="row"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            sx={{
+                                px: 2, py: 1.5,
+                                bgcolor: "rgba(162, 26, 22, 0.03)",
+                                borderBottom: "1px solid rgba(0,0,0,0.05)",
+                            }}
+                        >
+                            <Stack direction="row" alignItems="center" spacing={1}>
+                                <Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "#2e7d32" }} />
+                                <Typography sx={{ color: "#a21a16", fontWeight: 700, fontSize: "12px" }}>
+                                    TRỰC TUYẾN
+                                </Typography>
+                            </Stack>
+                            <IconButton size="small"><HistoryOutlinedIcon sx={{ fontSize: 18 }} /></IconButton>
+                        </Stack>
+
+                        {/* Vùng hiển thị tin nhắn */}
+                        <Box sx={{ flex: 1, overflowY: "auto", p: 2, display: "flex", flexDirection: "column", gap: 2 }}>
+                            {messages.map((msg) => (
                                 <Stack
                                     key={msg.id}
                                     direction="row"
-                                    alignItems="flex-start"
+                                    justifyContent={msg.sender === "ai" ? "flex-start" : "flex-end"}
                                     spacing={1}
-                                    sx={{ maxWidth: "calc(100% - 40px)" }}
                                 >
-                                    <AiAvatar />
+                                    {msg.sender === "ai" && <AiAvatar />}
                                     <Box
                                         sx={{
-                                            flex: 1,
+                                            maxWidth: "80%",
                                             p: 1.5,
-                                            bgcolor: "rgba(177, 65, 53, 0.05)",
-                                            borderRadius: "0px 16px 16px 16px",
+                                            bgcolor: msg.sender === "ai" ? "rgba(162, 26, 22, 0.05)" : "#f4f4f5",
+                                            borderRadius: msg.sender === "ai" ? "0px 16px 16px 16px" : "16px 0px 16px 16px",
                                         }}
                                     >
-                                        {typeof msg.content === "string" ? (
-                                            <Typography
-                                                variant="body2"
-                                                sx={{ color: "text.primary" }}
-                                            >
-                                                {msg.content}
-                                            </Typography>
-                                        ) : (
-                                            <Typography
-                                                component="div"
-                                                variant="body2"
-                                                sx={{ color: "text.primary" }}
-                                            >
-                                                {msg.content}
-                                            </Typography>
-                                        )}
-                                    </Box>
-                                </Stack>
-                            ) : (
-                                <Stack key={msg.id} direction="row" justifyContent="flex-end">
-                                    <Box
-                                        sx={{
-                                            maxWidth: "calc(100% - 40px)",
-                                            px: 1.5,
-                                            py: 1.5,
-                                            bgcolor: "#e2e8f0",
-                                            borderRadius: "16px 0px 16px 16px",
-                                        }}
-                                    >
-                                        <Typography
-                                            variant="body2"
-                                            sx={{
-                                                color: "text.primary",
-                                                fontFamily: "'Epilogue-Regular', Helvetica",
-                                                fontWeight: 400,
-                                                fontSize: "14px",
-                                                lineHeight: "20px",
-                                            }}
-                                        >
+                                        <Typography variant="body2" sx={{ color: "text.primary" }}>
                                             {msg.content}
                                         </Typography>
                                     </Box>
                                 </Stack>
-                            ),
-                        )}
-                    </Box>
-
-                    {/* Input Area */}
-                    <Box
-                        sx={{
-                            p: 2,
-                            bgcolor: "background.paper",
-                            borderTop: "1px solid rgba(138, 0, 0, 0.1)",
-                            flexShrink: 0,
-                        }}
-                    >
-                        <Box sx={{ position: "relative" }}>
-                            <InputBase
-                                value={inputValue}
-                                onChange={(e) => setInputValue(e.target.value)}
-                                placeholder="Đặt câu hỏi cho AI..."
-                                fullWidth
-                                sx={{
-                                    bgcolor: "#e5e5e5",
-                                    borderRadius: "12px",
-                                    px: 2,
-                                    py: "15px",
-                                    pr: 6,
-                                    fontSize: "14px",
-                                    fontFamily: "'Epilogue-Regular', Helvetica",
-                                    color: "#737373",
-                                    lineHeight: "normal",
-                                    "& input::placeholder": {
-                                        color: "#737373",
-                                        opacity: 1,
-                                    },
-                                }}
-                            />
-                            <IconButton
-                                size="small"
-                                sx={{
-                                    position: "absolute",
-                                    right: 8,
-                                    top: "50%",
-                                    transform: "translateY(-50%)",
-                                    width: 32,
-                                    height: 32,
-                                    bgcolor: "primary.main",
-                                    borderRadius: "8px",
-                                    "&:hover": {
-                                        bgcolor: "primary.dark",
-                                    },
-                                }}
-                            >
-                                <SendIcon sx={{ width: 16, height: 16, color: "#fff" }} />
-                            </IconButton>
+                            ))}
                         </Box>
-                    </Box>
-                </Paper>
-            </Box>
+
+                        {/* Ô nhập liệu */}
+                        <Box sx={{ p: 2, borderTop: "1px solid rgba(0,0,0,0.05)" }}>
+                            <Box sx={{ position: "relative" }}>
+                                <InputBase
+                                    fullWidth
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    placeholder="Đặt câu hỏi cho AI..."
+                                    sx={{
+                                        bgcolor: "#f1f1f1",
+                                        borderRadius: "12px",
+                                        px: 2, py: 1.5, pr: 6,
+                                        fontSize: "14px",
+                                    }}
+                                />
+                                <IconButton
+                                    size="small"
+                                    sx={{
+                                        position: "absolute", right: 8, top: "50%",
+                                        transform: "translateY(-50%)",
+                                        bgcolor: "#a21a16",
+                                        color: "#fff",
+                                        "&:hover": { bgcolor: "#801512" }
+                                    }}
+                                >
+                                    <SendIcon sx={{ fontSize: 16 }} />
+                                </IconButton>
+                            </Box>
+                        </Box>
+                    </Paper>
+                </Box>
+            </Collapse>
         </Stack>
     );
 };

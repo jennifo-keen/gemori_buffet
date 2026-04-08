@@ -8,14 +8,17 @@ const Ai = () => {
     <Stack
       direction={{ xs: "column", lg: "row" }}
       spacing={4}
-      sx={{ width: "100%", mt: 2 }}
+      sx={{
+        width: "100%",
+        mt: 2,
+        // Cực kỳ quan trọng: alignItems="flex-start" để sticky hoạt động đúng
+        alignItems: "flex-start"
+      }}
     >
-      {/* Phần dự báo món ăn bên trái - Chiếm phần lớn diện tích */}
       <Box sx={{ flex: 1.8 }}>
         <DishForecastSection />
       </Box>
 
-      {/* Phần Chatbot bên phải - Cố định độ rộng tối đa trên màn hình lớn */}
       <Box sx={{ width: { xs: "100%", lg: "400px" }, flexShrink: 0 }}>
         <AiAssistantChatSection />
       </Box>

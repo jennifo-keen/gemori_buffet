@@ -30,62 +30,61 @@ const DishCard = ({ dish }) => {
             elevation={0}
             sx={{
                 display: "flex",
-                alignItems: "flex-start",
-                gap: 2,
-                p: 2,
-                borderRadius: "16px",
-                border: "1px solid rgba(177, 65, 53, 0.05)",
-                width: "100%", // Để fit với Grid
-                height: "115px", // Chiều cao cố định để các card đều nhau
+                alignItems: "center",
+                gap: 1.5,
+                p: "12px",
+                borderRadius: "20px",
+                border: "1px solid rgba(0, 0, 0, 0.06)",
+                // FIX: Chiều rộng và chiều cao cố định
+                width: "320px",
+                height: "115px",
                 boxSizing: "border-box",
-                transition: "transform 0.2s ease-in-out",
-                "&:hover": { transform: "translateY(-4px)" }
+                bgcolor: "#fff",
+                flexShrink: 0, // Không cho phép card bị ép nhỏ lại
             }}
         >
-            {/* Product image */}
+            {/* Ảnh món ăn - Cố định size 75x75 */}
             <Box
                 component="img"
                 src={dish.image_url || "https://via.placeholder.com/150"}
                 alt={dish.name}
                 sx={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: "12px",
+                    width: 75,
+                    height: 75,
+                    borderRadius: "14px",
                     objectFit: "cover",
                     flexShrink: 0,
                 }}
             />
 
-            {/* Content area */}
+            {/* Vùng nội dung bên phải */}
             <Stack
-                justifyContent="space-between"
                 flex={1}
-                alignSelf="stretch"
-                sx={{ minWidth: 0 }}
+                justifyContent="space-between"
+                sx={{ minWidth: 0, height: "80px" }} // Cân bằng với chiều cao ảnh
             >
-                {/* Top section: title row + subtitle */}
-                <Stack spacing={0}>
-                    {/* Title and percentage row */}
-                    <Stack
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="flex-start"
-                    >
+                <Box>
+                    {/* Grid để ép % luôn nằm cố định bên phải */}
+                    <Box sx={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr auto",
+                        alignItems: "flex-start",
+                        width: "100%"
+                    }}>
                         <Typography
                             sx={{
-                                fontFamily: '"Be Vietnam Pro", Helvetica',
-                                fontSize: "16px",
+                                fontFamily: '"Be Vietnam Pro", sans-serif',
+                                fontSize: "14px",
                                 fontWeight: 700,
-                                letterSpacing: "0px",
-                                lineHeight: "24px",
-                                color: "#0f172a",
-                                flex: 1,
-                                pr: "4px",
-                                // Cắt chữ nếu tên món quá dài
+                                color: "#1a202c",
+                                lineHeight: "1.2",
+                                // Fix cứng chiều cao 2 dòng để layout luôn đều
+                                minHeight: "34px",
                                 display: "-webkit-box",
-                                WebkitLineClamp: 1,
+                                WebkitLineClamp: 2,
                                 WebkitBoxOrient: "vertical",
                                 overflow: "hidden",
+                                pr: 0.5
                             }}
                         >
                             {dish.name}
@@ -93,44 +92,39 @@ const DishCard = ({ dish }) => {
 
                         <Typography
                             sx={{
-                                fontFamily: '"Be Vietnam Pro", Helvetica',
-                                fontSize: "14px",
-                                fontWeight: 700,
-                                letterSpacing: "0px",
-                                lineHeight: "16px",
+                                fontSize: "15px",
+                                fontWeight: 800,
                                 color: "#a21a16",
-                                whiteSpace: "nowrap",
+                                textAlign: "right",
+                                minWidth: "42px", // Fix cứng độ rộng cột %
                             }}
                         >
                             {percent}%
                         </Typography>
-                    </Stack>
+                    </Box>
 
-                    {/* Subtitle */}
+                    {/* Số lượng dự đoán */}
                     <Typography
                         sx={{
-                            fontFamily: '"Epilogue", "Epilogue-Bold", Helvetica',
                             fontSize: "10px",
-                            fontWeight: 700,
-                            color: "#64748b",
-                            letterSpacing: "-0.25px",
-                            lineHeight: "15px",
-                            textTransform: "uppercase"
+                            fontWeight: 600,
+                            color: "#718096",
+                            textTransform: "uppercase",
+                            mt: 0.2
                         }}
                     >
                         SỐ LƯỢNG DỰ ĐOÁN: {dish.predicted_quantity}
                     </Typography>
-                </Stack>
+                </Box>
 
-                {/* Progress bar */}
+                {/* Thanh Progress */}
                 <Box
                     sx={{
                         width: "100%",
-                        height: 8,
-                        bgcolor: "rgba(177, 65, 53, 0.05)",
-                        borderRadius: "999px",
+                        height: 6,
+                        bgcolor: "#f0f2f5",
+                        borderRadius: "10px",
                         overflow: "hidden",
-                        mt: 1
                     }}
                 >
                     <Box
@@ -138,7 +132,7 @@ const DishCard = ({ dish }) => {
                             width: `${percent}%`,
                             height: "100%",
                             bgcolor: "#a21a16",
-                            borderRadius: "999px",
+                            borderRadius: "10px",
                         }}
                     />
                 </Box>
@@ -153,6 +147,9 @@ export const DishForecastSection = () => {
     const [slots, setSlots] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    // Thêm state để quản lý số lượng hiển thị
+    const [displayLimit, setDisplayLimit] = useState(10);
+
     useEffect(() => {
         const fetchForecast = async () => {
             try {
@@ -165,9 +162,14 @@ export const DishForecastSection = () => {
                     timeLabel: getHourSlot(d.forecast_date)
                 })).filter(d => d.timeLabel !== null);
 
-                setDishes(processedData);
+                // Sắp xếp giảm dần theo predicted_quantity để lấy Top
+                const sortedData = processedData.sort((a, b) =>
+                    (b.predicted_quantity || 0) - (a.predicted_quantity || 0)
+                );
 
-                const uniqueSlots = [...new Set(processedData.map(d => d.timeLabel))].sort((a, b) => {
+                setDishes(sortedData);
+
+                const uniqueSlots = [...new Set(sortedData.map(d => d.timeLabel))].sort((a, b) => {
                     return parseInt(a) - parseInt(b);
                 });
 
@@ -184,9 +186,31 @@ export const DishForecastSection = () => {
         fetchForecast();
     }, []);
 
+    // Reset limit về 10 mỗi khi đổi khung giờ
+    useEffect(() => {
+        setDisplayLimit(10);
+    }, [timeSlot]);
+
     const filteredDishes = dishes.filter(d => d.timeLabel === timeSlot);
 
+    // Cắt danh sách theo limit hiện tại
+    const visibleDishes = filteredDishes.slice(0, displayLimit);
+
     if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}><CircularProgress sx={{ color: "#a21a16" }} /></Box>;
+    const handleToggleDisplay = () => {
+        if (displayLimit >= filteredDishes.length) {
+            // Nếu đang hiện hết rồi thì thu gọn về 10
+            setDisplayLimit(10);
+            // Tùy chọn: Cuộn nhẹ lên đầu danh sách món ăn để user dễ nhìn
+            window.scrollTo({ top: 400, behavior: 'smooth' });
+        } else if (displayLimit === 10) {
+            // Đang 10 thì lên 20
+            setDisplayLimit(20);
+        } else {
+            // Đang 20 thì show hết
+            setDisplayLimit(filteredDishes.length);
+        }
+    };
 
     return (
         <Box sx={{ width: "100%" }}>
@@ -196,8 +220,8 @@ export const DishForecastSection = () => {
                         <DiamondOutlinedIcon sx={{ color: "#a21a16" }} />
                     </Box>
                     <Box>
-                        <Typography sx={{ fontWeight: 800, fontSize: "20px" }}>Dự báo Món ăn</Typography>
-                        <Typography variant="body2" color="text.secondary">AI phân tích nhu cầu khách hàng</Typography>
+                        <Typography sx={{ fontWeight: 800, fontSize: "20px" }}>Dự báo Món ăn (Top {filteredDishes.length})</Typography>
+                        <Typography variant="body2" color="text.secondary">Món ăn có nhu cầu cao nhất theo khung giờ</Typography>
                     </Box>
                 </Stack>
 
@@ -215,21 +239,47 @@ export const DishForecastSection = () => {
                 </ToggleButtonGroup>
             </Stack>
 
-            <Grid container spacing={2} alignItems="stretch">
-                {filteredDishes.length > 0 ? (
-                    filteredDishes.map((dish, idx) => (
-                        <Grid item xs={12} sm={6} lg={4} key={dish.id || idx}>
-                            <DishCard dish={dish} />
-                        </Grid>
+            {/* Grid hiển thị Card */}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: 'flex-start' }}>
+                {visibleDishes.length > 0 ? (
+                    visibleDishes.map((dish, idx) => (
+                        <DishCard key={dish.id || idx} dish={dish} />
                     ))
                 ) : (
-                    <Grid item xs={12}>
-                        <Typography align="center" color="text.secondary" sx={{ py: 4 }}>
-                            Không có dữ liệu dự báo cho khung giờ này.
-                        </Typography>
-                    </Grid>
+                    <Typography align="center" color="text.secondary" sx={{ py: 4, width: '100%' }}>
+                        Không có dữ liệu dự báo cho khung giờ này.
+                    </Typography>
                 )}
-            </Grid>
+            </Box>
+
+            {/* Nút Xem thêm / Thu gọn */}
+            {filteredDishes.length > 10 && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                    <ToggleButton
+                        value="check"
+                        selected
+                        onClick={handleToggleDisplay}
+                        sx={{
+                            borderRadius: '12px',
+                            px: 4,
+                            py: 1,
+                            textTransform: 'none',
+                            fontWeight: 700,
+                            color: '#a21a16 !important',
+                            bgcolor: 'rgba(162, 26, 22, 0.05) !important',
+                            border: '1px solid rgba(162, 26, 22, 0.2) !important',
+                            '&:hover': {
+                                bgcolor: 'rgba(162, 26, 22, 0.1) !important',
+                            }
+                        }}
+                    >
+                        {displayLimit >= filteredDishes.length
+                            ? "Thu gọn bớt"
+                            : `Xem thêm (${filteredDishes.length - displayLimit} món)`
+                        }
+                    </ToggleButton>
+                </Box>
+            )}
         </Box>
     );
 };
