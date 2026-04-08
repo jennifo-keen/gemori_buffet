@@ -29,3 +29,9 @@ export const formatOrderTime = (dateStr) => {
     ? new Date(dateStr).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
     : '--:--';
 };
+
+export const isHighPriority = (items) => {
+  const oldest = items?.find(i => i.status === 'pending');
+  if (!oldest) return false;
+  return Math.floor((Date.now() - new Date(oldest.item_order_time)) / 1000 / 60) >= 10;
+};
