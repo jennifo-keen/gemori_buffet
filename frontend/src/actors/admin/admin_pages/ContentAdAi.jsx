@@ -1,14 +1,36 @@
-import React from "react";
-import { Stack, Box } from "@mui/material";
+import React from 'react';
+import { Box, Stack } from "@mui/material";
 import { DailyRevenueChartSection } from "../admin_components/DailyRevenue/DailyRevenueChartSection";
-import { AiAssistantChatSection } from "../admin_components/AiAssistant/AiAssistantChatSection";
+import Ai from "../admin_components/Ai/Ai.index";
 
 const ContentAdAi = () => {
     return (
-        <Stack spacing={4} sx={{ width: "100%" }}>
-            <DailyRevenueChartSection />
-            <AiAssistantChatSection />
-        </Stack>
+        <Box
+            sx={{
+                p: { xs: 2, md: 4 },
+                width: "100%",
+                minHeight: "100vh",
+                bgcolor: "#fafafa",
+                display: "flex",
+                justifyContent: "center"
+            }}
+        >
+            <Stack
+                spacing={5}
+                sx={{
+                    width: "100%",
+                    maxWidth: "1600px" // Giới hạn chiều rộng để layout không bị loãng
+                }}
+            >
+                {/* Biểu đồ doanh thu phía trên */}
+                <Box sx={{ width: "100%" }}>
+                    <DailyRevenueChartSection />
+                </Box>
+
+                {/* Phần AI và Dự báo món ăn phía dưới */}
+                <Ai />
+            </Stack>
+        </Box>
     );
 };
 

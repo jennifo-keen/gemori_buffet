@@ -6,7 +6,8 @@ const { runForecast } = require("../forecastService");
     await runForecast();
 })();
 
-cron.schedule("*/1 * * * *", async () => {
+cron.schedule("0 */2 * * *", async () => {
     console.log("⏰ Running AI forecast...");
     await runForecast();
+
 });

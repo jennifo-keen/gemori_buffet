@@ -28,12 +28,12 @@ y = df['quantity']
 model = RandomForestRegressor()
 model.fit(X, y)
 
-# ===== PREDICT 2H TỚI =====
+# ===== PREDICT 1H TỚI =====
 now = datetime.now()
 future_times = [
-    (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0),
-    (now + timedelta(hours=2)).replace(minute=0, second=0, microsecond=0)
+    (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)  # chỉ dự đoán cho giờ kế tiếp
 ]
+
 
 results = []
 
