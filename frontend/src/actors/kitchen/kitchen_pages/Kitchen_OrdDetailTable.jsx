@@ -1,11 +1,77 @@
-import React from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
-import { Box, Button, Stack } from "@mui/material";
+import { Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
 import OrdStatusHeader  from "../kitchen_components/OrdStatusHeader"
 import OrderTable from '../kitchen_components/OrderTable';
 
+import { fetchPendingItems, updateItemStatus, completeTableStatus } from '../kitchen_api/kitchenApi';
+import { useTableSocket } from '../kitchen_hook/useTableSocket';
+
 export default function Kitchen_OrdDetailTable() {
+  const { tableCode } = useParams();
+  const navigate = useNavigate();
+
+  const [tableData, setTableData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [completing, setCompleting] = useState(false);
+
+  // Load data logic
+  const loadData = useCallback(async () => {
+    try {
+      const res = await fetchPendingItems();
+      const found = res.data.find(t => t.table_code === tableCode);
+      setTableData(found || null);
+    } catch (err) {
+      console.error("Lỗi tải dữ liệu bàn:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [tableCode]);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  // Realtime logic (Dùng chung hook xử lý 1 bàn)
+  useTableSocket(tableCode, loadData);
+
+  // Handlers
+  const handleUpdateItem = async (itemId, status) => {
+    try {
+      await updateItemStatus(itemId, status);
+      await loadData();
+    } catch (err) { console.error(err); }
+  };
+
+  const handleCompleteAll = async () => {
+    try {
+      setCompleting(true);
+      await completeTableStatus(tableCode);
+      navigate('/kitchen');
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCompleting(false);
+    }
+  };
+
+  if (loading) return (
+    <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+      <CircularProgress sx={{ color: "#b4463c" }} />
+    </Box>
+  );
+
+  if (!tableData) return (
+    <Box p={4} textAlign="center">
+      <Typography color="text.secondary">
+        Không có món nào đang chờ cho bàn {tableCode}
+      </Typography>
+      <Button onClick={() => navigate('/kitchen')} sx={{ mt: 2, color: "#b4463c" }}>
+        Quay lại
+      </Button>
+    </Box>
+  );
+  
   return (
         <Box
       sx={{
@@ -16,8 +82,11 @@ export default function Kitchen_OrdDetailTable() {
         justifyContent: "center",
         zoom: "0.75",
       }}>
-        <OrdStatusHeader/>
-        <OrderTable/>
+        <OrdStatusHeader tableData={tableData}/>
+        <OrderTable 
+          items={tableData.items}
+          onUpdateItem={handleUpdateItem}
+        />
 
          <Box
               component="footer"
@@ -33,6 +102,7 @@ export default function Kitchen_OrdDetailTable() {
                 <Button
                   variant="contained"
                   startIcon={<ArrowBackIcon />}
+                  onClick={() => navigate('/kitchen')}
                   sx={{
                     backgroundColor: "grey.100",
                     borderRadius: 3,
@@ -55,7 +125,9 @@ export default function Kitchen_OrdDetailTable() {
                 {/* Complete order button */}
                 <Button
                   variant="contained"
-                  startIcon={<CheckBoxIcon sx={{ width: 32, height: 32 }} />}
+                  startIcon={completing ? <CircularProgress size={20} color="inherit" /> : <CheckBoxIcon sx={{ width: 32, height: 32 }} />}
+                  onClick={handleCompleteAll}
+                  disabled={completing}
                   sx={{
                     backgroundColor: "#b14135",
                     borderRadius: 3,
@@ -71,7 +143,7 @@ export default function Kitchen_OrdDetailTable() {
                     },
                   }}
                 >
-                  HOÀN TẤT ĐƠN
+                  {completing ? 'ĐANG XỬ LÝ...' : 'HOÀN TẤT ĐƠN'}
                 </Button>
               </Stack>
             </Box>

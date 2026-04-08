@@ -1,8 +1,9 @@
 import React from 'react';
 import { Box, Chip, Paper, Stack, Typography } from "@mui/material";
 import {getPriorityLabel, formatOrderTime} from "../kitchen_utils/Component/OrdCardUntil"
-
+import useAuthStaff from '../../staff/staff_hook/useAuthStaff';
 export const OrdStatusHeader = ({ tableData }) => {
+  const { admin } = useAuthStaff();
   const items         = tableData?.items || [];
   const priorityLabel = getPriorityLabel(items);
   const firstTime     =formatOrderTime(items[0]?.item_order_time);
@@ -51,10 +52,10 @@ export const OrdStatusHeader = ({ tableData }) => {
 
           {/* Subtitle */}
           <Typography variant="body2" color="text.secondary" sx={{ pt: 1 }}>
-            Mã đơn: #{items?.id?.slice(0, 4)} • {items.length} món 
+            Mã đơn: #{items[0]?.order_id?.slice(0, 8) || '---'} • {items.length} món
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ pt: 1 }}>
-            • Nhân viên: Nguyễn Văn A
+            • Nhân viên: {admin?.full_name || '---'}
           </Typography>
         </Stack>
 

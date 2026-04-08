@@ -1,30 +1,34 @@
 import { useEffect } from 'react';
 import { io } from 'socket.io-client';
 
-export const useTableSocket = (tableCode, loadData, setTableData) => {
+export const useTableSocket = (tableCode, loadData) => {
   useEffect(() => {
-    const socket = io(import.meta.env.SOCKET_URL);
-    socket.on('connect', () => socket.emit('join_kitchen'));
-
-    // Lắng nghe cập nhật trạng thái món
-    socket.on('item_status_updated', ({ itemId, status }) => {
-      setTableData(prev => {
-        if (!prev) return prev;
-        const updatedItems = prev.items
-          .map(i => i.id === itemId ? { ...i, status } : i)
-          .filter(i => i.status !== 'done');
-        return { ...prev, items: updatedItems };
-      });
+    const socket = io(import.meta.env.VITE_SOCKET_URL, {
+      transports: ['websocket']
     });
 
-    // Lắng nghe có món mới cho bàn này
-    socket.on('new_order_item', ({ tableCode: tc }) => {
-      if (tc === tableCode) loadData();
+    socket.on('connect', () => {
+      console.log(`✅ Table Socket Connected (${tableCode})`);
+      socket.emit('join_kitchen');
     });
 
-    // Lắng nghe khi có món bị hủy
-    socket.on('order_item_cancelled', () => loadData());
+    const handleRefresh = () => {
+      console.log(`🔔 Update for table ${tableCode}: Refreshing...`);
+      loadData();
+    };
 
-    return () => socket.disconnect();
-  }, [tableCode, loadData, setTableData]);
+    socket.on('item_status_updated', handleRefresh);
+    socket.on('new_order_item', handleRefresh);
+    socket.on('order_item_cancelled', handleRefresh);
+    socket.on('table_items_updated', handleRefresh);
+
+    return () => {
+      // Bổ sung socket.off cho đồng bộ với file kia
+      socket.off('item_status_updated', handleRefresh);
+      socket.off('new_order_item', handleRefresh);
+      socket.off('order_item_cancelled', handleRefresh);
+      socket.off('table_items_updated', handleRefresh);
+      socket.disconnect();
+    };
+  }, [tableCode, loadData]);
 };

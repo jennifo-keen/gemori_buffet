@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState }  from "react";
 import { useNavigate } from 'react-router-dom';
 import CallBell from "../../../assets/icon/CallBell.svg?react";
 import GridViewRoundedIcon from "@mui/icons-material/GridViewRounded";
@@ -14,9 +14,9 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
 
 import useAuthStaff from '../../staff/staff_hook/useAuthStaff';
+import axiosInstance from '../kitchen_api/axiosKitchen';
 
 const BRAND_RED = "#b4463c";
 const BRAND_RED_LIGHT = "rgba(177, 65, 53, 0.1)";
@@ -24,9 +24,10 @@ const BRAND_RED_BORDER = "rgba(177, 65, 53, 0.05)";
 
 export const MenuKitchen = () => {
   const navigate = useNavigate();
-  const { logoutStaff} = useAuthStaff();
+  const { logoutStaff } = useAuthStaff();
   const [activeItem, setActiveItem] = useState("so-do-ban");
-
+  const [stats, setStats] = useState({ pending_count: 0, cooking_count: 0, active_tables: 0 });
+  
   const handleLogout = () => {
     logoutStaff();
     navigate('/kitchen/login');
@@ -39,12 +40,26 @@ export const MenuKitchen = () => {
   const handleOrderAllClick = () => {
     navigate(`/kitchen/all`);
   };
+
+useEffect(() => {
+  const fetchStats = async () => {
+    try {
+      const res = await axiosInstance.get('/stats');
+      setStats(res.data);
+    } catch (err) { console.error(err); }
+  };
+  fetchStats();
+  // Refresh mỗi 30 giây
+  const interval = setInterval(fetchStats, 30000);
+  return () => clearInterval(interval);
+}, []);
+
 const menuItems = [
   {
     id: "so-do-ban",
     label: "Sơ đồ bàn",
     icon: <GridViewRoundedIcon />,
-    badge: 28,
+    badge: stats.active_tables,
     path: "/kitchen",
     matchPaths: ['/kitchen', '/kitchen/f2'],
   },
@@ -52,7 +67,7 @@ const menuItems = [
     id: "don-goi-moi",
     label: "Đơn gọi mới",
     icon: <ClockUser />,
-    badge: 14,
+    badge: stats.pending_count,
     path: "/kitchen/detail",
     matchPaths: ['/kitchen/detail'],
     onClick: handleOrderNewClick,
@@ -61,7 +76,7 @@ const menuItems = [
     id: "tat-ca-don",
     label: "Tất cả đơn",
     icon: <CallBell/>,
-    badge: 12,
+    badge: stats.cooking_count,
     path: "/kitchen/all",
     matchPaths: ['/kitchen/all'],
     onClick: handleOrderAllClick,

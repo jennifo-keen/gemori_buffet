@@ -14,7 +14,7 @@ import useDialog  from '../staff_hook/useDialog';
 
 
 
-const Floor1 = ({ onTableClick }) => {
+const Floor1 = ({ onTableClick, basePath = '/staff' }) => {
   const navigate = useNavigate();
   const { showError } = useDialog();
   const {
@@ -47,6 +47,7 @@ const Floor1 = ({ onTableClick }) => {
     const t = getFloorTables(f.range[0], f.range[1]);
     return {
       ...f,
+      path: f.path.replace(/^\/staff/, basePath),
       emptyTables: t.filter(t => t.status === 'empty').length,
       pendingTables: t.filter(t => t.status === 'ordering').length,
     };

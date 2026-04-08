@@ -23,9 +23,10 @@ const updateItemStatus = async (itemId, status) => {
 
   // Lấy item + tableId để emit socket
   const check = await pool.query(
-    `SELECT oi.*, o.table_id, m.name AS menu_name
+    `SELECT oi.*, o.table_id, t.table_code, m.name AS menu_name
      FROM order_items oi
      LEFT JOIN orders o ON oi.order_id = o.id
+     LEFT JOIN tables t ON o.table_id = t.id
      LEFT JOIN menus m ON oi.menu_id = m.id
      WHERE oi.id = $1`,
     [itemId]
@@ -36,7 +37,7 @@ const updateItemStatus = async (itemId, status) => {
  
   await pool.query('UPDATE order_items SET status = $1 WHERE id = $2', [status, itemId]);
 
-  // Emit realtime đến khách và staff
+  // Emit realtime đến khách, bếp và staff
   try {
     const io = getIO();
     io.to(`table_${item.table_id}`).emit('item_status_updated', {
@@ -44,10 +45,18 @@ const updateItemStatus = async (itemId, status) => {
       status,
       menu_name: item.menu_name,
     });
+    io.to('kitchen').emit('item_status_updated', {
+      itemId,
+      status,
+      tableId:   item.table_id,
+      tableCode: item.table_code,
+      menu_name: item.menu_name,
+    });
     io.to('staff').emit('item_status_updated', {
       itemId,
       status,
       tableId:   item.table_id,
+      tableCode: item.table_code,
       menu_name: item.menu_name,
     });
   } catch (e) { console.error('Socket error:', e.message); }
