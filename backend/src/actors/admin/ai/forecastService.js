@@ -16,7 +16,7 @@ const runForecast = async () => {
     return new Promise((resolve, reject) => {
         // forecastService.js đang ở backend/src/actors/admin/ai/
         const pyPath = path.resolve(__dirname, "ai", "forecast.py");
-        const py = spawn("py", [pyPath, JSON.stringify(data)]);
+        const py = spawn("python3", [pyPath, JSON.stringify(data)]);
 
 
         let output = "";
