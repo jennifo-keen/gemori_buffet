@@ -3,9 +3,19 @@ const { Server } = require('socket.io');
 let io;
 
 const initSocket = (httpServer) => {
-  io = new Server(httpServer, {
-    cors: { origin: '*' },
-  });
+
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',') 
+  : [];
+
+io = new Server(httpServer, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+    credentials: true 
+    },
+  transports: ['websocket', 'polling'] 
+});
 
   io.on('connection', (socket) => {
     console.log(' Client kết nối:', socket.id);
