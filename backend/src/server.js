@@ -18,6 +18,10 @@ initSocket(httpServer);
 app.use(cors());
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.send('Server is running perfectly!');
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', time: new Date() });
@@ -35,6 +39,6 @@ app.use((req, res) => {
 app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 3000;
-httpServer.listen(PORT, () => {
-  console.log(`🚀 Server chạy tại http://localhost:${PORT}`);
+httpServer.listen(PORT,'0.0.0.0', () => {
+  console.log(` Server chạy tại http://localhost:${PORT}`);
 });
