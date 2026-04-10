@@ -18,8 +18,8 @@ const runForecast = async () => {
         const pyPath = path.resolve(__dirname, "ai", "forecast.py");
 
             //Chưa host thì dùng py, nếu host thì đổi lại mở cmt cái dưới
-        const py = spawn("py", [pyPath, JSON.stringify(data)]);
-        // const py = spawn("python3", [pyPath, JSON.stringify(data)]);
+        // const py = spawn("py", [pyPath, JSON.stringify(data)]);
+        const py = spawn("python3", [pyPath, JSON.stringify(data)]);
 
         let output = "";
 
