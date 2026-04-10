@@ -1,0 +1,209 @@
+[
+    {
+        "text": "doanh thu hôm nay",
+        "label": "revenue_today"
+    },
+    {
+        "text": "hôm nay bán được bao nhiêu tiền",
+        "label": "revenue_today"
+    },
+    {
+        "text": "hôm nay kiếm được bao nhiêu",
+        "label": "revenue_today"
+    },
+    {
+        "text": "hôm nay thu được bao nhiêu",
+        "label": "revenue_today"
+    },
+    {
+        "text": "hôm nay doanh số thế nào",
+        "label": "revenue_today"
+    },
+    {
+        "text": "tổng tiền hôm nay là bao nhiêu",
+        "label": "revenue_today"
+    },
+    {
+        "text": "doanh thu hôm nay bao nhiêu tiền",
+        "label": "revenue_today"
+    },
+    
+    {
+        "text": "doanh thu hôm qua",
+        "label": "revenue_yesterday"
+    },
+    {
+        "text": "hôm qua bán được bao nhiêu",
+        "label": "revenue_yesterday"
+    },
+    {
+        "text": "hôm qua kiếm được bao nhiêu tiền",
+        "label": "revenue_yesterday"
+    },
+    {
+        "text": "doanh số hôm qua thế nào",
+        "label": "revenue_yesterday"
+    },
+    
+    {
+        "text": "doanh thu ngày 8/10/2026",
+        "label": "revenue_by_date"
+    },
+    {
+        "text": "ngày 1/4/2026 bán được bao nhiêu",
+        "label": "revenue_by_date"
+    },
+    {
+        "text": "ngày 15/5/2026 thu được bao nhiêu",
+        "label": "revenue_by_date"
+    },
+    {
+        "text": "cho tôi biết doanh thu ngày 2/6/2026",
+        "label": "revenue_by_date"
+    },
+   
+    {
+        "text": "doanh thu tháng này",
+        "label": "revenue_month"
+    },
+    {
+        "text": "tháng này bán được bao nhiêu",
+        "label": "revenue_month"
+    },
+    {
+        "text": "tháng này kiếm được bao nhiêu tiền",
+        "label": "revenue_month"
+    },
+    {
+        "text": "doanh số tháng này thế nào",
+        "label": "revenue_month"
+    },
+   
+    {
+        "text": "doanh thu hôm nay so với hôm qua",
+        "label": "revenue_compare_day"
+    },
+    {
+        "text": "hôm nay tăng hay giảm so với hôm qua",
+        "label": "revenue_compare_day"
+    },
+    {
+        "text": "so sánh doanh thu hôm nay và hôm qua",
+        "label": "revenue_compare_day"
+    },
+    {
+        "text": "hôm nay có tăng so với hôm qua không",
+        "label": "revenue_compare_day"
+    },
+   
+    {
+        "text": "tháng này so với tháng trước",
+        "label": "revenue_compare_month"
+    },
+    {
+        "text": "so sánh doanh thu tháng này với tháng trước",
+        "label": "revenue_compare_month"
+    },
+    {
+        "text": "tháng này tăng hay giảm so với tháng trước",
+        "label": "revenue_compare_month"
+    },
+    
+    {
+        "text": "hôm nay có bao nhiêu đơn",
+        "label": "order_count"
+    },
+    {
+        "text": "số lượng đơn hôm nay",
+        "label": "order_count"
+    },
+    {
+        "text": "hôm nay có bao nhiêu order",
+        "label": "order_count"
+    },
+    {
+        "text": "bao nhiêu đơn hôm nay",
+        "label": "order_count"
+    },
+  
+    {
+        "text": "món bán chạy",
+        "label": "top_dish"
+    },
+    {
+        "text": "top món hôm nay",
+        "label": "top_dish"
+    },
+    {
+        "text": "món nào bán chạy nhất",
+        "label": "top_dish"
+    },
+    {
+        "text": "top 5 món bán chạy",
+        "label": "top_dish"
+    },
+    
+    {
+        "text": "món bán ít",
+        "label": "low_dish"
+    },
+    {
+        "text": "món nào bán ít nhất",
+        "label": "low_dish"
+    },
+    {
+        "text": "top món bán ít",
+        "label": "low_dish"
+    },
+    
+    {
+        "text": "dự báo hôm nay",
+        "label": "forecast"
+    },
+    {
+        "text": "nên chuẩn bị món gì",
+        "label": "forecast"
+    },
+    {
+        "text": "hôm nay nên làm món gì nhiều",
+        "label": "forecast"
+    },
+    {
+        "text": "món nào cần chuẩn bị nhiều",
+        "label": "forecast"
+    },
+    
+    {
+        "text": "món nào sắp hết",
+        "label": "inventory_low"
+    },
+    {
+        "text": "kiểm tra tồn kho",
+        "label": "inventory_low"
+    },
+    {
+        "text": "có món nào gần hết không",
+        "label": "inventory_low"
+    },
+    {
+        "text": "tồn kho hiện tại thế nào",
+        "label": "inventory_low"
+    },
+    
+    {
+        "text": "tình hình kinh doanh hôm nay",
+        "label": "business_summary"
+    },
+    {
+        "text": "tổng quan hôm nay",
+        "label": "business_summary"
+    },
+    {
+        "text": "hôm nay hoạt động thế nào",
+        "label": "business_summary"
+    },
+    {
+        "text": "tóm tắt hôm nay",
+        "label": "business_summary"
+    }
+]

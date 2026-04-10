@@ -1,67 +1,77 @@
 import sys
 import json
-import pandas as pd
+import joblib
+import os
 import warnings
+from datetime import datetime, timedelta
+
+# Tắt cảnh báo để đầu ra sạch
 warnings.filterwarnings("ignore", category=UserWarning)
 
-from datetime import datetime, timedelta
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.preprocessing import LabelEncoder
+def main():
+    # --- 1. ĐƯỜNG DẪN TUYỆT ĐỐI ---
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    MODEL_PATH = os.path.join(BASE_DIR, "models", "forecast_model.pkl")
+    ENCODER_PATH = os.path.join(BASE_DIR, "models", "label_encoder.pkl")
 
-data = json.loads(sys.argv[1])
-df = pd.DataFrame(data)
+    # --- 2. LOAD MODEL ---
+    try:
+        model = joblib.load(MODEL_PATH)
+        le = joblib.load(ENCODER_PATH)
+    except Exception as e:
+        # Nếu lỗi load model, trả về mảng rỗng để Node không crash
+        print(json.dumps([]))
+        return
 
-# ===== FEATURE =====
-df['item_order_time'] = pd.to_datetime(df['item_order_time'])
-df['hour'] = df['item_order_time'].dt.hour
-df['day'] = df['item_order_time'].dt.day
-df['day_of_week'] = df['item_order_time'].dt.dayofweek
+    # --- 3. XỬ LÝ DỮ LIỆU ĐẦU VÀO ---
+    if len(sys.argv) < 2:
+        print(json.dumps([]))
+        return
 
-# encode menu
-le = LabelEncoder()
-df['menu_encoded'] = le.fit_transform(df['menu_id'])
+    try:
+        raw_data = json.loads(sys.argv[1])
+        # Node gửi result.rows, ta cần lấy các menu_id duy nhất
+        menu_ids = list(set([item['menu_id'] for item in raw_data if 'menu_id' in item]))
+    except:
+        print(json.dumps([]))
+        return
 
-# ===== TRAIN =====
-X = df[['hour', 'day', 'day_of_week', 'menu_encoded']]
-y = df['quantity']
+    # --- 4. DỰ ĐOÁN ---
+    now = datetime.now()
+    next_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
+    forecast_time_str = next_hour.strftime("%Y-%m-%d %H:00:00")
 
-model = RandomForestRegressor()
-model.fit(X, y)
+    results = []
+    total_quantity = 0
+    known_classes = set(le.classes_)
 
-# ===== PREDICT 1H TỚI =====
-now = datetime.now()
-next_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
-future_times = [next_hour]   # ✅ thêm dòng này
+    for m_id in menu_ids:
+        if m_id not in known_classes:
+            continue
+        try:
+            encoded = le.transform([m_id])[0]
+            features = [[next_hour.hour, next_hour.day, next_hour.weekday(), encoded]]
+            pred = model.predict(features)[0]
+            qty = max(0, int(round(pred)))
+            
+            results.append({
+                "menu_id": m_id,
+                "forecast_date": forecast_time_str,
+                "predicted_quantity": qty
+            })
+            total_quantity += qty
+        except:
+            continue
 
-results = []
+    # --- 5. TÍNH % ---
+    final_output = []
+    for item in results:
+        percent = (item["predicted_quantity"] / total_quantity * 100) if total_quantity > 0 else 0
+        item["predicted_percent"] = int(round(percent))
+        final_output.append(item)
 
-for time in future_times:
-    for menu_id in df['menu_id'].unique():
-        encoded = le.transform([menu_id])[0]
-        pred = model.predict([[time.hour, time.day, time.weekday(), encoded]])[0]
-        results.append({
-            "menu_id": menu_id,
-            "forecast_date": time.strftime("%Y-%m-%d %H:00:00"),
-            "quantity": max(0, int(pred))
-        })
+    # Chỉ in duy nhất 1 chuỗi JSON này
+    print(json.dumps(final_output))
 
-
-# ===== TÍNH % =====
-final = []
-df_res = pd.DataFrame(results)
-
-for time in df_res['forecast_date'].unique():
-    temp = df_res[df_res['forecast_date'] == time]
-    total = temp['quantity'].sum()
-
-    for _, row in temp.iterrows():
-        percent = (row['quantity'] / total * 100) if total > 0 else 0
-
-        final.append({
-            "menu_id": row['menu_id'],
-           "forecast_date": row['forecast_date'],
-            "predicted_quantity": row['quantity'],
-            "predicted_percent": int(percent)
-        })
-
-print(json.dumps(final))
+if __name__ == "__main__":
+    main()
