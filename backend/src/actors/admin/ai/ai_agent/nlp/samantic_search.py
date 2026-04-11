@@ -1,7 +1,8 @@
 import json
 import sys
+import pickle
 import unicodedata
-from sklearn.feature_extraction.text import TfidfVectorizer
+import os
 from sklearn.metrics.pairwise import cosine_similarity
 
 def normalize(text):
@@ -9,26 +10,26 @@ def normalize(text):
     text = unicodedata.normalize('NFD', text)
     return ''.join(c for c in text if unicodedata.category(c) != 'Mn')
 
-# load dataset
-with open("ai_agent/semantic_dataset.json", "r", encoding="utf-8") as f:
-    data = json.load(f)
+# ===== LOAD =====
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-texts = [normalize(d["text"]) for d in data]
-sqls = [d["sql"] for d in data]
+vectorizer = pickle.load(open(os.path.join(BASE_DIR, "vectorizer.pkl"), "rb"))
+X = pickle.load(open(os.path.join(BASE_DIR, "matrix.pkl"), "rb"))
+data = pickle.load(open(os.path.join(BASE_DIR, "data.pkl"), "rb"))
 
-vectorizer = TfidfVectorizer()
-X = vectorizer.fit_transform(texts)
+# ===== INPUT =====
+input_json = json.loads(sys.argv[1])
+question = normalize(input_json["question"])
 
-# nhận input từ Node
-input_data = json.loads(sys.argv[1])
-question = normalize(input_data["question"])
-
+# ===== VECTOR =====
 q_vec = vectorizer.transform([question])
 
+# ===== SIMILARITY =====
 scores = cosine_similarity(q_vec, X)[0]
-best_idx = scores.argmax()
+idx = scores.argmax()
 
+# ===== OUTPUT =====
 print(json.dumps({
-    "sql": sqls[best_idx],
-    "confidence": float(scores[best_idx])
+    "sql": data[idx]["sql"],
+    "confidence": float(scores[idx])
 }))
