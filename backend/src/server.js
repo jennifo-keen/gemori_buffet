@@ -15,21 +15,23 @@ const httpServer = http.createServer(app);
 initSocket(httpServer);
 
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS 
-  ? process.env.ALLOWED_ORIGINS.split(',') 
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',')
   : [];
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Nếu origin là null (như Postman) hoặc nằm trong danh sách cho phép
+    if (!origin || allowedOrigins.includes(origin) || origin === 'http://localhost:5173') {
       callback(null, true);
     } else {
-      console.log("Blocked by CORS:", origin); // Log để bạn dễ debug khi bị lỗi
+      console.log("Blocked by CORS:", origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  // THÊM 'PATCH' VÀO ĐÂY LÀ ĂN NGAY
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
@@ -55,6 +57,6 @@ app.use((req, res) => {
 app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 3000;
-httpServer.listen(PORT,'0.0.0.0', () => {
+httpServer.listen(PORT, '0.0.0.0', () => {
   console.log(` Server chạy tại http://localhost:${PORT}`);
 });

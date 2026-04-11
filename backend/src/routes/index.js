@@ -6,6 +6,7 @@ const router = Router();
 router.use('/admin/report', require('../actors/admin/report/report.route'));
 router.use('/admin/forecast', require('../actors/admin/ai/forecastRoutes'));
 router.use('/admin/chat', require('../actors/admin/ai/chatagentRoutes'));
+router.use('/admin/tickets', require('../actors/admin/ticket/ticket.route'));
 
 router.use('/auth', require('../actors/admin/auth/auth.route'));
 router.use('/staff', require('../actors/staff/routes/staff.route'));

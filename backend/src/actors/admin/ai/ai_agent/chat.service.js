@@ -32,9 +32,7 @@ const formatResponse = (sql, rows, question) => {
 
     question = question.toLowerCase();
 
-    // ===============================
     // 📊 SO SÁNH (DAY / MONTH / YEAR)
-    // ===============================
     if (rows[0].today !== undefined && rows[0].yesterday !== undefined) {
         return calcCompare(
             Number(rows[0].today),
@@ -62,9 +60,7 @@ const formatResponse = (sql, rows, question) => {
         }
     }
 
-    // ===============================
     // 💰 DOANH THU
-    // ===============================
     if (rows[0].total !== undefined && sql.includes("SUM(amount)")) {
 
         if (question.includes("từ") && question.includes("đến")) {
@@ -74,16 +70,12 @@ const formatResponse = (sql, rows, question) => {
         return `💰 Doanh thu: ${formatMoney(rows[0].total)}`;
     }
 
-    // ===============================
     // 📦 SỐ ĐƠN
-    // ===============================
     if (rows[0].total !== undefined && sql.includes("COUNT(*)")) {
         return `📦 Có ${rows[0].total} đơn hàng`;
     }
 
-    // ===============================
     // ⚠️ TỒN KHO
-    // ===============================
     if (sql.includes("stock_quantity")) {
 
         if (rows.length === 0) {
@@ -99,9 +91,7 @@ const formatResponse = (sql, rows, question) => {
         return text;
     }
 
-    // ===============================
     // 🔥 GỢI Ý
-    // ===============================
     if (
         question.includes("nên") ||
         question.includes("chuẩn bị") ||
@@ -116,9 +106,7 @@ const formatResponse = (sql, rows, question) => {
         return text;
     }
 
-    // ===============================
     // 🧊 MÓN BÁN ÍT
-    // ===============================
     if (sql.includes("ORDER BY total ASC")) {
         let text = "🧊 Món bán ít:\n";
 
@@ -129,9 +117,7 @@ const formatResponse = (sql, rows, question) => {
         return text;
     }
 
-    // ===============================
     // 🔥 TOP MÓN
-    // ===============================
     if (sql.includes("GROUP BY")) {
         let text = "🔥 Top món bán chạy:\n";
 

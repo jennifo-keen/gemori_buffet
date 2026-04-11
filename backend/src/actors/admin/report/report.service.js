@@ -21,7 +21,6 @@ const getRevenueStatistics = async (month, year) => {
     }));
 };
 
-// EXPORT GIỐNG ÔNG BẠN NÈ
 module.exports = {
     getRevenueStatistics,
 };
