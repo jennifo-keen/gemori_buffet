@@ -20,7 +20,7 @@ module.exports = {
     order_count: {
         query: "order_count",
         type: "single",
-        template: "📦 Có {total} đơn"
+        template: "📦 Có {total} đơn hôm nay"
     },
 
     top_dish: {
@@ -45,5 +45,11 @@ module.exports = {
         query: "inventory_low",
         type: "list",
         template: "⚠️ Sắp hết: {list}"
+    },
+
+    business_summary: {
+        query: "business_summary",
+        type: "summary",
+        template: "📊 Hôm nay: {revenue} VND - {orders} đơn"
     }
 };

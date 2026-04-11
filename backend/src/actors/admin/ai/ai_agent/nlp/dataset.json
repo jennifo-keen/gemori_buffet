@@ -27,7 +27,6 @@
         "text": "doanh thu hôm nay bao nhiêu tiền",
         "label": "revenue_today"
     },
-    
     {
         "text": "doanh thu hôm qua",
         "label": "revenue_yesterday"
@@ -44,7 +43,6 @@
         "text": "doanh số hôm qua thế nào",
         "label": "revenue_yesterday"
     },
-    
     {
         "text": "doanh thu ngày 8/10/2026",
         "label": "revenue_by_date"
@@ -61,7 +59,6 @@
         "text": "cho tôi biết doanh thu ngày 2/6/2026",
         "label": "revenue_by_date"
     },
-   
     {
         "text": "doanh thu tháng này",
         "label": "revenue_month"
@@ -78,7 +75,6 @@
         "text": "doanh số tháng này thế nào",
         "label": "revenue_month"
     },
-   
     {
         "text": "doanh thu hôm nay so với hôm qua",
         "label": "revenue_compare_day"
@@ -95,7 +91,6 @@
         "text": "hôm nay có tăng so với hôm qua không",
         "label": "revenue_compare_day"
     },
-   
     {
         "text": "tháng này so với tháng trước",
         "label": "revenue_compare_month"
@@ -108,7 +103,6 @@
         "text": "tháng này tăng hay giảm so với tháng trước",
         "label": "revenue_compare_month"
     },
-    
     {
         "text": "hôm nay có bao nhiêu đơn",
         "label": "order_count"
@@ -125,7 +119,6 @@
         "text": "bao nhiêu đơn hôm nay",
         "label": "order_count"
     },
-  
     {
         "text": "món bán chạy",
         "label": "top_dish"
@@ -142,7 +135,6 @@
         "text": "top 5 món bán chạy",
         "label": "top_dish"
     },
-    
     {
         "text": "món bán ít",
         "label": "low_dish"
@@ -155,7 +147,6 @@
         "text": "top món bán ít",
         "label": "low_dish"
     },
-    
     {
         "text": "dự báo hôm nay",
         "label": "forecast"
@@ -172,7 +163,6 @@
         "text": "món nào cần chuẩn bị nhiều",
         "label": "forecast"
     },
-    
     {
         "text": "món nào sắp hết",
         "label": "inventory_low"
@@ -189,7 +179,6 @@
         "text": "tồn kho hiện tại thế nào",
         "label": "inventory_low"
     },
-    
     {
         "text": "tình hình kinh doanh hôm nay",
         "label": "business_summary"
@@ -205,5 +194,41 @@
     {
         "text": "tóm tắt hôm nay",
         "label": "business_summary"
+    },
+    {
+        "text": "top 3 mon hom nay",
+        "label": "top_dish_limit"
+    },
+    {
+        "text": "top 5 mon thang nay",
+        "label": "top_dish_limit"
+    },
+    {
+        "text": "lay top 10 mon ban chay",
+        "label": "top_dish_limit"
+    },
+    {
+        "text": "doanh thu tu 1/4/2026 den 5/4/2026",
+        "label": "revenue_range"
+    },
+    {
+        "text": "tinh doanh thu tu ngay 1 den ngay 10",
+        "label": "revenue_range"
+    },
+    {
+        "text": "top mon thang truoc",
+        "label": "top_dish_time"
+    },
+    {
+        "text": "mon ban chay hom qua",
+        "label": "top_dish_time"
+    },
+    {
+        "text": "so sanh tuan nay voi tuan truoc",
+        "label": "compare_week"
+    },
+    {
+        "text": "tuan nay doanh thu the nao so voi tuan truoc",
+        "label": "compare_week"
     }
 ]

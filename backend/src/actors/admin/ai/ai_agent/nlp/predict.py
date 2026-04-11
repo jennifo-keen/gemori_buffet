@@ -1,53 +1,64 @@
-import sys
-import json
-import re
+import sys, json, re, pickle, unicodedata
 from datetime import datetime
 
-def extract_date(text):
-    match = re.search(r'(\d{1,2})/(\d{1,2})/(\d{4})', text)
+model = pickle.load(open("intent_model.pkl", "rb"))
+vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 
-    if match:
-        day, month, year = match.groups()
-        try:
-            date_obj = datetime(int(year), int(month), int(day))
-            return date_obj.strftime("%Y-%m-%d")
-        except:
-            return None
+def normalize(text):
+    text = text.lower()
+    text = unicodedata.normalize('NFD', text)
+    return ''.join(c for c in text if unicodedata.category(c) != 'Mn')
 
-    return None
+def extract_number(text):
+    m = re.search(r'\d+', text)
+    return int(m.group()) if m else None
 
+def extract_date_range(text):
+    matches = re.findall(r'(\d{1,2}/\d{1,2}/\d{4})', text)
+    return matches[0], matches[1] if len(matches) >= 2 else (None, None)
 
 try:
     data = json.loads(sys.argv[1])
-    question = data["question"].lower()
+    q = normalize(data["question"])
 
-    date = extract_date(question)
+    top_n = extract_number(q)
+    start_date, end_date = extract_date_range(q)
 
-    # ===== INTENT =====
-    if "doanh thu" in question and date:
-        intent = "revenue_by_date"
-    elif "hôm nay" in question and "doanh thu" in question:
-        intent = "revenue_today"
-    elif "hôm qua" in question:
-        intent = "revenue_yesterday"
-    elif "tháng này" in question and "so với" in question:
-        intent = "revenue_compare_month"
-    elif "hôm nay" in question and "so với" in question:
-        intent = "revenue_compare_day"
-    elif "món" in question and "chạy" in question:
-        intent = "top_dish"
+    # RULE
+    if start_date and end_date:
+        intent = "revenue_range"
+
+    elif "top" in q and top_n:
+        intent = "top_dish_limit"
+
+    elif "tuan nay" in q and "tuan truoc" in q:
+        intent = "compare_week"
+
     else:
-        intent = "unknown"
+        X = vectorizer.transform([q])
+        intent = model.predict(X)[0]
+        conf = max(model.predict_proba(X)[0])
+
+        print(json.dumps({
+            "intent": intent,
+            "entities": {
+                "top_n": top_n,
+                "start_date": start_date,
+                "end_date": end_date
+            },
+            "confidence": float(conf)
+        }))
+        sys.exit()
 
     print(json.dumps({
         "intent": intent,
         "entities": {
-            "date": date
+            "top_n": top_n,
+            "start_date": start_date,
+            "end_date": end_date
         },
         "confidence": 0.95
     }))
 
 except Exception as e:
-    print(json.dumps({
-        "error": str(e)
-    }))
+    print(json.dumps({"error": str(e)}))

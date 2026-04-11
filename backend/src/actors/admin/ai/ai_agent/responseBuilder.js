@@ -1,7 +1,4 @@
-const buildList = (rows, key1, key2) => {
-    return rows.map(r => `${r[key1]} (${r[key2]})`).join(", ");
-};
+const buildList = (rows, k1, k2) =>
+    rows.map(r => `${r[k1]} (${r[k2]})`).join(", ");
 
-module.exports = {
-    buildList
-};
+module.exports = { buildList };

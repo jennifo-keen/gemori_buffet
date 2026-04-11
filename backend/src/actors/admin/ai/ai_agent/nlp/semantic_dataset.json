@@ -1,0 +1,30 @@
+[
+    {
+        "text": "doanh thu hôm nay",
+        "sql": "SELECT COALESCE(SUM(amount),0) as total FROM payments WHERE DATE(paid_at)=CURRENT_DATE"
+    },
+    {
+        "text": "doanh thu hôm qua",
+        "sql": "SELECT COALESCE(SUM(amount),0) as total FROM payments WHERE DATE(paid_at)=CURRENT_DATE - INTERVAL '1 day'"
+    },
+    {
+        "text": "doanh thu tháng này",
+        "sql": "SELECT COALESCE(SUM(amount),0) as total FROM payments WHERE DATE_TRUNC('month', paid_at)=DATE_TRUNC('month', CURRENT_DATE)"
+    },
+    {
+        "text": "hôm nay có bao nhiêu đơn",
+        "sql": "SELECT COUNT(*) as total FROM orders WHERE DATE(order_time)=CURRENT_DATE"
+    },
+    {
+        "text": "top món bán chạy",
+        "sql": "SELECT m.name, SUM(oi.quantity) as total FROM order_items oi JOIN menus m ON oi.menu_id=m.id WHERE DATE(oi.item_order_time)=CURRENT_DATE GROUP BY m.name ORDER BY total DESC LIMIT 5"
+    },
+    {
+        "text": "món bán ít",
+        "sql": "SELECT m.name, SUM(oi.quantity) as total FROM order_items oi JOIN menus m ON oi.menu_id=m.id WHERE DATE(oi.item_order_time)=CURRENT_DATE GROUP BY m.name ORDER BY total ASC LIMIT 5"
+    },
+    {
+        "text": "tồn kho thấp",
+        "sql": "SELECT m.name, i.stock_quantity as total FROM inventory i JOIN menus m ON i.menu_id=m.id WHERE i.stock_quantity <= i.min_quantity"
+    }
+]
