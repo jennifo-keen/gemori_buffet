@@ -15,13 +15,8 @@ const httpServer = http.createServer(app);
 initSocket(httpServer);
 
 
-<<<<<<< Updated upstream
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',')
-=======
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
   ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim()).filter(Boolean)
->>>>>>> Stashed changes
   : [];
 
 app.use(cors({
