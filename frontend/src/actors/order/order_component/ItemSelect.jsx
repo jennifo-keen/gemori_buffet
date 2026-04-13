@@ -5,7 +5,7 @@ import image from "../../../assets/img/Image.png"
 import { STATUS_CONFIG } from '../order_config/statusConfig';
 
 // Quantity counter component for reusability
-const QuantityCounter = ({ value, onDecrement, onIncrement }) => (
+const QuantityCounter = ({ value, onDecrement, onIncrement, maxQuantity }) => (
   <Stack
     direction="row"
     alignItems="center"
@@ -46,13 +46,14 @@ const QuantityCounter = ({ value, onDecrement, onIncrement }) => (
         color: "#1e293b",
       }}
     >
-      {value}
+      {value}{maxQuantity && ` / ${maxQuantity}`}
     </Typography>
 
     <IconButton
       onClick={onIncrement}
       size="small"
       disableRipple
+      disabled={maxQuantity !== null && value >= maxQuantity}
       sx={{
         width: 24,
         height: 24,
@@ -63,6 +64,7 @@ const QuantityCounter = ({ value, onDecrement, onIncrement }) => (
         fontSize: "1rem",
         lineHeight: "1.5rem",
         "&:hover": { bgcolor: "transparent" },
+        "&:disabled": { color: "#cbd5e1", cursor: "not-allowed" },
       }}
     >
       +
@@ -140,6 +142,7 @@ const Order_ItemSelect = ({ item, mode = 'cart' }) => {
             value={qty}
             onDecrement={() => removeFromCart(item.id)}
             onIncrement={() => addToCart(item)}
+            maxQuantity={item.stock_quantity}
           />
         ) : (
           // Món đã gọi — hiện trạng thái

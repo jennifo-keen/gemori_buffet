@@ -2,12 +2,13 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
-import { Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Stack, Typography, Alert } from "@mui/material";
 import OrdStatusHeader  from "../kitchen_components/OrdStatusHeader"
 import OrderTable from '../kitchen_components/OrderTable';
 
 import { fetchPendingItems, updateItemStatus, completeTableStatus } from '../kitchen_api/kitchenApi';
 import { useTableSocket } from '../kitchen_hook/useTableSocket';
+import useDialog from '../../staff/staff_hook/useDialog'
 
 export default function Kitchen_OrdDetailTable() {
   const { tableCode } = useParams();
@@ -15,7 +16,7 @@ export default function Kitchen_OrdDetailTable() {
 
   const [tableData, setTableData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [completing, setCompleting] = useState(false);
+  const { showConfirm, showSuccess, showError } = useDialog(); 
 
   // Load data logic
   const loadData = useCallback(async () => {
@@ -36,24 +37,71 @@ export default function Kitchen_OrdDetailTable() {
   useTableSocket(tableCode, loadData);
 
   // Handlers
-  const handleUpdateItem = async (itemId, status) => {
-    try {
-      await updateItemStatus(itemId, status);
-      await loadData();
-    } catch (err) { console.error(err); }
-  };
+const handleUpdateItem = (itemId, status) => {
+  const item = tableData?.items?.find(i => i.id === itemId);
 
-  const handleCompleteAll = async () => {
-    try {
-      setCompleting(true);
-      await completeTableStatus(tableCode);
-      navigate('/kitchen');
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setCompleting(false);
-    }
-  };
+  if (status === 'done') {
+    showConfirm({
+      title: 'Xác nhận xong món?',
+      subtitle: 'Món sẽ được đánh dấu hoàn thành và thông báo cho khách.',
+      badges: [
+        { label: item?.menu_name || 'Món' },
+        { label: `SL: ${item?.quantity}` },
+      ],
+      confirmText: 'Xong món',
+      cancelText: 'Hủy',
+      onConfirm: async () => {
+        try {
+          await updateItemStatus(itemId, status);
+        } catch (err) {
+          showError({
+            title: 'Lỗi cập nhật',
+            subtitle: err.response?.data?.message || 'Có lỗi xảy ra',
+            confirmText: 'Đóng',
+          });
+        }
+      },
+    });
+  } else {
+    updateItemStatus(itemId, status).catch(err =>
+      showError({
+        title: 'Lỗi cập nhật',
+        subtitle: err.response?.data?.message || 'Có lỗi xảy ra',
+        confirmText: 'Đóng',
+      })
+    );
+  }
+};
+
+  const handleCompleteAll = () => {
+  showConfirm({
+    title: 'Hoàn tất đơn bàn?',
+    subtitle: `Tất cả món của bàn ${tableCode} sẽ được đánh dấu hoàn thành.`,
+    badges: [
+      { label: `Bàn ${tableCode}` },
+      { label: `${tableData?.items?.length || 0} món` },
+    ],
+    confirmText: 'Hoàn tất',
+    cancelText: 'Hủy',
+    onConfirm: async () => {
+      try {
+        await completeTableStatus(tableCode);
+        showSuccess({
+          title: 'Hoàn tất đơn!',
+          subtitle: `Bàn ${tableCode} đã được phục vụ xong.`,
+          confirmText: 'Đóng',
+          onConfirm: () => navigate('/kitchen'),
+        });
+      } catch (err) {
+        showError({
+          title: 'Lỗi hoàn tất',
+          subtitle: err.response?.data?.message || 'Có lỗi xảy ra',
+          confirmText: 'Đóng',
+        });
+      }
+    },
+  });
+};
 
   if (loading) return (
     <Box display="flex" justifyContent="center" alignItems="center" height="100%">
@@ -125,9 +173,7 @@ export default function Kitchen_OrdDetailTable() {
                 {/* Complete order button */}
                 <Button
                   variant="contained"
-                  startIcon={completing ? <CircularProgress size={20} color="inherit" /> : <CheckBoxIcon sx={{ width: 32, height: 32 }} />}
                   onClick={handleCompleteAll}
-                  disabled={completing}
                   sx={{
                     backgroundColor: "#b14135",
                     borderRadius: 3,
@@ -143,7 +189,7 @@ export default function Kitchen_OrdDetailTable() {
                     },
                   }}
                 >
-                  {completing ? 'ĐANG XỬ LÝ...' : 'HOÀN TẤT ĐƠN'}
+                  HOÀN TẤT ĐƠN
                 </Button>
               </Stack>
             </Box>

@@ -8,8 +8,11 @@ import InfoCard from "../staff_components/InfoCard"
 import QrCode from "../../../assets/icon/QrCode.svg"
 
 import { getTableOrder } from '../staff_api/tableApi';
+import { deleteOrderItem } from '../staff_api/orderApi';
 
-import useAuthStaff from '../staff_hook/useAuthStaff';
+import  useAuthStaff  from '../staff_hook/useAuthStaff';
+import useDialog from '../staff_hook/useDialog';
+
 
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import GroupsIcon from "@mui/icons-material/Groups";
@@ -28,6 +31,7 @@ const StaffCheckOut = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { admin, tables } = useAuthStaff();
+  const { showConfirm, showSuccess, showError } = useDialog();
 
   const tableId   = searchParams.get('tableId');
   const tableCode = searchParams.get('tableCode');
@@ -38,11 +42,11 @@ const StaffCheckOut = () => {
 
   // Lấy order của bàn
   useEffect(() => {
-    if (!tableId) return;
+    if (!tableCode) return;
     const fetchOrder = async () => {
       try {
         setLoading(true);
-        const res = await getTableOrder(tableId);
+        const res = await getTableOrder(tableCode);
         setOrder(res.data);
       } catch  {
         setError('Không thể tải đơn hàng');
@@ -51,10 +55,54 @@ const StaffCheckOut = () => {
       }
     };
     fetchOrder();
-  }, [tableId]);
+  }, [tableCode]);
 
   const formatVND = (amount) =>
     new Intl.NumberFormat('vi-VN').format(amount || 0) + ' VNĐ';
+
+const handleDeleteItem = (itemId) => {
+  const item = order?.items?.find(i => i.id === itemId);
+  if (!item) return;
+
+  if (item.status === 'done') {
+    showError({
+      title: 'Không thể xóa',
+      subtitle: 'Món đã được phục vụ, không thể hủy.',
+      confirmText: 'Đã hiểu',
+    });
+    return;
+  }
+
+  showConfirm({
+    title: 'Xác nhận hủy món',
+    subtitle: `Bạn có chắc muốn hủy món ${item.menu_name} này không?`,
+    badges: [
+      { label: item.menu_name },
+      { label: `SL: ${item.quantity}` },
+      { label: item.status === 'pending' ? 'Đang chờ' : 'Đang làm' },
+    ],
+    confirmText: 'Hủy món',
+    cancelText: 'Giữ lại',
+    onConfirm: async () => {
+      try {
+        await deleteOrderItem(itemId, tableCode);
+        const res = await getTableOrder(tableCode);
+        setOrder(res.data);
+        showSuccess({
+          title: 'Đã hủy món!',
+          subtitle: `Món đã được xóa khỏi đơn hàng bàn ${tableCode}`,
+          confirmText: 'Đóng',
+        });
+      } catch (err) {
+        showError({
+          title: 'Hủy món thất bại',
+          subtitle: err.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại',
+          confirmText: 'Thử lại',
+        });
+      }
+    },
+  });
+};
 
   const ticketTotal = order
     ? (order.ticket_price * order.ticket_quantity)
@@ -254,6 +302,7 @@ const StaffCheckOut = () => {
                           status: item.status,
                           image: item.image_url,
                         }}
+                        onDelete={handleDeleteItem}
                       />
                     ))
                   : (

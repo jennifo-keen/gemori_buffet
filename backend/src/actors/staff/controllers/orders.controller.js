@@ -15,6 +15,15 @@ const getAllOrders = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+const cancelItem = async (req, res, next) => {
+  try {
+    const { tableCode } = req.query;
+    if (!tableCode) return res.status(400).json({ message: 'Thiếu tableCode' });
+    const result = await ordersService.cancelItem(req.params.itemId, tableCode);
+    res.json(result);
+  } catch (err) { next(err); }
+};
+
 const createOrder = async (req, res, next) => {
   try {
     const { tableId, buffetTicketId, ticketQuantity } = req.body;
@@ -26,4 +35,4 @@ const createOrder = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-module.exports = { getOrder, getAllOrders, createOrder };
+module.exports = { getOrder, getAllOrders, createOrder, cancelItem };

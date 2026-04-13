@@ -35,7 +35,7 @@ router.get('/menu', menuController.getAllMenus);
 router.get('/orders', requireRole('admin'), ordersController.getAllOrders);
 router.get('/orders/:id', ordersController.getOrder);
 router.post('/orders/create', requireRole('staff', 'admin'), ordersController.createOrder);
-
+router.delete('/order-items/:itemId', requireRole('staff', 'admin'), ordersController.cancelItem);
 // ============ PAYMENT ROUTES ============
 router.post('/payment/checkout', requireRole('staff', 'admin'), paymentController.checkout);
 
@@ -43,7 +43,7 @@ router.post('/payment/checkout', requireRole('staff', 'admin'), paymentControlle
 router.get('/tables', tablesController.getAll);
 router.patch('/tables/:id/open', requireRole('staff', 'admin'), tablesController.openTable);
 router.patch('/tables/:id/close', requireRole('staff', 'admin'), tablesController.closeTable);
-router.get('/tables/:id/order', tablesController.getTableOrder);
+router.get('/tables/:tableCode/order', tablesController.getTableOrder);
 
 // ============ VOUCHERS ROUTES ============
 router.post('/vouchers/validate', requireRole('staff', 'admin'), vouchersController.validate);

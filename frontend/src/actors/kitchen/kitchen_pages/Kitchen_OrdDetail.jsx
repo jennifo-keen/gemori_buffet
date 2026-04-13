@@ -1,15 +1,17 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography, Alert } from "@mui/material";
 import TableCard from '../kitchen_components/TableCardOpt';
 
 import { fetchPendingItems, updateItemStatus, completeTableStatus } from '../kitchen_api/kitchenApi';
 import { useKitchenSocket } from '../kitchen_hook/useKitchenSocket';
 
+import useDialog from '../../staff/staff_hook/useDialog'
+
 export default function Kitchen_OrdDetail() {
   const [tables, setTables] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { showConfirm, showSuccess, showError } = useDialog(); 
 
-  // 1. Logic tải dữ liệu
   const loadData = useCallback(async () => {
     try {
       const res = await fetchPendingItems();
@@ -23,25 +25,74 @@ export default function Kitchen_OrdDetail() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  // 2. Sử dụng custom hook để xử lý Realtime
+  // Sử dụng custom hook để xử lý Realtime
   useKitchenSocket(loadData);
 
-  // 3. Các hàm xử lý sự kiện
+  // Các hàm xử lý sự kiện
   const handleCompleteTable = async (tableCode) => {
-    try {
-      await completeTableStatus(tableCode);
-      await loadData();
-    } catch (err) {
-      console.error(err);
-    }
+    const tableData = tables.find(t => t.table_code === tableCode);
+    showConfirm({
+      title: 'Hoàn tất đơn bàn?',
+      subtitle: `Tất cả món của bàn ${tableCode} hoàn thành.`,
+      badges: [
+        { label: `Bàn ${tableCode}` },
+        { label: `${tableData?.items?.length || 0} món` },
+      ],
+      confirmText: 'Hoàn tất',
+      cancelText: 'Hủy',
+      onConfirm: async () => {
+        try {
+          await completeTableStatus(tableCode);
+          await loadData();
+          showSuccess({
+            title: 'Hoàn tất đơn!',
+            subtitle: `Bàn ${tableCode} đã được phục vụ xong.`,
+            confirmText: 'Đóng',
+          });
+        } catch (err) {
+          showError({
+            title: 'Lỗi hoàn tất',
+            subtitle: err.response?.data?.message || 'Có lỗi xảy ra',
+            confirmText: 'Đóng',
+          });
+        }
+      },
+    });
   };
 
   const handleUpdateItem = async (itemId, status) => {
-    try {
-      await updateItemStatus(itemId, status);
-      await loadData();
-    } catch (err) {
-      console.error(err);
+      const item = tables.flatMap(t => t.items).find(i => i.id === itemId);
+
+    if (status === 'done') {
+      showConfirm({
+        title: 'Xác nhận xong món?',
+        subtitle: 'Món sẽ được đánh dấu hoàn thành và gửi thông báo cho khách.',
+        badges: [
+          { label: item?.menu_name || 'Món' },
+          { label: `SL: ${item?.quantity}` },
+        ],
+        confirmText: 'Xong món',
+        cancelText: 'Hủy',
+        onConfirm: async () => {
+          try {
+            await updateItemStatus(itemId, status);
+          } catch (err) {
+            showError({
+              title: 'Lỗi cập nhật',
+              subtitle: err.response?.data?.message || 'Có lỗi xảy ra',
+              confirmText: 'Đóng',
+            });
+          }
+        },
+      });
+    } else {
+      updateItemStatus(itemId, status).catch(err => {
+        showError({
+          title: 'Lỗi cập nhật',
+          subtitle: err.response?.data?.message || 'Có lỗi xảy ra',
+          confirmText: 'Đóng',
+        });
+      });
     }
   };
 
@@ -61,6 +112,7 @@ export default function Kitchen_OrdDetail() {
       sx={{
         zoom: 0.75,
         display: "flex",
+        flexDirection: "column",
         gap: 2,
         overflowX: "auto",
         padding: 2,
@@ -77,15 +129,17 @@ export default function Kitchen_OrdDetail() {
         },
       }}
     >
-      {tables.map((tableData) => (
-        <Box key={tableData.table_code} sx={{ flex: "0 0 auto" }}>
-          <TableCard 
-            data={tableData}
-            onComplete={() => handleCompleteTable(tableData.table_code)}
-            onUpdateItem={handleUpdateItem}
-          />
-        </Box>
-      ))}
+      <Box sx={{ display: "flex", gap: 2, overflowX: "auto" }}>
+        {tables.map((tableData) => (
+          <Box key={tableData.table_code} sx={{ flex: "0 0 auto" }}>
+            <TableCard 
+              data={tableData}
+              onComplete={() => handleCompleteTable(tableData.table_code)}
+              onUpdateItem={handleUpdateItem}
+            />
+          </Box>
+        ))}
+      </Box>
     </Box>
   );
 };

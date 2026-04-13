@@ -98,4 +98,32 @@ const tableCheck = await pool.query('SELECT * FROM tables WHERE id = $1', [table
   return result.rows[0];
 };
  
-module.exports = { getOrderById, getAllOrders, createOrder };
+const cancelItem = async (itemId, tableCode) => {
+  const check = await pool.query(
+    `SELECT oi.*, o.table_id, t.table_code
+     FROM order_items oi
+     LEFT JOIN orders o ON oi.order_id = o.id
+     LEFT JOIN tables t ON o.table_id  = t.id
+     WHERE oi.id = $1`,
+    [itemId]
+  );
+
+  const item = check.rows[0];
+  if (!item) throw { status: 404, message: 'Món không tồn tại' };
+  if (item.table_code !== tableCode)
+    throw { status: 403, message: 'Không có quyền hủy món này' };
+  if (item.status !== 'pending' && item.status !== 'cooking')
+    throw { status: 400, message: 'Chỉ có thể hủy món đang chờ hoặc đang làm' };
+
+  await pool.query('DELETE FROM order_items WHERE id = $1', [itemId]);
+
+  try {
+    const io = getIO();
+    io.to('kitchen').emit('order_item_cancelled', { itemId, tableId: item.table_id });
+    io.to('staff').emit('order_item_cancelled', { itemId, tableId: item.table_id });
+  } catch (e) { console.error('Socket error:', e.message); }
+
+  return { message: 'Đã hủy món thành công' };
+};
+
+module.exports = { getOrderById, getAllOrders, createOrder, cancelItem };

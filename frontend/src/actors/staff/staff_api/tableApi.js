@@ -13,5 +13,5 @@ export const closeTable = (tableId) =>
   axiosInstance.patch(`/tables/${tableId}/close`);
 
 // Xem order đang chạy của bàn
-export const getTableOrder = (tableId) =>
-  axiosInstance.get(`/tables/${tableId}/order`);
+export const getTableOrder = (tableCode) =>
+  axiosInstance.get(`/tables/${tableCode}/order`);

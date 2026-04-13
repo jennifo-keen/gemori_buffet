@@ -9,13 +9,15 @@ import { Box, Button, Stack, CircularProgress, Typography } from "@mui/material"
 import { fetchPendingItems, updateItemStatus, completeTableStatus } from '../kitchen_api/kitchenApi';
 import { useTableSocket } from '../kitchen_hook/useTableSocket';
 
+import useDialog from '../../staff/staff_hook/useDialog'
+
 export default function Kitchen_OrdDetailOrd() {
   const { tableCode } = useParams();
   const navigate = useNavigate();
 
   const [tableData, setTableData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [completing, setCompleting] = useState(false)
+  const { showConfirm, showSuccess, showError } = useDialog(); 
 
   // Load data logic
   const loadData = useCallback(async () => {
@@ -37,25 +39,71 @@ export default function Kitchen_OrdDetailOrd() {
 
   // Handlers
   const handleUpdateItem = async (itemId, status) => {
-    try {
-      await updateItemStatus(itemId, status);
-      await loadData();
-    } catch (err) {
-      console.error("Lỗi cập nhật món:", err);
-    }
-  };
+      const item = tableData?.items?.find(i => i.id === itemId);
+
+      if (status === 'done') {
+        showConfirm({
+          title: 'Xác nhận xong món?',
+          subtitle: 'Món sẽ được đánh dấu hoàn thành và thông báo cho khách.',
+          badges: [
+            { label: item?.menu_name || 'Món' },
+            { label: `SL: ${item?.quantity}` },
+          ],
+          confirmText: 'Xong món',
+          cancelText: 'Hủy',
+          onConfirm: async () => {
+            try {
+              await updateItemStatus(itemId, status);
+            } catch (err) {
+              showError({
+                title: 'Lỗi cập nhật',
+                subtitle: err.response?.data?.message || 'Có lỗi xảy ra',
+                confirmText: 'Đóng',
+              });
+            }
+          },
+        });
+      } else {
+        // cooking — cập nhật thẳng
+        updateItemStatus(itemId, status).catch(err =>
+          showError({
+            title: 'Lỗi cập nhật',
+            subtitle: err.response?.data?.message || 'Có lỗi xảy ra',
+            confirmText: 'Đóng',
+          })
+        );
+      }
+    };
 
   const handleCompleteAll = async () => {
-    try {
-      setCompleting(true);
-      await completeTableStatus(tableCode);
-      navigate('/kitchen/all');
-    } catch (err) {
-      console.error("Lỗi hoàn tất bàn:", err);
-    } finally {
-      setCompleting(false);
-    }
-  };
+    showConfirm({
+    title: 'Hoàn tất đơn bàn?',
+    subtitle: `Tất cả món của bàn ${tableCode} sẽ được đánh dấu hoàn thành.`,
+    badges: [
+      { label: `Bàn ${tableCode}` },
+      { label: `${tableData?.items?.length || 0} món` },
+    ],
+    confirmText: 'Hoàn tất',
+    cancelText: 'Hủy',
+    onConfirm: async () => {
+      try {
+        await completeTableStatus(tableCode);
+        showSuccess({
+          title: 'Hoàn tất đơn!',
+          subtitle: `Bàn ${tableCode} đã được phục vụ xong.`,
+          confirmText: 'Đóng',
+          onConfirm: () => navigate('/kitchen/all'),
+        });
+      } catch (err) {
+        showError({
+          title: 'Lỗi hoàn tất',
+          subtitle: err.response?.data?.message || 'Có lỗi xảy ra',
+          confirmText: 'Đóng',
+        });
+      }
+    },
+  });
+};
 
   if (loading) return (
     <Box display="flex" justifyContent="center" alignItems="center" height="100%">
@@ -81,6 +129,7 @@ export default function Kitchen_OrdDetailOrd() {
         zoom: "0.75",
       }}>
         <OrdStatusHeader tableData={tableData} />
+
         <OrderTable 
           items={tableData.items}
           onUpdateItem={handleUpdateItem}
@@ -124,9 +173,7 @@ export default function Kitchen_OrdDetailOrd() {
             {/* Complete order button */}
             <Button
               variant="contained"
-              startIcon={completing ? <CircularProgress size={20} color="inherit" /> : <CheckBoxIcon />}
               onClick={handleCompleteAll}
-              disabled={completing}
               sx={{
                 backgroundColor: "#b14135",
                 borderRadius: "12px",
@@ -142,7 +189,7 @@ export default function Kitchen_OrdDetailOrd() {
                 },
               }}
             >
-              {completing ? 'ĐANG XỬ LÝ...' : 'HOÀN TẤT ĐƠN'}
+              HOÀN TẤT ĐƠN
             </Button>
           </Stack>
         </Box>

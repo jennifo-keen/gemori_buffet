@@ -23,7 +23,7 @@ const closeTable = async (req, res, next) => {
 
 const getTableOrder = async (req, res, next) => {
   try {
-    const order = await tablesService.getTableCurrentOrder(req.params.id);
+    const order = await tablesService.getTableCurrentOrderByCode(req.params.tableCode);
     res.json(order);
   } catch (err) { next(err); }
 };

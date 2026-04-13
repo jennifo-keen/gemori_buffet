@@ -6,7 +6,7 @@ import { ORDER_ITEM_STATUS } from '../staff_config/staticConfig';
 import { Box, Chip, Stack, Typography } from "@mui/material";
 
 
-const Bill = ({ item }) => {
+const Bill = ({ item, onDelete }) => {
   if (!item) return null;
   const status = ORDER_ITEM_STATUS[item.status] || ORDER_ITEM_STATUS.pending;
 
@@ -109,15 +109,18 @@ const Bill = ({ item }) => {
                     width: "40px",
                   }}
                 >
-                  <Box
-                    component="img"
-                    src={DeleteOutlineIcon}
-                    sx={{
-                      width: "20px",
-                      height: "20px",
-                      cursor: "pointer",
-                    }}
-                  />
+                  {(item.status === 'pending' || item.status === 'cooking') && (
+                    <Box
+                      component="img"
+                      src={DeleteOutlineIcon}
+                      sx={{
+                        width: "20px",
+                        height: "20px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => onDelete && onDelete(item.id)}
+                    />
+                  )}
                 </Box>
               </Stack>
             </Box>

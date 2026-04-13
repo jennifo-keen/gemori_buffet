@@ -26,11 +26,10 @@ const addItems = async (req, res, next) => {
  
 const cancelItem = async (req, res, next) => {
   try {
-    // tableId truyền qua query để verify quyền
-    const { tableId } = req.query;
-    if (!tableId) return res.status(400).json({ message: 'Thiếu tableId' });
- 
-    const result = await orderService.cancelItem(req.params.itemId, tableId);
+    const { tableCode } = req.query; 
+    if (!tableCode) return res.status(400).json({ message: 'Thiếu tableCode' });
+
+    const result = await orderService.cancelItem(req.params.itemId, tableCode);
     res.json(result);
   } catch (err) { next(err); }
 };

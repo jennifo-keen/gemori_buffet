@@ -53,9 +53,10 @@ const getMenuByTable = async (tableCode) => {
 
   // Lấy tất cả món thuộc gói buffet này
   const menuResult = await pool.query(
-    `SELECT m.id, m.code, m.name, m.category, m.image_url
+    `SELECT m.id, m.code, m.name, m.category, m.image_url, i.stock_quantity
      FROM menus m
      INNER JOIN buffet_ticket_menus btm ON m.id = btm.menu_id
+     LEFT JOIN inventory i ON m.id = i.menu_id
      WHERE btm.buffet_ticket_id = $1
        AND m.status = true
      ORDER BY m.category ASC, m.name ASC`,

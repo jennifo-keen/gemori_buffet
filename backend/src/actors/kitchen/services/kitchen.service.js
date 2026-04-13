@@ -74,6 +74,26 @@ const updateItemStatus = async (itemId, status) => {
   const item = check.rows[0];
   if (!item) throw { status: 404, message: 'Món không tồn tại' };
 
+  // Nếu chuyển sang 'done', kiểm tra và trừ tồn kho
+  if (status === 'done') {
+    const inventoryCheck = await pool.query(
+      'SELECT stock_quantity FROM inventory WHERE menu_id = $1',
+      [item.menu_id]
+    );
+    const inventory = inventoryCheck.rows[0];
+    if (!inventory) {
+      throw { status: 400, message: 'Món này chưa có thông tin tồn kho' };
+    }
+    if (inventory.stock_quantity < item.quantity) {
+      throw { status: 400, message: `Không đủ tồn kho. Còn ${inventory.stock_quantity}, cần ${item.quantity}` };
+    }
+    // Trừ tồn kho
+    await pool.query(
+      'UPDATE inventory SET stock_quantity = stock_quantity - $1, updated_at = NOW() WHERE menu_id = $2',
+      [item.quantity, item.menu_id]
+    );
+  }
+
   await pool.query(
     'UPDATE order_items SET status = $1 WHERE id = $2',
     [status, itemId]
@@ -134,7 +154,7 @@ const updateAllItemsByTable = async (tableCode, status) => {
 
   // Lấy tất cả món pending/cooking của bàn
   const itemsResult = await pool.query(
-    `SELECT oi.id FROM order_items oi
+    `SELECT oi.id, oi.menu_id, oi.quantity FROM order_items oi
      LEFT JOIN orders o ON oi.order_id = o.id
      WHERE o.table_id = $1
        AND o.status = 'ordering'
@@ -146,6 +166,28 @@ const updateAllItemsByTable = async (tableCode, status) => {
     throw { status: 400, message: 'Không có món nào cần cập nhật' };
 
   const itemIds = itemsResult.rows.map(r => r.id);
+
+  // Nếu chuyển sang 'done', kiểm tra và trừ tồn kho cho từng món
+  if (status === 'done') {
+    for (const item of itemsResult.rows) {
+      const inventoryCheck = await pool.query(
+        'SELECT stock_quantity FROM inventory WHERE menu_id = $1',
+        [item.menu_id]
+      );
+      const inventory = inventoryCheck.rows[0];
+      if (!inventory) {
+        throw { status: 400, message: `Món ${item.menu_id} chưa có thông tin tồn kho` };
+      }
+      if (inventory.stock_quantity < item.quantity) {
+        throw { status: 400, message: `Không đủ tồn kho cho món ${item.menu_id}. Còn ${inventory.stock_quantity}, cần ${item.quantity}` };
+      }
+      // Trừ tồn kho
+      await pool.query(
+        'UPDATE inventory SET stock_quantity = stock_quantity - $1, updated_at = NOW() WHERE menu_id = $2',
+        [item.quantity, item.menu_id]
+      );
+    }
+  }
 
   await pool.query(
     'UPDATE order_items SET status = $1 WHERE id = ANY($2)',

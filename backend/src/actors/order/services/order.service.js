@@ -62,6 +62,28 @@ const addItems = async (tableCode, items) => {
   if (menuCheck.rows.length !== menuIds.length)
     throw { status: 400, message: 'Một số món không hợp lệ hoặc đã hết' };
 
+  // Kiểm tra inventory cho tất cả items
+  for (const item of items) {
+    const inventoryCheck = await pool.query(
+      `SELECT stock_quantity FROM inventory WHERE menu_id = $1`,
+      [item.menuId]
+    );
+
+    const inventory = inventoryCheck.rows[0];
+    
+    // Nếu không có record trong inventory hoặc stock_quantity <= 0
+    if (!inventory || !inventory.stock_quantity || inventory.stock_quantity <= 0) {
+      const menuName = (await pool.query('SELECT name FROM menus WHERE id = $1', [item.menuId])).rows[0]?.name;
+      throw { status: 400, message: `Món "${menuName}" không có trong kho hoặc đã hết hàng!` };
+    }
+    
+    // Nếu quantity order vượt quá stock_quantity
+    if (item.quantity > inventory.stock_quantity) {
+      const menuName = (await pool.query('SELECT name FROM menus WHERE id = $1', [item.menuId])).rows[0]?.name;
+      throw { status: 400, message: `Không thể đặt ${item.quantity} của "${menuName}". Chỉ còn ${inventory.stock_quantity} món trong kho!` };
+    }
+  }
+
   // Insert từng món
   const inserted = [];
   for (const item of items) {
@@ -97,27 +119,31 @@ try {
 };
 
 // Hủy món — chỉ khi còn pending
-const cancelItem = async (itemId, tableId) => {
-  // Kiểm tra item thuộc bàn này
+const cancelItem = async (itemId, tableCode) => {
 const check = await pool.query(
-    `SELECT oi.*, o.table_id FROM order_items oi
+    `SELECT oi.*, o.table_id, t.table_code 
+     FROM order_items oi
      LEFT JOIN orders o ON oi.order_id = o.id
+     LEFT JOIN tables t ON o.table_id = t.id
      WHERE oi.id = $1`,
     [itemId]
   );
 
  const item = check.rows[0];
-  if (!item) throw { status: 404, message: 'Món không tồn tại' };
-  if (item.table_id !== tableId) throw { status: 403, message: 'Không có quyền hủy món này' };
-  if (item.status !== 'pending') throw { status: 400, message: 'Chỉ có thể hủy món đang chờ xử lý' };
+  if (!item) 
+    throw { status: 404, message: 'Món không tồn tại' };
+  if (item.table_code !== tableCode)
+    throw { status: 403, message: 'Không có quyền hủy món này' };
+  if (item.status !== 'pending' && item.status !== 'cooking') 
+    throw { status: 400, message: 'Chỉ có thể hủy món đang chờ xử lý hoặc đang làm' };
  
   await pool.query('DELETE FROM order_items WHERE id = $1', [itemId]);
 
   // Notify bếp và staff
    try {
     const io = getIO();
-    io.to('kitchen').emit('order_item_cancelled', { itemId, tableId });
-    io.to('staff').emit('order_item_cancelled', { itemId, tableId });
+    io.to('kitchen').emit('order_item_cancelled', { itemId, tableId: item.table_id });
+    io.to('staff').emit('order_item_cancelled', {itemId, tableId: item.table_id });
   } catch (e) { console.error('Socket error:', e.message); }
  
   return { message: 'Đã hủy món thành công' };

@@ -82,6 +82,21 @@ export const OrderProvider = ({ children }) => {
 
   // ── Cart — thêm/bớt/xóa ─────────────────────────────────────
   const addToCart = (menuItem) => {
+    const currentQty = getCartQty(menuItem.id);
+    const stock = menuItem.stock_quantity;
+    
+    // Kiểm tra nếu không có inventory record hoặc stock <= 0
+    if (stock === null || stock === undefined || stock <= 0) {
+      alert('Món này không có trong kho hoặc đã hết hàng!');
+      return;
+    }
+    
+    // Kiểm tra không vượt quá stock_quantity
+    if (currentQty + 1 > stock) {
+      alert(`Không thể thêm. Chỉ còn ${stock} món trong kho!`);
+      return;
+    }
+    
     setCart(prev => {
       const exist = prev.find(i => i.id === menuItem.id);
       if (exist) {

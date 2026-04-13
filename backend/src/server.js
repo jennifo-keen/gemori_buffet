@@ -15,8 +15,13 @@ const httpServer = http.createServer(app);
 initSocket(httpServer);
 
 
+<<<<<<< Updated upstream
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',')
+=======
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim()).filter(Boolean)
+>>>>>>> Stashed changes
   : [];
 
 app.use(cors({
@@ -25,13 +30,12 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin) || origin === 'http://localhost:5173') {
       callback(null, true);
     } else {
-      console.log("Blocked by CORS:", origin);
+      console.log('Blocked by CORS:', origin, 'allowed:', allowedOrigins);
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
-  // THÊM 'PATCH' VÀO ĐÂY LÀ ĂN NGAY
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT','PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());

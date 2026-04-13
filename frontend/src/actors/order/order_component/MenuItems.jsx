@@ -8,6 +8,8 @@ import RemoveIcon from "@mui/icons-material/Remove";
 export const MenuItems = ({ item }) => {
   const { addToCart, removeFromCart, getCartQty } = useOrder();
   const qty = getCartQty(item.id);
+  // Item không khả dụng nếu: không có inventory record (null/undefined) HOẶC stock_quantity <= 0
+  const isOutOfStock = item.stock_quantity === null || item.stock_quantity === undefined || item.stock_quantity <= 0;
   return (
     <Stack 
       direction="row" 
@@ -16,6 +18,7 @@ export const MenuItems = ({ item }) => {
       sx={{
         width:"230px",
         my:"12px",
+        opacity: isOutOfStock ? 0.5 : 1,
       }}
       >
       <Box
@@ -28,6 +31,7 @@ export const MenuItems = ({ item }) => {
           bgcolor: "grey.200",
           borderRadius: 2,
           flexShrink: 0,
+          filter: isOutOfStock ? 'grayscale(100%)' : 'none',
         }}
       />
 
@@ -75,8 +79,8 @@ export const MenuItems = ({ item }) => {
 
         {/* Add button */}
         {qty === 0 ? (
-          <IconButton size="small" onClick={() => addToCart(item)}
-            sx={{ bgcolor: "#a21a16", color: "white", borderRadius: "999px", p: 0.5, "&:hover": { bgcolor: "#8b1512" } }}
+          <IconButton size="small" onClick={() => addToCart(item)} disabled={isOutOfStock}
+            sx={{ bgcolor: isOutOfStock ? "grey.400" : "#a21a16", color: "white", borderRadius: "999px", p: 0.5, "&:hover": { bgcolor: isOutOfStock ? "grey.400" : "#8b1512" } }}
           >
             <AddIcon sx={{ width: 18, height: 18 }} />
           </IconButton>
@@ -90,8 +94,8 @@ export const MenuItems = ({ item }) => {
             <Typography sx={{ fontWeight: 700, fontSize: 13, minWidth: 16, textAlign: 'center' }}>
               {qty}
             </Typography>
-            <IconButton size="small" onClick={() => addToCart(item)}
-              sx={{ bgcolor: "#a21a16", color: "white", borderRadius: "999px", p: 0.5, "&:hover": { bgcolor: "#8b1512" } }}
+            <IconButton size="small" onClick={() => addToCart(item)} disabled={isOutOfStock}
+              sx={{ bgcolor: isOutOfStock ? "grey.400" : "#a21a16", color: "white", borderRadius: "999px", p: 0.5, "&:hover": { bgcolor: isOutOfStock ? "grey.400" : "#8b1512" } }}
             >
               <AddIcon sx={{ width: 16, height: 16 }} />
             </IconButton>

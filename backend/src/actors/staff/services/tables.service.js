@@ -89,4 +89,49 @@ const orderResult = await pool.query(
   return { ...order, items: itemsResult.rows };
 };
  
-module.exports = { getAllTables, openTable, closeTable, getTableCurrentOrder };
+const getTableCurrentOrderByCode = async (tableCode) => {
+  const tableResult = await pool.query(
+    'SELECT * FROM tables WHERE table_code = $1', [tableCode]
+  );
+  const table = tableResult.rows[0];
+  if (!table) throw { status: 404, message: 'Bàn không tồn tại' };
+
+  // Dùng table.id để query orders
+  const orderResult = await pool.query(
+    `SELECT o.*,
+      bt.name      AS ticket_name,
+      bt.price     AS ticket_price,
+      bt.image_url AS ticket_image,
+      c.full_name  AS customer_name,
+      c.phone      AS customer_phone,
+      v.code       AS voucher_code,
+      v.discount_type,
+      v.discount_value
+     FROM orders o
+     LEFT JOIN buffet_tickets bt ON o.buffet_ticket_id = bt.id
+     LEFT JOIN customers      c  ON o.customer_id      = c.id
+     LEFT JOIN vouchers        v  ON o.voucher_id       = v.id
+     WHERE o.table_id = $1 AND o.status = 'ordering'
+     LIMIT 1`,
+    [table.id]
+  );
+
+  const order = orderResult.rows[0];
+  if (!order) return null;
+
+  const itemsResult = await pool.query(
+    `SELECT oi.*,
+       m.name      AS menu_name,
+       m.image_url,
+       m.category
+     FROM order_items oi
+     LEFT JOIN menus m ON oi.menu_id = m.id
+     WHERE oi.order_id = $1
+     ORDER BY oi.item_order_time ASC`,
+    [order.id]
+  );
+
+  return { ...order, items: itemsResult.rows };
+};
+
+module.exports = { getAllTables, openTable, closeTable, getTableCurrentOrder, getTableCurrentOrderByCode };
