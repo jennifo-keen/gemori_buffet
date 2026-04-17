@@ -1,5 +1,7 @@
 import React from "react";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { useNavigate } from 'react-router-dom';
+
+import ArrowForwardIcon        from "@mui/icons-material/ArrowForward";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import {
   Box,
@@ -7,8 +9,8 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+
 import { useOrder } from '../order_context/OrderContext';
-import { useNavigate } from 'react-router-dom';
 
 export const OrdMenus = () => {
   const { cartTotal, submitOrder, cart, tableCode } = useOrder();

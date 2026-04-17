@@ -1,22 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { useOrder } from '../order_context/OrderContext';
-import Header from "../order_component/HeaderProfile"
-import ItemVoucher from "../order_component/ItemVoucher"
-import HistoryItem from "../order_component/HistoryTicket"
+
+import VoucherBucket from "../order_component/ItemAcc"
+import Header        from "../order_component/HeaderProfile"
+import ItemVoucher   from "../order_component/ItemVoucher"
+import HistoryItem   from "../order_component/HistoryTicket"
+
+import { getProfile, getAvailableVouchers } from '../order_api/customerApi';
+
+import Cardholder from "../../../assets/icon/Cardholder_Ord.svg?react";
+
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import HistoryIcon       from '@mui/icons-material/History';
+
 import {
   Box,
   Typography,
   Avatar,
   Paper,
   Stack,
-  CircularProgress, Divider,
+  CircularProgress
 } from '@mui/material';
-import HistoryIcon from '@mui/icons-material/History';
-import VoucherBucket from "../order_component/ItemAcc"
-import { getProfile, getAvailableVouchers } from '../order_api/customerApi';
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import Cardholder from "../../../assets/icon/Cardholder_Ord.svg?react";
 
 export const MemberProfile = () => {
    const navigate = useNavigate();

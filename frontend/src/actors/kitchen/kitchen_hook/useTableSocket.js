@@ -8,12 +8,12 @@ export const useTableSocket = (tableCode, loadData) => {
     });
 
     socket.on('connect', () => {
-      console.log(`✅ Table Socket Connected (${tableCode})`);
+      console.log(` Table Socket Connected (${tableCode})`);
       socket.emit('join_kitchen');
     });
 
     const handleRefresh = () => {
-      console.log(`🔔 Update for table ${tableCode}: Refreshing...`);
+      console.log(` Update for table ${tableCode}: Refreshing...`);
       loadData();
     };
 

@@ -2,21 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 
 import CardTable from "../staff_components/CardTable"
-import Bill from "../staff_components/Bill"
-import InfoCard from "../staff_components/InfoCard"
+import Bill      from "../staff_components/Bill"
+import InfoCard  from "../staff_components/InfoCard"
 
 import QrCode from "../../../assets/icon/QrCode.svg"
 
-import { getTableOrder } from '../staff_api/tableApi';
+import { getTableOrder }   from '../staff_api/tableApi';
 import { deleteOrderItem } from '../staff_api/orderApi';
 
-import  useAuthStaff  from '../staff_hook/useAuthStaff';
-import useDialog from '../staff_hook/useDialog';
+import  useAuthStaff from '../staff_hook/useAuthStaff';
+import useDialog     from '../staff_hook/useDialog';
 
 
 import RestaurantIcon from "@mui/icons-material/Restaurant";
-import GroupsIcon from "@mui/icons-material/Groups";
-import PersonIcon from "@mui/icons-material/Person";
+import GroupsIcon     from "@mui/icons-material/Groups";
+import PersonIcon     from "@mui/icons-material/Person";
 import {Box, 
         Stack, 
         Typography,
@@ -387,13 +387,9 @@ const handleDeleteItem = (itemId) => {
                   </Typography>
 
                   {/* Line items with bottom divider */}
-                  <Box pb={3} sx={{ borderBottom: "1px solid", borderColor: "grey.100" }}>
+                  <Box pb={3} sx={{ borderBottom: "1px solid", borderColor: "grey.100", width: "355px" }}>
                     <Stack spacing={1.5}>                   
-                        <Stack
-                          direction="row"
-                          justifyContent="space-between"
-                          alignItems="center"
-                        >
+                        <Stack spacing={0.5} sx={{ mb: 2 }}>
                           <Typography variant="body2" color="text.secondary">
                             {order?.ticket_name} × {order?.ticket_quantity}
                           </Typography>
@@ -403,7 +399,7 @@ const handleDeleteItem = (itemId) => {
                         </Stack>
               
                         {/* Tạm tính */}
-                    <Stack direction="row" justifyContent="space-between">
+                    <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
                       <Typography variant="body2" color="text.secondary">
                         Tạm tính
                       </Typography>
@@ -459,13 +455,12 @@ const handleDeleteItem = (itemId) => {
                     `/staff/checkout/pay?tableId=${tableId}&tableCode=${tableCode}&orderId=${order?.id}`
                   )}
                     startIcon={
-                    <SvgIcon 
-                      sx={{
-                        fontSize: 14,
-                      }}
-                    >
-                      <path d="M26 6H6C5.20435 6 4.44129 6.31607 3.87868 6.87868C3.31607 7.44129 3 8.20435 3 9V23C3 23.7956 3.31607 24.5587 3.87868 25.1213C4.44129 25.6839 5.20435 26 6 26H26C26.7956 26 27.5587 25.6839 28.1213 25.1213C28.6839 24.5587 29 23.7956 29 23V9C29 8.20435 28.6839 7.44129 28.1213 6.87868C27.5587 6.31607 26.7956 6 26 6ZM19 15C19 15.7956 18.6839 16.5587 18.1213 17.1213C17.5587 17.6839 16.7956 18 16 18C15.2044 18 14.4413 17.6839 13.8787 17.1213C13.3161 16.5587 13 15.7956 13 15C13 14.7348 12.8946 14.4804 12.7071 14.2929C12.5196 14.1054 12.2652 14 12 14H5V12H27V14H20C19.7348 14 19.4804 14.1054 19.2929 14.2929C19.1054 14.4804 19 14.7348 19 15ZM6 8H26C26.2652 8 26.5196 8.10536 26.7071 8.29289C26.8946 8.48043 27 8.73478 27 9V10H5V9C5 8.73478 5.10536 8.48043 5.29289 8.29289C5.48043 8.10536 5.73478 8 6 8Z" fill="#FFFFFF"/>
-                      </SvgIcon>}
+                    <SvgIcon viewBox="0 0 32 32">
+                      <path 
+                        d="M27 6H6C5.20435 6 4.44129 6.31607 3.87868 6.87868C3.31607 7.44129 3 8.20435 3 9V23C3 23.7956 3.31607 24.5587 3.87868 25.1213C4.44129 25.6839 5.20435 26 6 26H26C26.7956 26 27.5587 25.6839 28.1213 25.1213C28.6839 24.5587 29 23.7956 29 23V9C29 8.20435 28.6839 7.44129 28.1213 6.87868C27.5587 6.31607 26.7956 6 26 6ZM19 15C19 15.7956 18.6839 16.5587 18.1213 17.1213C17.5587 17.6839 16.7956 18 16 18C15.2044 18 14.4413 17.6839 13.8787 17.1213C13.3161 16.5587 13 15.7956 13 15C13 14.7348 12.8946 14.4804 12.7071 14.2929C12.5196 14.1054 12.2652 14 12 14H5V12H27V14H20C19.7348 14 19.4804 14.1054 19.2929 14.2929C19.1054 14.4804 19 14.7348 19 15ZM6 8H26C26.2652 8 26.5196 8.10536 26.7071 8.29289C26.8946 8.48043 27 8.73478 27 9V10H5V9C5 8.73478 5.10536 8.48043 5.29289 8.29289C5.48043 8.10536 5.73478 8 6 8Z" 
+                        fill="currentColor" 
+                      />
+                    </SvgIcon>}
                     sx={{
                       backgroundColor: "#b4463c",
                       borderRadius: 3,

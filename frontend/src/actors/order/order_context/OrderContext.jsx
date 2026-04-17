@@ -1,23 +1,24 @@
-import React from 'react';
-import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import {Outlet, useParams } from 'react-router-dom';
+
 import { io } from 'socket.io-client';
+
 import { getMenu, getOrder, addOrderItems, cancelOrderItem } from '../order_api/tableOrderApi';
-import { customerLogin, customerRegister } from '../order_api/customerApi';
+import { customerLogin, customerRegister }                   from '../order_api/customerApi';
 
 export const OrderContext = createContext(null);
 
 export const OrderProvider = ({ children }) => {
-  const { tableCode } = useParams(); // lấy từ URL /table/:tableCode
+  const { tableCode } = useParams(); 
   
   const [order, setOrder]       = useState(null);
   const [menu, setMenu]         = useState({ ticket_name: '', categories: [] });
-  const [cart, setCart]         = useState([]); // món đang chọn chưa gửi
+  const [cart, setCart]         = useState([]); 
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  // ── Customer auth — OPTIONAL ─────────────────────────────────
+  // Customer auth
   const [customer, setCustomer] = useState(() => {
     const saved = localStorage.getItem('customer_info');
     return saved ? JSON.parse(saved) : null;
@@ -25,7 +26,7 @@ export const OrderProvider = ({ children }) => {
 
   const socketRef = useRef(null);
 
-  // ── Khởi tạo — load menu + load order (không cần verify bàn) ──────────
+  //Khởi tạo load menu + load order (không cần verify bàn)
   const loadMenuAndOrder = useCallback(async () => {
     if (!tableCode) return;
     try {
@@ -46,7 +47,7 @@ export const OrderProvider = ({ children }) => {
     }
   }, [tableCode]);
 
-  // ── Socket — nhận cập nhật realtime ─────────────────────────
+  //Socket nhận cập nhật realtime
   useEffect(() => {
     loadMenuAndOrder();
     if (!tableCode) return;
@@ -80,7 +81,7 @@ export const OrderProvider = ({ children }) => {
     return () => { socket.disconnect(); socketRef.current = null; };
   }, [tableCode, loadMenuAndOrder ]);
 
-  // ── Cart — thêm/bớt/xóa ─────────────────────────────────────
+  //Cart thêm/bớt/xóa 
   const addToCart = (menuItem) => {
     const currentQty = getCartQty(menuItem.id);
     const stock = menuItem.stock_quantity;
@@ -123,7 +124,7 @@ export const OrderProvider = ({ children }) => {
   // Tổng số món trong cart
   const cartTotal = cart.reduce((sum, i) => sum + i.quantity, 0);
 
-  // ── Gửi bếp ─────────────────────────────────────────────────
+  // Gửi bếp 
   const submitOrder = async () => {
     if (!cart.length) return;
     const items = cart.map(i => ({ menuId: i.id, quantity: i.quantity }));
@@ -138,7 +139,7 @@ export const OrderProvider = ({ children }) => {
     return res.data;
   };
 
-  // ── Hủy món ─────────────────────────────────────────────────
+  // Hủy món 
   const cancelItem = async (itemId) => {
     await cancelOrderItem(itemId, tableCode);
     setOrder(prev => ({
@@ -147,7 +148,7 @@ export const OrderProvider = ({ children }) => {
     }));
   };
 
-  // ── Customer auth — OPTIONAL, không bắt buộc ────────────────
+  // Customer auth — OPTIONAL, không bắt buộc
   const loginCustomer = async (phone, password) => {
     const res = await customerLogin(phone, password);
     const { token, customer } = res.data;

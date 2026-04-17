@@ -1,7 +1,10 @@
 import React from "react";
 import { Box, IconButton, Stack, Typography, Chip } from "@mui/material";
+
 import { useOrder } from '../order_context/OrderContext';
+
 import image from "../../../assets/img/Image.png"
+
 import { STATUS_CONFIG } from '../order_config/statusConfig';
 
 // Quantity counter component for reusability
@@ -46,7 +49,7 @@ const QuantityCounter = ({ value, onDecrement, onIncrement, maxQuantity }) => (
         color: "#1e293b",
       }}
     >
-      {value}{maxQuantity && ` / ${maxQuantity}`}
+      {value}
     </Typography>
 
     <IconButton

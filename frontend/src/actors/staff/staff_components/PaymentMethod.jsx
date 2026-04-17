@@ -1,9 +1,9 @@
 import React from 'react';
 import { Box, Typography, Stack, Button, Paper } from '@mui/material';
-import PaymentIcon from '@mui/icons-material/Payment';
-import PaymentsIcon from '@mui/icons-material/Payments'; // Tiền mặt
-import QrCode2Icon from '@mui/icons-material/QrCode2'; // QR/Chuyển khoản
-import CreditCardIcon from '@mui/icons-material/CreditCard'; // Thẻ
+import PaymentIcon     from '@mui/icons-material/Payment';
+import PaymentsIcon    from '@mui/icons-material/Payments'; 
+import QrCode2Icon     from '@mui/icons-material/QrCode2'; 
+import CreditCardIcon  from '@mui/icons-material/CreditCard'; 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 
@@ -41,7 +41,6 @@ const PaymentMethods = ({ selectedMethod, onSelect, onConfirm, loading }) => {
                 alignItems: 'center',
                 borderRadius: 3,
                 border: '1px solid',
-                // Đổi màu viền nếu được chọn
                 borderColor: isSelected ? '#b4463c' : '#f0f0f0',
                 bgcolor: isSelected ? 'rgba(180, 70, 60, 0.02)' : 'white',
                 transition: 'all 0.2s',

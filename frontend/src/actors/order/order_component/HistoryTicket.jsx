@@ -1,6 +1,7 @@
-// src/components/Order_HistoryTicket.jsx
 import React from "react";
+
 import { Box, Stack, Typography } from "@mui/material";
+
 import image from "../../../assets/img/Image.png";
 
 const Order_HistoryTicket = () => {
@@ -18,7 +19,7 @@ const Order_HistoryTicket = () => {
       <Stack
         direction="row"
         alignItems="center"
-        justifyContent="space-between" // FIX
+        justifyContent="space-between" 
         sx={{ width: "100%" }}
       >
         {/* Left */}

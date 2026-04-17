@@ -1,8 +1,10 @@
 import React from "react";
-import AddIcon from "@mui/icons-material/Add";
-import DeleteIcon from "../../../assets/TrashLine.svg?react";
+
+import AddIcon    from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { Box, IconButton, Stack, Typography } from "@mui/material";
+
+import DeleteIcon from "../../../assets/TrashLine.svg?react";
 
 export default function Bill2() {
   return (

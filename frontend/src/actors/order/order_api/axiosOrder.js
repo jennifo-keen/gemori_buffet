@@ -12,7 +12,7 @@ axiosOrder.interceptors.request.use((config) => {
   return config;
 });
 
-// Xử lý lỗi 401 — không redirect vì Web 1 không bắt buộc đăng nhập
+// Xử lý lỗi 401 Web không bắt buộc đăng nhập
 axiosOrder.interceptors.response.use(
   (response) => response,
   (error) => {

@@ -1,9 +1,7 @@
 import React from "react";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import Box from "@mui/material/Box";
-import Chip from "@mui/material/Chip";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
+import {Box, Chip, Stack, Typography} from "@mui/material";
+
 import {getRelativeTime, isHighPriority } from "../../kitchen_utils/Component/OrdCardUntil";
 
 export const HeaderOpt = ({ tableData }) => {

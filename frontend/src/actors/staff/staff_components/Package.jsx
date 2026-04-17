@@ -12,7 +12,6 @@ import {
   Typography,
 } from "@mui/material";
 
-
 export default function Package({ ticket, isSelected, onSelect }) {
   return (
     <Card
@@ -20,6 +19,8 @@ export default function Package({ ticket, isSelected, onSelect }) {
       sx={{
         width: "304px",
         height:"453.6px",
+        display: "flex",        
+        flexDirection: "column",
         borderRadius: "16px",
         border: "2px solid #FFF7F3",
         boxShadow: "0px 28px 8px rgba(189, 189, 189, 0.00), 0 18px 7px 0 rgba(189, 189, 189, 0.01), 0 10px 6px 0 rgba(189, 189, 189, 0.05), 0 4px 4px 0 rgba(189, 189, 189, 0.09), 0 1px 2px 0 rgba(189, 189, 189, 0.10)",
@@ -53,7 +54,15 @@ export default function Package({ ticket, isSelected, onSelect }) {
         />
       </Box>
 
-      <CardContent sx={{ padding: 3 }}>
+      <CardContent 
+        sx={{ 
+          padding: 3, 
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,               
+          
+        }}
+      >
         <Typography
           variant="h6"
           component="h2"
@@ -84,6 +93,8 @@ export default function Package({ ticket, isSelected, onSelect }) {
           variant={isSelected ? "contained" : "outlined"}
           sx={{
             borderRadius: 3,
+            mt: "auto",         
+            mx: "auto",
             borderWidth: 2,
             borderColor: "#b4463c",
             color: isSelected ? "#ffffff" : "#b4463c",
@@ -94,8 +105,8 @@ export default function Package({ ticket, isSelected, onSelect }) {
             textTransform: "none",
             "&:hover": {
               borderWidth: 2,
-              borderColor: "#b4463c",
-              backgroundColor: "rgba(180, 70, 60, 0.04)",
+              borderColor: "#b4463c" ,
+              transform: "scale(1.02)",
             },
           }}
         >

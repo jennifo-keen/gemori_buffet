@@ -1,6 +1,7 @@
 import React from 'react';
-import Floor1 from '../../staff/staff_pages/Floor1';
 import { useNavigate } from 'react-router-dom';
+
+import Floor1 from '../../staff/staff_pages/Floor1';
 
 const KitchenFloor1 = () => {
   const navigate = useNavigate();

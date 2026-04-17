@@ -1,22 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { useOrder } from '../order_context/OrderContext';
+
 import {
   getProfile, updateProfile,
   deleteAccount, getAvailableVouchers,
 } from '../order_api/customerApi';
-import ConfirmationNumberOutlinedIcon from "@mui/icons-material/ConfirmationNumberOutlined";
-import EditIcon from "@mui/icons-material/Edit";
-import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
-import { Box, Button, CircularProgress, Dialog, DialogActions,
-  DialogContent, DialogContentText, DialogTitle,
-  Paper, Stack, TextField, Typography, } from "@mui/material";
+
 import Footer from "../order_component/Footer"
 import Header from "../order_component/HeaderProfile"
-import SaveIcon from "@mui/icons-material/Save";
-import CloseIcon from "@mui/icons-material/Close";
 
+import { Box, Button, CircularProgress, Dialog, DialogActions,
+  DialogContent, DialogContentText, DialogTitle,
+  Paper, Stack, TextField, Typography
+ } from "@mui/material";
 
+import SaveIcon    from "@mui/icons-material/Save";
+import CloseIcon   from "@mui/icons-material/Close";
+import ConfirmIcon from "@mui/icons-material/ConfirmationNumberOutlined";
+import EditIcon    from "@mui/icons-material/Edit";
+import ShopIcon    from "@mui/icons-material/ShoppingBagOutlined";
 
 const BORDER_COLOR = "rgba(177, 65, 53, 0.1)";
 
@@ -102,8 +106,8 @@ const OrdProfile = () => {
   ];
 
   const statsCards = [
-    { label: "Đơn hàng",  value: profile?.stats?.orders   || 0, icon: <ShoppingBagOutlinedIcon sx={{ color: "#a21a16", width: 24, height: 24 }} /> },
-    { label: "Voucher",   value: profile?.stats?.vouchers || 0, icon: <ConfirmationNumberOutlinedIcon sx={{ color: "#a21a16", width: 24, height: 24 }} /> },
+    { label: "Đơn hàng",  value: profile?.stats?.orders   || 0, icon: <ShopIcon sx={{ color: "#a21a16", width: 24, height: 24 }} /> },
+    { label: "Voucher",   value: profile?.stats?.vouchers || 0, icon: <ConfirmIcon sx={{ color: "#a21a16", width: 24, height: 24 }} /> },
   ];
 
   return (

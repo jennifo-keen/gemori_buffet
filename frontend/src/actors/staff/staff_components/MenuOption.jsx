@@ -12,15 +12,28 @@ const MenuOption = ({
   const location = useLocation();
 
   const getActiveId = () => {
-  const match = menuItems.find(item => {
-    if (!item.path) return false;
-    if (item.matchPaths) {
-      return item.matchPaths.some(p => location.pathname.startsWith(p));
-    }
-    return location.pathname.startsWith(item.path);
-  });
-  return match?.id || defaultActiveId;
-};
+    let bestMatch = null;
+    let maxMatchLength = 0;
+
+    menuItems.forEach(item => {
+      const pathsToCheck = [];
+      if (item.path) pathsToCheck.push(item.path);
+      if (item.matchPaths) pathsToCheck.push(...item.matchPaths);
+
+      pathsToCheck.forEach(p => {
+        if (location.pathname.startsWith(p)) {
+          if (location.pathname === p || location.pathname[p.length] === '/') {
+            if (p.length > maxMatchLength) {
+              maxMatchLength = p.length;
+              bestMatch = item;
+            }
+          }
+        }
+      });
+    });
+
+    return bestMatch?.id || defaultActiveId;
+  };
 
   const activeId = getActiveId();
 

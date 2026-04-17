@@ -1,7 +1,10 @@
-import React from 'react';
-import { useState } from "react";
-import FavoriteIcon from "@mui/icons-material/Favorite";
+import React, { useState } from 'react';
+
+import FavoriteIcon      from "@mui/icons-material/Favorite";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
+
+import axiosInstance from '../staff_api/axiosInstance';
+
 import {
   Box,
   Button,
@@ -12,8 +15,6 @@ import {
   Typography,
   CircularProgress,
 } from "@mui/material";
-
-import axiosInstance from '../staff_api/axiosInstance';
 
 export const MemberShipPopUp_In = ({ onSuccess, onClose }) => {
   const [customerName, setCustomerName] = useState("");
@@ -32,7 +33,7 @@ export const MemberShipPopUp_In = ({ onSuccess, onClose }) => {
       const res = await axiosInstance.post('/customers', {
         full_name: customerName,
         phone: phoneNumber,
-        email: `${phoneNumber}@gemori.vn`, // email tạm
+        email: `${phoneNumber}@gemori.vn`, 
       });
       onSuccess?.(res.data);
       onClose?.();

@@ -1,7 +1,8 @@
 import React from "react";
-import { Box, List, ListItem, Typography } from "@mui/material";
-import { useOrder } from '../order_context/OrderContext';
 
+import { Box, List, ListItem, Typography } from "@mui/material";
+
+import { useOrder } from '../order_context/OrderContext';
 
 export const ListCategory = () => {
   const { menu, selectedCategory, setSelectedCategory } = useOrder();

@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import OrdStatusHeader  from "../kitchen_components/OrdStatusHeader"
-import OrderTable from '../kitchen_components/OrderTable';
-import CheckBoxIcon from "@mui/icons-material/CheckBox";
+
 import CloseIcon from "@mui/icons-material/Close";
 import { Box, Button, Stack, CircularProgress, Typography } from "@mui/material";
 
+import OrdStatusHeader  from "../kitchen_components/OrdStatusHeader"
+import OrderTable       from '../kitchen_components/OrderTable';
+
 import { fetchPendingItems, updateItemStatus, completeTableStatus } from '../kitchen_api/kitchenApi';
+
 import { useTableSocket } from '../kitchen_hook/useTableSocket';
 
 import useDialog from '../../staff/staff_hook/useDialog'

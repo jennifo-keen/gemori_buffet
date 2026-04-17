@@ -3,17 +3,17 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 
 import Package from '../staff_components/Package.jsx';
 
-import ArrowBackIcon from "../../../assets/icon/ArrowFatLeft.svg";
+import ArrowBackIcon  from "../../../assets/icon/ArrowFatLeft.svg";
 import ArrowRightIcon from "../../../assets/icon/ArrowFatRight.svg"; 
-import PeopleAltIcon from "../../../assets/icon/UsersThree.svg";
+import PeopleAltIcon  from "../../../assets/icon/UsersThree.svg";
 
 import { getBuffetTickets } from '../staff_api/menuApi';
-import { createOrder } from '../staff_api/orderApi.js';
+import { createOrder }      from '../staff_api/orderApi.js';
 
 import useAuthStaff from '../staff_hook/useAuthStaff.js';
-import useDialog from '../staff_hook/useDialog.js';
+import useDialog    from '../staff_hook/useDialog.js';
 
-import AddIcon from "@mui/icons-material/Add";
+import AddIcon    from "@mui/icons-material/Add";
 import PersonIcon from "@mui/icons-material/Person";
 import RemoveIcon from "@mui/icons-material/Remove";
 import {
@@ -162,18 +162,30 @@ const StaffOrders = () => {
 {/* List buffer ticket */}
     <Stack 
       direction="row" 
-      alignItems="center" 
-      justifyContent="center"
       spacing={1}
+      sx={{
+        overflowX: 'auto', 
+        scrollSnapType: 'x mandatory', 
+        '&::-webkit-scrollbar': { display: 'none' }, 
+        msOverflowStyle: 'none', 
+        scrollbarWidth: 'none',
+        width: '100%',
+      }}
     >
       {tickets.map(ticket => (
+        <Box 
+          key={ticket.id} 
+          sx={{ 
+            scrollSnapAlign: 'start' 
+          }}
+        >
           <Package
-            key={ticket.id}
             ticket={ticket}
             isSelected={selectedTicket?.id === ticket.id}
             onSelect={() => setSelectedTicket(ticket)}
           />
-        ))}
+        </Box>
+      ))}
     </Stack>
 
       <Paper

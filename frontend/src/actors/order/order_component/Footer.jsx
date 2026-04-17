@@ -1,10 +1,11 @@
 import React from 'react';
+
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
-import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
-import PhoneIcon from "@mui/icons-material/Phone";
-import Logo from "../../../assets/img/Logo 1.png"
+import EmailOutlinedIcon      from "@mui/icons-material/EmailOutlined";
+import PhoneIcon              from "@mui/icons-material/Phone";
 import { Box, Stack, Typography } from "@mui/material";
 
+import Logo from "../../../assets/img/Logo 1.png"
 const infoLinks = [
   "Về chúng tôi",
   "Thực đơn chi tiết",

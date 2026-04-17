@@ -9,12 +9,12 @@ export const useKitchenSocket = (loadData) => {
     });
 
     socket.on('connect', () => {
-      console.log("✅ Kitchen Socket Connected");
+      console.log(" Kitchen Socket Connected");
       socket.emit('join_kitchen');
     });
 
     const handleRefresh = () => {
-      console.log("🔔 Signal received: Refreshing all data...");
+      console.log(" Signal received: Refreshing all data...");
       loadData();
     };
 

@@ -1,7 +1,8 @@
 import React from "react";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+
 import { Box, Button, Chip, Stack, Typography } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+
 import { STATUS_CONFIG} from "../../kitchen_config/StatusOrdConfig";
 
 export const ItemListOrdTable = ({ items = [], onUpdateItem }) => {
@@ -158,7 +159,14 @@ export const ItemListOrdTable = ({ items = [], onUpdateItem }) => {
          {item.status === 'cooking' && (
                 <Button variant="contained" size="small"
                   onClick={() => onUpdateItem?.(item.id, 'done')}
-                  sx={{ bgcolor: "#b14135", borderRadius: 2, fontWeight: "bold", textTransform: "none", whiteSpace: "nowrap", "&:hover": { bgcolor: "#9a3830" } }}
+                  sx={{ 
+                    bgcolor: "#b14135", 
+                    borderRadius: 2, 
+                    fontWeight: "bold", 
+                    textTransform: "none", 
+                    whiteSpace: "nowrap", 
+                      "&:hover": { bgcolor: "#9a3830" } 
+                    }}
                 >
                   Xong món
                 </Button>

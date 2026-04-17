@@ -1,9 +1,9 @@
 import React from 'react';
-import Logo from "../../../assets/img/Logo 1.png"
-import MenuIcon from "@mui/icons-material/Menu";
-import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
-import { AppBar, Box, IconButton, Toolbar, Typography } from "@mui/material";
 
+import MenuIcon from "@mui/icons-material/Menu";
+import { AppBar, Box, IconButton, Toolbar } from "@mui/material";
+
+import Logo from "../../../assets/img/Logo 1.png"
 
 export const HeaderLogin = () => {
   return (

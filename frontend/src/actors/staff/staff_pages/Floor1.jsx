@@ -7,10 +7,10 @@ import SelectFloor from '../staff_components/SelectFloor';
 import SquareTable from '../staff_components/SquareTable';
 
 import { FLOORS, FLOOR1_ROW1, FLOOR1_ROW2 } from '../staff_config/floorConfig';
-import { handleTableAction } from '../staff_config/tablesActions';
+import { handleTableAction }                from '../staff_config/tablesActions';
 
 import useAuthStaff from '../staff_hook/useAuthStaff';
-import useDialog  from '../staff_hook/useDialog';
+import useDialog    from '../staff_hook/useDialog';
 
 
 
@@ -63,7 +63,7 @@ const renderRow = (row) => row.map(({ code, chairTop, chairBottom }) => (
         table={{
           tableNumber: code,
           capacity: chairTop + chairBottom + ' người',
-          foodStatus: 'Món đã ra: 5/7',
+          foodStatus: 'Món đã ra:....',
           status: getStatus(getTable(code)),
         }}
         tableActiveColor={getTableColor(getTable(code))}

@@ -1,8 +1,8 @@
 import React from "react";
+
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { Button } from "@mui/material";
 
-// variant: 0 = contained, 1 = outlined-solid, 2 = outlined-dashed
 const BtnCheckTitle = ({
   variant = 0,
   label = "Title",

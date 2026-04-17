@@ -1,13 +1,6 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-
-// Column header definitions for the order list table header
-const columns = [
-  { label: "Tên món ăn", flex: 1, align: "left" },
-  { label: "Số lượng", width: 128, align: "center" },
-  { label: "Trạng thái", width: 192, align: "center" },
-  { label: "Thao tác", width: 192, align: "right" },
-];
+import { columns } from "../../kitchen_config/HeaderColumOrdTable";
 
 export const HeaderOrdTable = () => {
   return (

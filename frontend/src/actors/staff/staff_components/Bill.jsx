@@ -5,7 +5,6 @@ import { ORDER_ITEM_STATUS } from '../staff_config/staticConfig';
 
 import { Box, Chip, Stack, Typography } from "@mui/material";
 
-
 const Bill = ({ item, onDelete }) => {
   if (!item) return null;
   const status = ORDER_ITEM_STATUS[item.status] || ORDER_ITEM_STATUS.pending;

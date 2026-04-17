@@ -1,6 +1,8 @@
 import React from "react";
+
 import Logo1 from "../../../assets/img/Logo 1.png?reach";
-import NotificationsOutlinedIcon from "../../../assets/icon/BellRinging.svg?reach";
+import NofiIcon from "../../../assets/icon/BellRinging.svg?reach";
+
 import useAuthStaff  from "../staff_hook/useAuthStaff";
 import {
   Avatar,
@@ -51,7 +53,7 @@ export default function Header() {
               "&:hover": { bgcolor: "grey.200" },
             }}
           >
-            <Box component="img" src={NotificationsOutlinedIcon} sx={{ fontSize: 24 }} />
+            <Box component="img" src={NofiIcon} sx={{ fontSize: 24 }} />
           </IconButton>
 
           <Divider orientation="vertical" flexItem sx={{ height: 48, width: 2, bgcolor: "grey.300" }} />

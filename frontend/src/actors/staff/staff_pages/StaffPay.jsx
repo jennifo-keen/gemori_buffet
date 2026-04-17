@@ -2,19 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 
 import MemberShipInput from "../staff_components/MemberShip_Input"
-import Ticket from "../staff_components/Ticket";
-import PaymentMethod from "../staff_components/PaymentMethod"
+import Ticket          from "../staff_components/Ticket";
+import PaymentMethod   from "../staff_components/PaymentMethod"
 
 import ShoppingCartOutlined from "@mui/icons-material/ShoppingCartOutlined";
-import ArrowDropDown from "@mui/icons-material/ArrowDropDown";
+import ArrowDropDown        from "@mui/icons-material/ArrowDropDown";
 import { Box, Stack, Typography, TextField, Button, Grid, CircularProgress } from "@mui/material";
 
 import { validateVoucher, checkout } from '../staff_api/paymentApi';
-import { getTableOrder } from '../staff_api/tableApi';
+import { getTableOrder }             from '../staff_api/tableApi';
 
 import useAuthStaff from '../staff_hook/useAuthStaff';
-import useDialog from '../staff_hook/useDialog'
-
+import useDialog    from '../staff_hook/useDialog'
 
 const StaffPay = () => {
   const [searchParams] = useSearchParams();
@@ -38,10 +37,10 @@ const StaffPay = () => {
 
    // Lấy order
   useEffect(() => {
-    if (!tableId) return;
+    if (!tableCode) return;
     const fetch = async () => {
       try {
-        const res = await getTableOrder(tableId);
+        const res = await getTableOrder(tableCode);
         setOrder(res.data);
       } catch {
         showError({ title: 'Lỗi', subtitle: 'Không thể tải đơn hàng' });
@@ -50,7 +49,7 @@ const StaffPay = () => {
       }
     };
     fetch();
-  }, [tableId]);
+  }, [tableCode]);
 
   // Tính tiền
   const ticketTotal    = order ? order.ticket_price * order.ticket_quantity : 0;

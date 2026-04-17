@@ -2,14 +2,14 @@ import React from "react";
 import { useNavigate } from 'react-router-dom';
 
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import LogoutIcon from "@mui/icons-material/Logout";
-import PaymentIcon from "@mui/icons-material/Payment";
+import LogoutIcon    from "@mui/icons-material/Logout";
+import PaymentIcon   from "@mui/icons-material/Payment";
 import { Box, Stack, Typography } from "@mui/material";
 
 import MenuOption from "./MenuOption.jsx";
 
 import useAuthStaff from '../staff_hook/useAuthStaff';
-import useDialog from '../staff_hook/useDialog';
+import useDialog    from '../staff_hook/useDialog';
 
 export default function MenuStaff() {
   const navigate = useNavigate();

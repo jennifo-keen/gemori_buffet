@@ -1,9 +1,12 @@
 import React from 'react';
-import AddIcon from "@mui/icons-material/Add";
-import { Box, IconButton, Stack, Typography } from "@mui/material";
-import defaultImage from "../../../assets/img/Image.png"
-import { useOrder } from '../order_context/OrderContext';
+
+import AddIcon    from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import { Box, IconButton, Stack, Typography } from "@mui/material";
+
+import defaultImage from "../../../assets/img/Image.png"
+
+import { useOrder } from '../order_context/OrderContext';
 
 export const MenuItems = ({ item }) => {
   const { addToCart, removeFromCart, getCartQty } = useOrder();

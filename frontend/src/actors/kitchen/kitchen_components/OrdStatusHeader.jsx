@@ -1,7 +1,10 @@
 import React from 'react';
 import { Box, Chip, Paper, Stack, Typography } from "@mui/material";
+
 import {getPriorityLabel, formatOrderTime} from "../kitchen_utils/Component/OrdCardUntil"
+
 import useAuthStaff from '../../staff/staff_hook/useAuthStaff';
+
 export const OrdStatusHeader = ({ tableData }) => {
   const { admin } = useAuthStaff();
   const items         = tableData?.items || [];
@@ -13,7 +16,6 @@ export const OrdStatusHeader = ({ tableData }) => {
       sx={{ 
         borderRadius: 3, 
         p: 3,
-        // width: "1114px",
     }}
     >
       <Stack

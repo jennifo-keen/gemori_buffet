@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, List, ListItem, Typography, Chip, Button   } from "@mui/material";
+import { Box, List, ListItem, Typography } from "@mui/material";
 
 export const ItemListOpt = ({ items = [] }) => {
   return (
@@ -74,31 +74,6 @@ export const ItemListOpt = ({ items = [] }) => {
               x{item.quantity}
             </Typography>
           </Box>
-
-                    {/* Nút hành động */}
-          {/* <Box sx={{ flexShrink: 0 }}>
-            {item.status === 'pending' && (
-              <Button size="small" variant="contained"
-                onClick={() => onUpdateItem?.(item.id, 'cooking')}
-                sx={{ bgcolor: "#f59e0b", borderRadius: 2, textTransform: "none", fontWeight: 600, fontSize: 12, whiteSpace: "nowrap", "&:hover": { bgcolor: "#d97706" } }}
-              >
-                Bắt đầu
-              </Button>
-            )}
-            {item.status === 'cooking' && (
-              <Button size="small" variant="contained"
-                onClick={() => onUpdateItem?.(item.id, 'done')}
-                sx={{ bgcolor: "#b4463c", borderRadius: 2, textTransform: "none", fontWeight: 600, fontSize: 12, whiteSpace: "nowrap", "&:hover": { bgcolor: "#9a3830" } }}
-              >
-                Xong món
-              </Button>
-            )}
-            {item.status === 'done' && (
-              <Typography variant="body2" color="success.main" fontWeight={600} sx={{ whiteSpace: "nowrap" }}>
-                ✓ Xong
-              </Typography>
-            )}
-          </Box> */}
         </ListItem>
       ))}
     </List>

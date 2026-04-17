@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Box, CircularProgress, Typography, Alert } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
+
 import TableCard from '../kitchen_components/TableCardOpt';
 
 import { fetchPendingItems, updateItemStatus, completeTableStatus } from '../kitchen_api/kitchenApi';
+
 import { useKitchenSocket } from '../kitchen_hook/useKitchenSocket';
 
 import useDialog from '../../staff/staff_hook/useDialog'
@@ -30,17 +32,6 @@ export default function Kitchen_OrdDetail() {
 
   // Các hàm xử lý sự kiện
   const handleCompleteTable = async (tableCode) => {
-    const tableData = tables.find(t => t.table_code === tableCode);
-    showConfirm({
-      title: 'Hoàn tất đơn bàn?',
-      subtitle: `Tất cả món của bàn ${tableCode} hoàn thành.`,
-      badges: [
-        { label: `Bàn ${tableCode}` },
-        { label: `${tableData?.items?.length || 0} món` },
-      ],
-      confirmText: 'Hoàn tất',
-      cancelText: 'Hủy',
-      onConfirm: async () => {
         try {
           await completeTableStatus(tableCode);
           await loadData();
@@ -54,10 +45,8 @@ export default function Kitchen_OrdDetail() {
             title: 'Lỗi hoàn tất',
             subtitle: err.response?.data?.message || 'Có lỗi xảy ra',
             confirmText: 'Đóng',
-          });
-        }
-      },
-    });
+          });       
+      }
   };
 
   const handleUpdateItem = async (itemId, status) => {
@@ -118,8 +107,6 @@ export default function Kitchen_OrdDetail() {
         padding: 2,
         minHeight: "100vh",
         backgroundColor: "#f8f9fa",
-
-        // scroll đẹp hơn
         "&::-webkit-scrollbar": {
           height: 8,
         },

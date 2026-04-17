@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
-import AvtIcon  from "../../../assets/icon/UserCircleDashed.svg?react";
-import ChatIcon from "../../../assets/icon/Chats.svg?react";
+
+import AvtIcon         from "../../../assets/icon/UserCircleDashed.svg?react";
 import CookingPotIcon  from "../../../assets/icon/CookingPot.svg?react";
-import ShoppingIcon from "../../../assets/icon/ShoppingCartSimple.svg?react";
+import ShoppingIcon    from "../../../assets/icon/ShoppingCartSimple.svg?react";
+
+import { useOrder } from '../order_context/OrderContext';
+
 import {
   AppBar,
   Box,
@@ -11,11 +14,10 @@ import {
   Divider,
   IconButton,
   Toolbar,
-  Typography,
   Snackbar, Alert, Avatar
 } from "@mui/material";
-import { useOrder } from '../order_context/OrderContext';
-import { useState } from 'react';
+
+
 
 export const Order_HeaderOrd = () => {
   const navigate = useNavigate();

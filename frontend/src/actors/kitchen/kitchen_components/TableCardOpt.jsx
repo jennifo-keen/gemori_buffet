@@ -1,10 +1,11 @@
 import React from "react";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CheckCircleIcon       from "@mui/icons-material/CheckCircle";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { Box, Button, Paper, Stack } from "@mui/material";
-import { HeaderOpt } from "./TableCardSection/HeaderOpt";
+
+import { HeaderOpt }   from "./TableCardSection/HeaderOpt";
 import { ItemListOpt } from "./TableCardSection/ItemListOpt";
-import { TitleOpt } from "./TableCardSection/TitleOpt";
+import { TitleOpt }    from "./TableCardSection/TitleOpt";
 
 const TableCard = ({ data, onComplete, onUpdateItem }) => {
   return (

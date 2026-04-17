@@ -1,4 +1,5 @@
 import React from "react";
+
 import AddIcon from "@mui/icons-material/Add";
 import {
   Box,
@@ -9,6 +10,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+
 import rectangle3 from "../../../assets/Rectangle 3.png";
 
 export const ItemFood  = () => {

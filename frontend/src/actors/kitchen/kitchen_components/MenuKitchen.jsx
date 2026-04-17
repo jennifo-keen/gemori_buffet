@@ -1,9 +1,17 @@
 import React, { useEffect, useState }  from "react";
 import { useNavigate } from 'react-router-dom';
-import CallBell from "../../../assets/icon/CallBell.svg?react";
-import GridViewRoundedIcon from "@mui/icons-material/GridViewRounded";
-import LogoutIcon from "@mui/icons-material/Logout";
+
 import ClockUser from "../../../assets/icon/ClockUser.svg?react";
+import CallBell  from "../../../assets/icon/CallBell.svg?react";
+
+import useAuthStaff from '../../staff/staff_hook/useAuthStaff';
+
+import axiosInstance from '../kitchen_api/axiosKitchen';
+
+import { BRAND_RED, BRAND_RED_LIGHT, BRAND_RED_BORDER } from "../kitchen_config/Color";
+
+import GridViewRoundedIcon from "@mui/icons-material/GridViewRounded";
+import LogoutIcon          from "@mui/icons-material/Logout";
 import {
   Box,
   List,
@@ -14,13 +22,6 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-
-import useAuthStaff from '../../staff/staff_hook/useAuthStaff';
-import axiosInstance from '../kitchen_api/axiosKitchen';
-
-const BRAND_RED = "#b4463c";
-const BRAND_RED_LIGHT = "rgba(177, 65, 53, 0.1)";
-const BRAND_RED_BORDER = "rgba(177, 65, 53, 0.05)";
 
 export const MenuKitchen = () => {
   const navigate = useNavigate();
@@ -88,7 +89,7 @@ const menuItems = [
       component="nav"
       sx={{
         width: 260,
-        minHeight: "100vh",
+        minHeight: "100%",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -229,7 +230,7 @@ const menuItems = [
               fontSize: "0.9375rem",
               color: BRAND_RED,
               whiteSpace: "nowrap",
-              // cursor: "pointer",
+              cursor: "pointer",
             }}
           >
             Đăng xuất

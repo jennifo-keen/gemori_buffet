@@ -1,9 +1,9 @@
 import React from "react";
+
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
 import {
   Box,
-  Divider,
   ListItem,
   ListItemIcon,
   ListItemText,

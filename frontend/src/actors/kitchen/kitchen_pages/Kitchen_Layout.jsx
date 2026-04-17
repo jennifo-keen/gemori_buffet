@@ -1,9 +1,11 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import Sidebar from '../kitchen_components/MenuKitchen.jsx';
-import Header from '../../staff/staff_components/HeaderStaff.jsx';
-import { Box } from '@mui/material'; 
+import { Box } from '@mui/material';
 
+import Sidebar from '../kitchen_components/MenuKitchen.jsx';
+
+import Header from '../../staff/staff_components/HeaderStaff.jsx';
+ 
 const KitchenLayout = () => {
   return (
     <Box 

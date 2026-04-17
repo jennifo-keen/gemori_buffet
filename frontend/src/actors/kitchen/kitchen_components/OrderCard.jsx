@@ -1,9 +1,14 @@
 import React from "react";
+
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import { Box, Button, Card, Chip, Stack, Typography } from "@mui/material";
+
 import { STATUS_CONFIG } from "../kitchen_config/StatusOrdConfig";
-import { getRelativeTime, getPriorityStatus, 
-        getPriorityLabel, formatOrderTime 
+
+import { getRelativeTime, 
+         getPriorityStatus, 
+         getPriorityLabel, 
+         formatOrderTime
       } from "../kitchen_utils/Component/OrdCardUntil";
 
 export const OrdCard = ({ tableData, onViewDetail }) => {

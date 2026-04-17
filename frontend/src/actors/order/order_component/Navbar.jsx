@@ -1,10 +1,13 @@
 import React from "react";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import CloseIcon from "@mui/icons-material/Close";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import { AppBar, Box, IconButton, Stack, Toolbar, Typography } from "@mui/material";
-import logo from "../../../assets/img/Logo 1.png"
 import { useNavigate } from "react-router-dom";
+
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import CloseIcon       from "@mui/icons-material/Close";
+import MoreHorizIcon   from "@mui/icons-material/MoreHoriz";
+import { AppBar, Box, IconButton, Stack, Toolbar } from "@mui/material";
+
+import logo from "../../../assets/img/Logo 1.png"
+
 import { useOrder } from '../order_context/OrderContext';
 
 export const Order_Navbar = () => {

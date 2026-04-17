@@ -1,11 +1,11 @@
 import React from 'react';
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import AppBar from "@mui/material/AppBar";
-import IconButton from "@mui/material/IconButton";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
+import AppBar        from "@mui/material/AppBar";
+import IconButton    from "@mui/material/IconButton";
+import Toolbar       from "@mui/material/Toolbar";
+import Typography    from "@mui/material/Typography";
 
-// Nhận vào 2 props: title (tiêu đề) và icon (icon tùy chỉnh)
+// Nhận vào 2 props: title và icon
 export const Order_HeaderUser = ({ title = "Tiêu đề", icon: RightIcon }) => {
   return (
     <AppBar

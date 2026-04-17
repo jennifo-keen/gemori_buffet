@@ -5,13 +5,13 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import SelectFloor from '../staff_components/SelectFloor';
 import SquareTable from '../staff_components/SquareTable';
-import Table_8 from '../staff_components/Table_8';
-import Table_4 from '../staff_components/Table_4';
+import Table_8     from '../staff_components/Table_8';
+import Table_4     from '../staff_components/Table_4';
 
-import  useAuthStaff  from '../staff_hook/useAuthStaff';
-import  useDialog  from '../staff_hook/useDialog';
+import  useAuthStaff from '../staff_hook/useAuthStaff';
+import  useDialog    from '../staff_hook/useDialog';
 
-import { handleTableAction } from '../staff_config/tablesActions';
+import { handleTableAction }                from '../staff_config/tablesActions';
 import { FLOORS, FLOOR2_ROW1, FLOOR2_ROW2 } from '../staff_config/floorConfig';
 
 const Floor2 = ({ onTableClick, basePath = '/staff' }) => {
@@ -96,7 +96,14 @@ const Floor2 = ({ onTableClick, basePath = '/staff' }) => {
       </Stack>
 
       <Stack alignItems="center" spacing={1}>
-        <Stack direction="row" spacing={1}>{FLOOR2_ROW1.map(renderTable)}</Stack>
+        <Stack 
+          direction="row" 
+          spacing={1} 
+          justifyContent="space-between" 
+          sx={{ width: "100%", pt: "24px" }}
+        >
+          {FLOOR2_ROW1.map(renderTable)}
+        </Stack>
 
         {/* Lối vào */}
         <Stack direction="row" alignItems="center" justifyContent="center" spacing={1}
@@ -108,7 +115,14 @@ const Floor2 = ({ onTableClick, basePath = '/staff' }) => {
           </Typography>
         </Stack>
 
-        <Stack direction="row" spacing={1}>{FLOOR2_ROW2.map(renderTable)}</Stack>
+        <Stack 
+          direction="row" 
+          spacing={1} 
+          justifyContent="space-between" 
+          sx={{ width: "100%" }}
+        >
+                {FLOOR2_ROW2.map(renderTable)}
+        </Stack>
       </Stack>
     </Box>
   );

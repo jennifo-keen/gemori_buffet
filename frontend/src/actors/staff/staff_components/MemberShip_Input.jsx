@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 
 import PersonAdd from "../../../assets/icon/UserCirclePlus.svg";
-import { getCustomerByPhone } from '../staff_api/paymentApi';
+
 import MemberShipPopUp_In from '../staff_components/MemberShipPopUp_In';
-import MemberShip_Inf from '../staff_components/MemberShip_Inf'
+import MemberShip_Inf     from '../staff_components/MemberShip_Inf'
 
 import Favorite from "@mui/icons-material/Favorite";
 import {
