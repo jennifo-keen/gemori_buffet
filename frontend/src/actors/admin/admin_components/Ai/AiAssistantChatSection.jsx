@@ -140,7 +140,7 @@ export const AiAssistantChatSection = () => {
 
             {/* CHAT */}
             <Collapse in={isOpen}>
-                <Box sx={{ pt: 2, height: "550px" }}>
+                <Box sx={{ pt: 2, height: "650px" }}>
                     <Paper sx={{
                         height: "100%",
                         display: "flex",
