@@ -82,7 +82,7 @@ const getProfile = async (customerId) => {
     [customerId]
   );
 
-  // Đếm số voucher available (chưa dùng = quantity > 0 hoặc null, còn hạn)
+  // Đếm số voucher available 
   const voucherResult = await pool.query(
     `SELECT COUNT(*) AS total FROM vouchers
      WHERE is_active = true

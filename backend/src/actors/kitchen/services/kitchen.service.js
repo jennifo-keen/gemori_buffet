@@ -1,7 +1,7 @@
 const { pool } = require('../../../config/db');
 const { getIO } = require('../../../config/socket');
 
-// ── Lấy danh sách món cần làm (pending + cooking) ──────────────
+// Lấy danh sách món cần làm (pending + cooking) 
 // Group theo bàn để bếp dễ theo dõi
 const getPendingItems = async () => {
   const result = await pool.query(
@@ -54,7 +54,7 @@ const getPendingItems = async () => {
   );
 };
 
-// ── Cập nhật trạng thái món ─────────────────────────────────────
+// Cập nhật trạng thái món
 const updateItemStatus = async (itemId, status) => {
   const validStatuses = ['pending', 'cooking', 'done'];
   if (!validStatuses.includes(status))
@@ -103,14 +103,14 @@ const updateItemStatus = async (itemId, status) => {
   try {
     const io = getIO();
 
-    // → Khách tại bàn (Web 1)
+    // Khách tại bàn
     io.to(`table_${item.table_id}`).emit('item_status_updated', {
       itemId,
       status,
       menu_name: item.menu_name,
     });
 
-    // → Bếp (Web 2)
+    // Bếp
     io.to('kitchen').emit('item_status_updated', {
       itemId,
       status,
@@ -119,7 +119,7 @@ const updateItemStatus = async (itemId, status) => {
       menu_name: item.menu_name,
     });
 
-    // → Staff (Web 3)
+    // Staff
     io.to('staff').emit('item_status_updated', {
       itemId,
       status,
@@ -139,7 +139,7 @@ const updateItemStatus = async (itemId, status) => {
   };
 };
 
-// ── Cập nhật tất cả món của 1 bàn cùng lúc ─────────────────────
+//Cập nhật tất cả món của 1 bàn cùng lúc
 const updateAllItemsByTable = async (tableCode, status) => {
   const validStatuses = ['cooking', 'done'];
   if (!validStatuses.includes(status))
@@ -221,7 +221,7 @@ const updateAllItemsByTable = async (tableCode, status) => {
   return { updated: itemIds.length, status, tableCode };
 };
 
-// ── Thống kê nhanh cho bếp ─────────────────────────────────────
+// Thống kê nhanh cho bếp
 const getKitchenStats = async () => {
   const result = await pool.query(
     `SELECT

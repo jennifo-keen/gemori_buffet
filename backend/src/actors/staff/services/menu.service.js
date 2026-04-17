@@ -1,6 +1,6 @@
 const { pool } = require('../../../config/db');
 
-// Lấy danh sách gói buffet — Web 3 Staff
+// Lấy danh sách gói buffet
 const getBuffetTickets = async () => {
   const result = await pool.query(
     `SELECT bt.*,
@@ -18,7 +18,7 @@ const getBuffetTickets = async () => {
   return result.rows;
 };
  
-// Lấy tất cả món — Web 3 Staff
+// Lấy tất cả món
 const getAllMenus = async () => {
   const result = await pool.query(
     `SELECT id, code, name, category, image_url, status

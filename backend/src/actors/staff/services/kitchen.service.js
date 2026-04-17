@@ -1,7 +1,7 @@
 const { pool } = require('../../../config/db');
 const { getIO } = require('../../../config/socket');
 
-// Lấy tất cả món đang pending/cooking — Web 3 (Staff theo dõi)
+// Lấy tất cả món đang pending/cooking
 const getPendingItems = async () => {
   const result = await pool.query(
     `SELECT oi.*, m.name AS menu_name, m.image_url, m.category, t.table_code
@@ -15,7 +15,7 @@ const getPendingItems = async () => {
   return result.rows;
 };
 
-// Cập nhật trạng thái món — Web 3 hoặc Web 5 Bếp
+// Cập nhật trạng thái món 
 const updateItemStatus = async (itemId, status) => {
   const validStatuses = ['pending', 'cooking', 'done'];
   if (!validStatuses.includes(status))

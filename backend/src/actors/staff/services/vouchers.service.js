@@ -1,14 +1,18 @@
 const { pool } = require('../../../config/db');
 
-// Kiểm tra voucher hợp lệ khi thanh toán — Web 3
+// Kiểm tra voucher hợp lệ khi thanh toán
 const validateVoucher = async (code, baseAmount) => {
   const result = await pool.query(
     'SELECT * FROM vouchers WHERE code = $1', [code]
   );
 
 const voucher = result.rows[0];
-  if (!voucher) throw { status: 404, message: 'Mã giảm giá không tồn tại' };
-  if (!voucher.is_active) throw { status: 400, message: 'Mã giảm giá không còn hoạt động' };
+  if (!voucher){
+    throw { status: 404, message: 'Mã giảm giá không tồn tại' };
+  }
+  if (!voucher.is_active){
+    throw { status: 400, message: 'Mã giảm giá không còn hoạt động' };
+  } 
  
   const now = new Date();
 
@@ -18,7 +22,7 @@ const voucher = result.rows[0];
   if (voucher.end_date && new Date(voucher.end_date) < now)
     throw { status: 400, message: 'Mã giảm giá đã hết hạn' };
   
-  // Kiểm tra theo số lượng (quantity = null nghĩa là không giới hạn)
+  // Kiểm tra theo số lượng
   if (voucher.quantity !== null && voucher.quantity <= 0)
     throw { status: 400, message: 'Mã giảm giá đã hết lượt sử dụng' };
 

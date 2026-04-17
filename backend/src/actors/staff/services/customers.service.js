@@ -4,14 +4,17 @@ const { pool } = require('../../../config/db');
 const getAllCustomers = async () => {
   const result = await pool.query(
     `SELECT id, full_name, phone, email, birthday, gender, address, created_at, update_at
-     FROM customers ORDER BY created_at DESC`
+     FROM customers 
+     ORDER BY created_at DESC`
   );
   return result.rows;
 };
 
 const getCustomerByPhone = async (phone) => {
   const result = await pool.query(
-    `SELECT id, full_name, phone, email FROM customers WHERE phone = $1`,
+    `SELECT id, full_name, phone, email 
+     FROM customers 
+     WHERE phone = $1`,
     [phone]
   );
   if (!result.rows[0]) throw { status: 404, message: 'Không tìm thấy thành viên' };
@@ -21,14 +24,34 @@ const getCustomerByPhone = async (phone) => {
 const createCustomer = async (data) => {
   const { full_name, phone, email, password, birthday, gender, address } = data;
 
-  // Kiểm tra trùng
+  // Validation
+  if (!password) {
+    throw { status: 400, message: 'Vui lòng nhập mật khẩu' };
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !emailRegex.test(email)) {
+    throw { status: 400, message: 'Email không được để trống hoặc sai định dạng' };
+  }
+  
+  const phoneRegex = /^\d{10}$/;
+  if (!phone || !phoneRegex.test(phone)) {
+    throw { status: 400, message: 'Số điện thoại phải bao gồm chính xác 10 chữ số' };
+    }
+
+ // Check trùng lặp
  const existPhone = await pool.query('SELECT id FROM customers WHERE phone = $1', [phone]);
-  if (existPhone.rows[0]) throw { status: 400, message: 'Số điện thoại đã được đăng ký' };
+  if (existPhone.rows[0]){
+    throw { status: 400, message: 'Số điện thoại đã được đăng ký' };
+  } 
  
   const existEmail = await pool.query('SELECT id FROM customers WHERE email = $1', [email]);
-  if (existEmail.rows[0]) throw { status: 400, message: 'Email đã được đăng ký' };
+  if (existEmail.rows[0]){
+    throw { status: 400, message: 'Email đã được đăng ký' };
+  }
  
-  const password_hash = await bcrypt.hash(password || '123456', 10);
+  //số 10, thuật toán sẽ thực hiện 2^10 (1024) vòng lặp mã hóa để tạo ra chuỗi hash cuối cùng
+  const password_hash = await bcrypt.hash(password, 10);
  
   const result = await pool.query(
     `INSERT INTO customers (full_name, phone, email, password_hash, birthday, gender, address)
@@ -43,24 +66,31 @@ const updateCustomer = async (id, data) => {
   const { full_name, email, birthday, gender, address, password } = data;
  
   const check = await pool.query('SELECT id FROM customers WHERE id = $1', [id]);
-  if (!check.rows[0]) throw { status: 404, message: 'Thành viên không tồn tại' };
+  if (!check.rows[0]){
+    throw { status: 404, message: 'Thành viên không tồn tại' };
+  } 
  
   const fields = []; const values = []; let i = 1;
-  if (full_name) { fields.push(`full_name = $${i++}`);     values.push(full_name); }
-  if (email)     { fields.push(`email = $${i++}`);          values.push(email); }
-  if (birthday)  { fields.push(`birthday = $${i++}`);       values.push(birthday); }
-  if (gender)    { fields.push(`gender = $${i++}`);         values.push(gender); }
-  if (address)   { fields.push(`address = $${i++}`);        values.push(address); }
+  if (full_name) { fields.push(`full_name = $${i++}`);  values.push(full_name); }
+  if (email)     { fields.push(`email = $${i++}`);      values.push(email);     }
+  if (birthday)  { fields.push(`birthday = $${i++}`);   values.push(birthday);  }
+  if (gender)    { fields.push(`gender = $${i++}`);     values.push(gender);    }
+  if (address)   { fields.push(`address = $${i++}`);    values.push(address);   }
   if (password)  {
     const hash = await bcrypt.hash(password, 10);
     fields.push(`password_hash = $${i++}`); values.push(hash);
   }
  
-  if (!fields.length) throw { status: 400, message: 'Không có gì để cập nhật' };
+  if (!fields.length){
+    throw { status: 400, message: 'Không có gì để cập nhật' };
+  }
  
   values.push(id);
   const result = await pool.query(
-    `UPDATE customers SET ${fields.join(', ')} WHERE id = $${i} RETURNING id, full_name, phone, email`,
+    `UPDATE customers 
+     SET ${fields.join(', ')} 
+     WHERE id = $${i} 
+     RETURNING id, full_name, phone, email`,
     values
   );
   return result.rows[0];
@@ -68,7 +98,9 @@ const updateCustomer = async (id, data) => {
  
 const deleteCustomer = async (id) => {
   const check = await pool.query('SELECT id FROM customers WHERE id = $1', [id]);
-  if (!check.rows[0]) throw { status: 404, message: 'Thành viên không tồn tại' };
+  if (!check.rows[0]){
+    throw { status: 404, message: 'Thành viên không tồn tại' };
+  }
   await pool.query('DELETE FROM customers WHERE id = $1', [id]);
 };
  

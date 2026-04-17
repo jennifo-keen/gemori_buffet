@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 
-// Dành cho Staff / Admin (Web 3, 4)
 const authMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ message: 'Chưa đăng nhập' });
@@ -14,7 +13,7 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-// Dành cho Customer (Web 2)
+// Dành cho Customer 
 const authCustomerMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
   console.log('AUTH CUSTOMER RUNNING'); 
@@ -28,18 +27,6 @@ const authCustomerMiddleware = (req, res, next) => {
     res.status(401).json({ message: 'Token không hợp lệ hoặc đã hết hạn' });
   }
 };
-
-// const authCustomerMiddleware = (req, res, next) => {
-//   const token = req.headers.authorization?.split(' ')[1];
-//   if (!token) return res.status(401).json({ message: 'Vui lòng đăng nhập' });
-//   try {
-//     // Customer token có shape: { id, phone }
-//     req.customer = jwt.verify(token, process.env.JWT_SECRET);
-//     next();
-//   } catch {
-//     res.status(401).json({ message: 'Token không hợp lệ hoặc đã hết hạn' });
-//   }
-// };
 
 // Kiểm tra role
 const requireRole = (...roles) => (req, res, next) => {

@@ -4,7 +4,7 @@ const { getIO } = require('../../../config/socket');
 
 
 const processPayment = async ({ orderId, paymentMethod, phone, voucherCode }) => {
-  // 1. Lấy order
+  // Lấy order
 const orderResult = await pool.query(
     `SELECT o.*, bt.price AS ticket_price
      FROM orders o
@@ -14,13 +14,17 @@ const orderResult = await pool.query(
   );
 
 const order = orderResult.rows[0];
-  if (!order) throw { status: 404, message: 'Hóa đơn không tồn tại' };
-  if (order.status !== 'ordering') throw { status: 400, message: 'Hóa đơn không ở trạng thái ordering' };
+  if (!order){
+    throw { status: 404, message: 'Hóa đơn không tồn tại' };
+  }
+  if (order.status !== 'ordering'){
+    throw { status: 400, message: 'Hóa đơn không ở trạng thái ordering' };
+  } 
  
   const baseAmount = order.ticket_price * order.ticket_quantity;
   let discountAmount = 0, voucherId = null, customerId = null;
 
-  // 2. Tìm khách hàng thành viên theo SĐT
+  // Tìm khách hàng thành viên theo SĐT
  if (phone) {
     const customerResult = await pool.query(
       'SELECT id FROM customers WHERE phone = $1', [phone]
@@ -28,7 +32,7 @@ const order = orderResult.rows[0];
     if (customerResult.rows[0]) customerId = customerResult.rows[0].id;
   }
 
-  // 3. Áp voucher nếu có
+  // Áp voucher nếu có
  if (voucherCode) {
     const { voucher, discountAmount: disc } = await validateVoucher(voucherCode, baseAmount);
     discountAmount = disc;
@@ -37,7 +41,7 @@ const order = orderResult.rows[0];
 
   const totalAmount = baseAmount - discountAmount;
 
-  // 4. Cập nhật order
+  // Cập nhật order
   await pool.query(
     `UPDATE orders
      SET status = 'paid', customer_id = $1, voucher_id = $2, total_amount = $3
@@ -45,7 +49,7 @@ const order = orderResult.rows[0];
     [customerId, voucherId, totalAmount, orderId]
   );
 
-  // 5. Tạo payment
+  // Tạo payment
 const paymentResult = await pool.query(
     `INSERT INTO payments (order_id, payment_method, amount, paid_at, status)
      VALUES ($1, $2, $3, NOW(), 'paid')
@@ -53,10 +57,10 @@ const paymentResult = await pool.query(
     [orderId, paymentMethod, totalAmount]
   );
 
-  // 6. Đóng bàn
+  // Đóng bàn
   await pool.query(`UPDATE tables SET status = 'empty' WHERE id = $1`, [order.table_id]);
 
-  // 7. Trừ số lượng voucher nếu có
+  // Trừ số lượng voucher nếu có
   if (voucherId) await useVoucher(voucherId);
 
   try {

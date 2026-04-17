@@ -1,6 +1,6 @@
 const { pool } = require('../../../config/db');
 
-// Lấy danh sách gói buffet — Web 3 Staff + Web 1
+// Lấy danh sách gói buffet 
 const getBuffetTickets = async () => {
   const result = await pool.query(
     `SELECT bt.*,
@@ -18,7 +18,7 @@ const getBuffetTickets = async () => {
   return result.rows;
 };
 
-// Lấy menu theo gói buffet của bàn — Web 1
+// Lấy menu theo gói buffet của bàn 
 const getMenuByTable = async (tableCode) => {
   const tableResult = await pool.query('SELECT * FROM tables WHERE table_code = $1', [tableCode]);
   const table = tableResult.rows[0];
@@ -41,7 +41,7 @@ const getMenuByTable = async (tableCode) => {
     buffetTicketId = orderResult.rows[0].buffet_ticket_id;
     ticketName = orderResult.rows[0].ticket_name;
   } else {
-    // Fallback: nếu chưa có order, dùng gói buffet mặc định first active
+    // nếu chưa có order, dùng gói buffet mặc định first active
     const ticketResult = await pool.query(
       `SELECT id, name FROM buffet_tickets WHERE is_active = true ORDER BY price ASC LIMIT 1`
     );

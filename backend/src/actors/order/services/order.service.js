@@ -1,7 +1,7 @@
 const { pool } = require('../../../config/db');
 const { getIO } = require('../../../config/socket');
 
-// Lấy order + danh sách món realtime — Web 1
+// Lấy order + danh sách món realtime
 const getOrderByTable = async (tableCode) => {
   // tableCode từ route /tables/:tableCode/order
   const tableResult = await pool.query('SELECT * FROM tables WHERE table_code = $1', [tableCode]);
@@ -149,7 +149,7 @@ const check = await pool.query(
   return { message: 'Đã hủy món thành công' };
 };
 
-// Hóa đơn tạm tính — Web 1
+// Hóa đơn tạm tính 
 const getBill = async (tableCode) => {
   const tableResult = await pool.query('SELECT * FROM tables WHERE table_code = $1', [tableCode]);
   const table = tableResult.rows[0];

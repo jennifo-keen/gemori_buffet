@@ -1,10 +1,11 @@
 const { pool } = require('../../../config/db');
 const { getIO } = require('../../../config/socket');
 
-// Xem chi tiết 1 order — Web 3
+// Xem chi tiết 1 order
 const getOrderById = async (orderId) => {
   const orderResult = await pool.query(
-    `SELECT o.*, t.table_code,
+    `SELECT o.*, 
+      t.table_code,
       bt.name      AS ticket_name,
       bt.price     AS ticket_price,
       bt.image_url AS ticket_image,
@@ -12,10 +13,10 @@ const getOrderById = async (orderId) => {
       c.phone      AS customer_phone,
       v.code       AS voucher_code
      FROM orders o
-     LEFT JOIN tables        t  ON o.table_id         = t.id
+     LEFT JOIN tables         t  ON o.table_id         = t.id
      LEFT JOIN buffet_tickets bt ON o.buffet_ticket_id = bt.id
      LEFT JOIN customers      c  ON o.customer_id      = c.id
-     LEFT JOIN vouchers        v  ON o.voucher_id       = v.id
+     LEFT JOIN vouchers       v  ON o.voucher_id       = v.id
      WHERE o.id = $1`,
     [orderId]
   );
@@ -25,7 +26,7 @@ const getOrderById = async (orderId) => {
  
   const itemsResult = await pool.query(
     `SELECT oi.*,
-       m.name      AS menu_name,
+       m.name AS menu_name,
        m.image_url,
        m.category
      FROM order_items oi
@@ -38,15 +39,16 @@ const getOrderById = async (orderId) => {
   return { ...order, items: itemsResult.rows };
 };
 
-// Lấy tất cả order — Web 4
+// Lấy tất cả order
 const getAllOrders = async ({ status }) => {
   let query = `
-    SELECT o.*, t.table_code,
+    SELECT o.*, 
+      t.table_code,
       bt.name     AS ticket_name,
       c.full_name AS customer_name,
       c.phone     AS customer_phone
     FROM orders o
-    LEFT JOIN tables         t  ON o.table_id         = t.id
+    LEFT JOIN tables         t  ON o.table_id          = t.id
     LEFT JOIN buffet_tickets bt ON o.buffet_ticket_id  = bt.id
     LEFT JOIN customers      c  ON o.customer_id       = c.id
     WHERE 1=1
@@ -59,13 +61,18 @@ const getAllOrders = async ({ status }) => {
   return result.rows;
 };
 
-// Tạo order mới — Web 3 Staff
+// Tạo order mới
 const createOrder = async ({ tableId, buffetTicketId, ticketQuantity }) => {
   // Kiểm tra bàn
 const tableCheck = await pool.query('SELECT * FROM tables WHERE id = $1', [tableId]);
   const table = tableCheck.rows[0];
-  if (!table) throw { status: 404, message: 'Bàn không tồn tại' };
-  if (table.status !== 'empty') throw { status: 400, message: 'Bàn không ở trạng thái trống' };
+  if (!table){
+    throw { status: 404, message: 'Bàn không tồn tại' };
+  }
+
+  if (table.status !== 'empty'){
+     throw { status: 400, message: 'Bàn không ở trạng thái trống' };
+  }
 
   // Lấy giá vé
   // Kiểm tra gói buffet — is_active = true
@@ -74,7 +81,9 @@ const tableCheck = await pool.query('SELECT * FROM tables WHERE id = $1', [table
     [buffetTicketId]
   );
   const ticket = ticketCheck.rows[0];
-  if (!ticket) throw { status: 404, message: 'Gói buffet không tồn tại hoặc đã ngừng bán' };
+  if (!ticket){
+    throw { status: 404, message: 'Gói buffet không tồn tại hoặc đã ngừng bán' };
+  }
  
   const totalAmount = ticket.price * ticketQuantity;
 
@@ -109,9 +118,13 @@ const cancelItem = async (itemId, tableCode) => {
   );
 
   const item = check.rows[0];
-  if (!item) throw { status: 404, message: 'Món không tồn tại' };
+  if (!item){
+    throw { status: 404, message: 'Món không tồn tại' };
+  }
+
   if (item.table_code !== tableCode)
     throw { status: 403, message: 'Không có quyền hủy món này' };
+  
   if (item.status !== 'pending' && item.status !== 'cooking')
     throw { status: 400, message: 'Chỉ có thể hủy món đang chờ hoặc đang làm' };
 
