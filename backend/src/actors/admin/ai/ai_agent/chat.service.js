@@ -25,112 +25,92 @@ const calcCompare = (current, previous, label) => {
 };
 
 const formatResponse = (sql, rows, question) => {
-
     if (!rows || rows.length === 0) {
-        return "😢 Không có dữ liệu";
+        return "😢 Không có dữ liệu cho yêu cầu này m ơi.";
     }
 
     question = question.toLowerCase();
+    const first = rows[0];
 
-    // 📊 SO SÁNH (DAY / MONTH / YEAR)
-    if (rows[0].today !== undefined && rows[0].yesterday !== undefined) {
-        return calcCompare(
-            Number(rows[0].today),
-            Number(rows[0].yesterday),
-            "Doanh thu hôm nay"
-        );
+    // ===== 1. 💳 PAYMENT POPULAR (ƯU TIÊN CAO NHẤT) =====
+    if (first.payment_method && first.total !== undefined) {
+        return `💳 Khách hay thanh toán bằng **${first.payment_method}** nhất (${first.total} lượt).`;
     }
 
-    if (rows[0].current !== undefined && rows[0].previous !== undefined) {
-
-        if (sql.includes("month")) {
-            return calcCompare(
-                Number(rows[0].current),
-                Number(rows[0].previous),
-                "Doanh thu tháng này"
-            );
-        }
-
-        if (sql.includes("year")) {
-            return calcCompare(
-                Number(rows[0].current),
-                Number(rows[0].previous),
-                "Doanh thu năm nay"
-            );
-        }
+    // ===== 2. 🎟 VOUCHER POPULAR =====
+    if (first.code && first.total !== undefined && !first.start_date) {
+        return `🎟 Voucher được dùng nhiều nhất là **${first.code}** (${first.total} lượt).`;
     }
 
-    // 💰 DOANH THU
-    if (rows[0].total !== undefined && sql.includes("SUM(amount)")) {
+    // ===== 3. 🪑 TABLE STATUS =====
+    if (first.table_code && first.status) {
+        const grouped = {};
+        rows.forEach(r => {
+            if (!grouped[r.status]) grouped[r.status] = [];
+            grouped[r.status].push(r.table_code);
+        });
+
+        let text = "🪑 **Tình trạng bàn:**\n";
+        for (const status in grouped) {
+            text += `- ${status}: ${grouped[status].join(", ")}\n`;
+        }
+        return text;
+    }
+
+    // ===== 4. 🎟 LIST VOUCHER =====
+    if (first.code && first.start_date) {
+        let text = "🎟 **Danh sách voucher:**\n";
+        rows.forEach(v => {
+            text += `- ${v.code} | SL: ${v.quantity} | ${v.is_active ? "🟢 Active" : "🔴 Off"}\n`;
+        });
+        return text;
+    }
+
+    // ===== 5. 📊 COMPARE =====
+    if (first.today !== undefined && first.yesterday !== undefined) {
+        return calcCompare(Number(first.today), Number(first.yesterday), "Hôm nay");
+    }
+
+    if (first.current !== undefined && first.previous !== undefined) {
+        return calcCompare(Number(first.current), Number(first.previous), "Giai đoạn này");
+    }
+
+    // ===== 6. 🔥 TOP / LOW DISH =====
+    if (first.name && (first.sum !== undefined || first.total !== undefined)) {
+        const key = first.sum !== undefined ? "sum" : "total";
+        const isTop = sql.toLowerCase().includes("desc");
+
+        let text = isTop
+            ? "🔥 **Top món bán chạy:**\n"
+            : "🧊 **Món bán chậm:**\n";
+
+        rows.forEach((item, i) => {
+            text += `${i + 1}. ${item.name} (${item[key]} món)\n`;
+        });
+
+        return text;
+    }
+
+    // ===== 7. 💰 DOANH THU (CHỈ SUM(amount)) =====
+    if (sql.toLowerCase().includes("sum(amount)")) {
+        const value = first.total || Object.values(first)[0];
 
         if (question.includes("từ") && question.includes("đến")) {
-            return `💰 Tổng doanh thu trong khoảng thời gian: ${formatMoney(rows[0].total)}`;
+            return `💰 Doanh thu trong khoảng: **${formatMoney(value)}**`;
         }
 
-        return `💰 Doanh thu: ${formatMoney(rows[0].total)}`;
+        return `💰 Doanh thu: **${formatMoney(value)}**`;
     }
 
-    // 📦 SỐ ĐƠN
-    if (rows[0].total !== undefined && sql.includes("COUNT(*)")) {
-        return `📦 Có ${rows[0].total} đơn hàng`;
+    // ===== 8. 📦 COUNT =====
+    if (Object.values(first)[0] !== undefined && rows.length === 1) {
+        const val = Object.values(first)[0];
+        return `📊 Kết quả: ${val}`;
     }
 
-    // ⚠️ TỒN KHO
-    if (sql.includes("stock_quantity")) {
-
-        if (rows.length === 0) {
-            return "✅ Tồn kho ổn, không có món nào sắp hết";
-        }
-
-        let text = "⚠️ Cảnh báo tồn kho:\n";
-
-        rows.forEach((item) => {
-            text += `- ${item.name} (còn ${item.stock_quantity})\n`;
-        });
-
-        return text;
-    }
-
-    // 🔥 GỢI Ý
-    if (
-        question.includes("nên") ||
-        question.includes("chuẩn bị") ||
-        question.includes("nhập")
-    ) {
-        let text = "🔥 Gợi ý món nên chuẩn bị:\n";
-
-        rows.forEach((item, index) => {
-            text += `${index + 1}. ${item.name} (${item.total})\n`;
-        });
-
-        return text;
-    }
-
-    // 🧊 MÓN BÁN ÍT
-    if (sql.includes("ORDER BY total ASC")) {
-        let text = "🧊 Món bán ít:\n";
-
-        rows.forEach((item, index) => {
-            text += `${index + 1}. ${item.name} (${item.total})\n`;
-        });
-
-        return text;
-    }
-
-    // 🔥 TOP MÓN
-    if (sql.includes("GROUP BY")) {
-        let text = "🔥 Top món bán chạy:\n";
-
-        rows.forEach((item, index) => {
-            text += `${index + 1}. ${item.name} (${item.total} món)\n`;
-        });
-
-        return text;
-    }
-
-    return JSON.stringify(rows);
+    // ===== FALLBACK =====
+    return "📊 Kết quả:\n" + JSON.stringify(rows, null, 2);
 };
-
 const semanticSearch = (question) => {
     return new Promise((resolve) => {
 
