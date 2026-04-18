@@ -5,6 +5,8 @@ import AdminHome from "../actors/admin/admin_pages/AdminHome";
 import ContentAdAi from "../actors/admin/admin_pages/ContentAdAi";
 import BuffetTicketPage from "../actors/admin/admin_pages/BuffetTicketPage";
 import MenuPage from "../actors/admin/admin_pages/MenuPage";
+import TablePage from "../actors/admin/admin_pages/TablePage";
+import OrderPage from "../actors/admin/admin_pages/OrderPage";
 
 const AdminRouter =
 {
@@ -26,6 +28,14 @@ const AdminRouter =
         {
             path: "quan-ly-ve", // Path này phải khớp với 'id' ông đặt trong Sidebar
             element: <BuffetTicketPage />,
+        },
+        {
+            path: "quan-ly-ban", // Path này phải khớp với 'id' ông đặt trong Sidebar
+            element: <TablePage />,
+        },
+        {
+            path: "quan-ly-don-hang", // Path này phải khớp với 'id' ông đặt trong Sidebar
+            element: <OrderPage />,
         },
     ],
 }

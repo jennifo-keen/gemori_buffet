@@ -13,7 +13,7 @@ import {
 import { useOrder } from '../order_context/OrderContext';
 
 export const OrdMenus = () => {
-  const { cartTotal, submitOrder, cart, tableCode } = useOrder();
+  const { cartTotal, submitOrder, tableCode } = useOrder();
   const navigate = useNavigate();
 
 

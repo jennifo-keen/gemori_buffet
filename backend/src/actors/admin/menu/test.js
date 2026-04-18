@@ -1,1399 +1,885 @@
-import { Stack, Typography } from "@mui/material";
+import { Box, Stack } from "@mui/material";
+import { OrderDetailSidebarSection } from "./OrderDetailSidebarSection";
+import { OrderQueueTableSection } from "./OrderQueueTableSection";
+import { ThemeProvider } from "./ThemeProvider";
 
-// Column header definitions for the menu table
-const columns = [
-  { label: "ẢNH MÓN", align: "center", flex: 1.25 },
-  { label: "TÊN MÓN", align: "left", flex: 2.7 },
-  { label: "DANH MỤC", align: "center", flex: 1.3 },
-  { label: "GIÁ NIÊM YẾT", align: "center", flex: 1.5 },
-  { label: "TRẠNG THÁI", align: "center", flex: 1.4 },
-  { label: "HÀNH ĐỘNG", align: "center", flex: 1.4 },
+const ContentLayoutMain = () => {
+  return (
+    <ThemeProvider>
+      <Stack
+        direction="row"
+        spacing={3}
+        sx={{ width: "100%", minHeight: "595px" }}
+      >
+        {/* Main order queue table - takes ~2/3 of the width */}
+        <Box sx={{ flex: "0 0 65%" }}>
+          <OrderQueueTableSection />
+        </Box>
+        {/* Order detail sidebar - takes ~1/3 of the width */}
+        <Box sx={{ flex: 1 }}>
+          <OrderDetailSidebarSection />
+        </Box>
+      </Stack>
+    </ThemeProvider>
+  );
+};
+
+export default ContentLayoutMain;
+import CloseIcon from "@mui/icons-material/Close";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import { Box, Button, IconButton, Stack, Typography } from "@mui/material";
+
+// Food item data
+const menuItems = [
+  {
+    id: 1,
+    name: "Nước lẩu Mala Đài Loan",
+    quantity: "x1",
+    status: "Đã lên món",
+    statusType: "served",
+    time: "18:50",
+    image:
+      "https://storage.googleapis.com/a1aa/image/ab6axudllrorl-uqxfcnhxf0qp-anhgzebyybngsowuzqvb6opquuox-1ygogcpndqaf1kqxrvr7qyaedilqklwthgmyusa5fz5viehdepwgnsrstwdcodk5t7d-0mrylmpjos7qa7qyg3uwq0ssvkyn4hc0k5imhvatgp366xankwpb5rjim4zdcfwhlwp5ecu5d7unhlikoudloqa-k12dmopxtnb9uudxahuugaypbf3bthznpzivqv3fa8qu9tx6rt2karsn1cmonn1s.png",
+  },
+  {
+    id: 2,
+    name: "Bò Wagyu Thượng Hạng",
+    quantity: "x3",
+    status: "Đã lên món",
+    statusType: "served",
+    time: "19:05",
+    image:
+      "https://storage.googleapis.com/a1aa/image/ab6axuc-itaoafc1xyhsrjrdmufgghyhms4satfck-6rn8k5qbtmlr2hf52gbhc7gfu93ll6pmvhzsdyfbeuwe2x-0gthwe3g-wneqb-ipo39sace-jdd4v5ffdn-ukt-obgbhenzmnmswgzhzpuzuryaqcikoahi9rjxequambfqnfamuge7zcmuqx6-fscukxlvwu-cejziceq1cme90aauntw-zkpdotg7q295dl0zsv0eqv2pkxttnxmejmeng2sncewrnjmkjaxkz4h.png",
+  },
+  {
+    id: 3,
+    name: "Khay Hải Sản Tổng Hợp",
+    quantity: "x2",
+    status: "Đang chuẩn bị",
+    statusType: "preparing",
+    time: "Chờ 12p",
+    image:
+      "https://storage.googleapis.com/a1aa/image/ab6axucjtq8o8fr5w9aqbhv6dhxk1c1yqnvjbj9hfmt8svoleqdmeeaznx8hqtjbdj3jmmimirqkaw-mixyhscfhpef0fu5vznmiwkadfwqa7xv5xkxgqerdc4iiqk7qwqzq3cj0rjo9vtpnvrwonhozsintiohaomnisyfpyswir-srztqrxbaz7tdla6o-jsob0pb8eu2qzspnkcdglsvnveufxzndo1i3y92bpt0p5n-8itih4kjsqqvxahv1fdi72uvagbm3ev6-jmm9.png",
+  },
 ];
 
-export const MenuTableHeaderSection = () => {
-  return (
-    <Stack
-      component="thead"
-      direction="row"
-      sx={{
-        width: "100%",
-        backgroundColor: "tableHeader.main",
-        borderBottom: "1px solid",
-        borderColor: "border.main",
-      }}
-    >
-      {columns.map((col) => (
-        <Stack
-          key={col.label}
-          component="th"
-          direction="row"
-          alignItems="center"
-          justifyContent={col.align === "left" ? "flex-start" : "center"}
-          sx={{ flex: col.flex, px: 3, py: 2 }}
-        >
-          <Typography
-            variant="labelLabel3Bold"
-            sx={{
-              color: "tableHeader.contrastText",
-              whiteSpace: "nowrap",
-              textAlign: col.align,
-            }}
-          >
-            {col.label}
-          </Typography>
-        </Stack>
-      ))}
-    </Stack>
-  );
-};
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import {
-  Box,
-  Chip,
-  IconButton,
-  Stack,
-  Switch,
-  TableCell,
-  TableRow,
-  Typography,
-} from "@mui/material";
-
-// Menu item data
-const menuItem = {
-  image:
-    "https://ab6axubnnispo1icxciwqt3uj7yorxkqhgtpiuptdogjxnoiktozj-9f8k58xupdrlanjrq6jli7acjhn36herciiavjkxagkbt1sh7ee7-h-fpawayd83kba-hziu96j1amthll2eql30krk6txf86gt3zncwvamty7sgudgtstzaiiqvwk2s7-qjojwpdjvxe2vburcz-cmztlpbp2z5gjepfbog2ncbwmfgeezvxbcft6bsafushccoyw7tdvthmrtako9-xqqpve3gzb-6.png",
-  name: "Thịt bò Wagyu thượng hạng",
-  code: "Mã: MW-BEEF-001",
-  category: "Thịt bò",
-  price: "289.000đ",
-  isActive: true,
-  statusLabel: "Đang bán",
+const getStatusStyles = (statusType) => {
+  if (statusType === "served") {
+    return { backgroundColor: "#d1fae5", color: "#047857" };
+  }
+  return { backgroundColor: "#fef3c7", color: "#b45309" };
 };
 
-export const MenuTableBodySection = () => {
-  return (
-    <TableRow
-      sx={{
-        height: "84px",
-        borderBottom: "1px solid",
-        borderColor: "border.main",
-        "&:last-child td": { borderBottom: 0 },
-      }}
-    >
-      {/* Product Image */}
-      <TableCell sx={{ width: "125px", px: 3, py: 2 }}>
-        <Box
-          component="img"
-          src={menuItem.image}
-          alt={menuItem.name}
-          sx={{
-            width: 48,
-            height: 48,
-            borderRadius: "8px",
-            objectFit: "cover",
-            boxShadow: 5,
-            display: "block",
-          }}
-        />
-      </TableCell>
-      {/* Product Name & Code */}
-      <TableCell sx={{ width: "271px", px: 3, py: 0 }}>
-        <Stack spacing={0}>
-          <Typography
-            variant="body1"
-            sx={{
-              fontFamily: '"Be Vietnam Pro", Helvetica',
-              fontSize: "14px",
-              fontWeight: 700,
-              lineHeight: "16px",
-              color: "text.primary",
-            }}
-          >
-            {menuItem.name}
-          </Typography>
-          <Typography
-            sx={{
-              fontFamily: '"Be Vietnam Pro", Helvetica',
-              fontSize: "9px",
-              fontWeight: 500,
-              lineHeight: "17px",
-              color: "text.secondary",
-            }}
-          >
-            {menuItem.code}
-          </Typography>
-        </Stack>
-      </TableCell>
-      {/* Category Badge */}
-      <TableCell sx={{ width: "131px", px: 2, py: 0, textAlign: "center" }}>
-        <Chip
-          label={menuItem.category}
-          size="small"
-          sx={{
-            backgroundColor: "neutral.main",
-            color: "common.white",
-            fontFamily: '"Be Vietnam Pro", Helvetica',
-            fontSize: "12px",
-            fontWeight: 500,
-            lineHeight: "20px",
-            height: "20px",
-            borderRadius: "4px",
-            "& .MuiChip-label": {
-              px: 1,
-            },
-          }}
-        />
-      </TableCell>
-      {/* Price */}
-      <TableCell sx={{ width: "124px", py: 0, textAlign: "center" }}>
-        <Typography
-          sx={{
-            fontFamily: '"Be Vietnam Pro", Helvetica',
-            fontSize: "14px",
-            fontWeight: 700,
-            lineHeight: "16px",
-            color: "primary.main",
-            textAlign: "center",
-          }}
-        >
-          {menuItem.price}
-        </Typography>
-      </TableCell>
-      {/* Status Toggle */}
-      <TableCell sx={{ width: "167px", pl: 6, pr: 3, py: 0 }}>
-        <Stack direction="row" alignItems="center" spacing={0.5}>
-          <Switch
-            checked={menuItem.isActive}
-            size="small"
-            sx={{
-              "& .MuiSwitch-switchBase.Mui-checked": {
-                color: "common.white",
-              },
-              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                backgroundColor: "primary.main",
-                opacity: 1,
-              },
-              "& .MuiSwitch-track": {
-                backgroundColor: "primary.main",
-                opacity: 1,
-              },
-            }}
-          />
-          <Typography
-            sx={{
-              fontFamily: '"Be Vietnam Pro", Helvetica',
-              fontSize: "10px",
-              fontWeight: 700,
-              lineHeight: "18px",
-              color: menuItem.isActive ? "primary.main" : "slate.main",
-            }}
-          >
-            {menuItem.statusLabel}
-          </Typography>
-        </Stack>
-      </TableCell>
-      {/* Action Icons */}
-      <TableCell sx={{ textAlign: "right", pr: 2, py: 0 }}>
-        <Stack direction="row" justifyContent="flex-end" spacing={0.5}>
-          <IconButton size="small" aria-label="edit">
-            <EditOutlinedIcon
-              sx={{ width: 18, height: 18, color: "text.secondary" }}
-            />
-          </IconButton>
-          <IconButton size="small" aria-label="delete">
-            <DeleteOutlineIcon
-              sx={{ width: 18, height: 18, color: "text.secondary" }}
-            />
-          </IconButton>
-        </Stack>
-      </TableCell>
-    </TableRow>
-  );
-};
-
-export default MenuTableBodySection;
-import DeleteOutlined from "@mui/icons-material/DeleteOutlined";
-import EditOutlined from "@mui/icons-material/EditOutlined";
-import {
-  Box,
-  Chip,
-  IconButton,
-  Stack,
-  Switch,
-  Typography,
-} from "@mui/material";
-import React from "react";
-
-const IMAGE_URL =
-  "https://ab6axubnnispo1icxciwqt3uj7yorxkqhgtpiuptdogjxnoiktozj-9f8k58xupdrlanjrq6jli7acjhn36herciiavjkxagkbt1sh7ee7-h-fpawayd83kba-hziu96j1amthll2eql30krk6txf86gt3zncwvamty7sgudgtstzaiiqvwk2s7-qjojwpdjvxe2vburcz-cmztlpbp2z5gjepfbog2ncbwmfgeezvxbcft6bsafushccoyw7tdvthmrtako9-xqqpve3gzb-8.png";
-
-export const MenuRowEntrySection = () => {
-  const [active, setActive] = React.useState(true);
-
+export const OrderDetailSidebarSection = () => {
   return (
     <Box
-      component="article"
       sx={{
-        display: "flex",
-        alignItems: "center",
-        height: 84,
         width: "100%",
-        borderBottom: "1px solid",
-        borderColor: "border.main",
-        borderTop: "1px solid",
-        px: 0,
+        display: "flex",
+        flexDirection: "column",
+        gap: 3,
+        p: 2.5,
+        bgcolor: "background.paper",
+        borderRadius: "12px",
+        border: "1px solid",
+        borderColor: "primary.light",
+        boxShadow: 1,
       }}
     >
-      {/* Product Image */}
-      <Box
-        sx={{
-          flexShrink: 0,
-          width: 125,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          px: 3,
-        }}
+      {/* Header */}
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="flex-start"
       >
-        <Box
-          component="img"
-          src={IMAGE_URL}
-          alt="Thịt bò Wagyu thượng hạng"
-          sx={{
-            width: 64,
-            height: 48,
-            borderRadius: "8px",
-            objectFit: "cover",
-            objectPosition: "center",
-            boxShadow: 5,
-            flexShrink: 0,
-          }}
-        />
-      </Box>
-      {/* Product Name & Code */}
-      <Box
-        sx={{
-          width: 272,
-          flexShrink: 0,
-          px: 3,
-          py: "25.5px",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-        }}
-      >
-        <Typography
-          variant="labelLabel2Bold"
-          sx={{
-            color: "text.primary",
-            fontSize: "14px",
-            fontWeight: 700,
-            lineHeight: "16px",
-            letterSpacing: 0,
-          }}
-        >
-          Thịt bò Wagyu thượng hạng
-        </Typography>
-        <Typography
-          variant="captionCaption2Medium"
-          sx={{
-            color: "text.secondary",
-            fontSize: "9px",
-            fontWeight: 500,
-            lineHeight: "17px",
-            letterSpacing: 0,
-            mt: "2px",
-          }}
-        >
-          Mã: MW-BEEF-001
-        </Typography>
-      </Box>
-      {/* Category Badge */}
-      <Box
-        sx={{
-          width: 131,
-          flexShrink: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          px: 2,
-        }}
-      >
-        <Chip
-          label="Thịt bò"
-          size="small"
-          sx={{
-            backgroundColor: "neutral.main",
-            color: "common.white",
-            fontFamily: '"Be Vietnam Pro", Helvetica',
-            fontSize: "12px",
-            fontWeight: 500,
-            lineHeight: "20px",
-            height: "auto",
-            borderRadius: "4px",
-            "& .MuiChip-label": {
-              px: "8px",
-              py: 0,
-            },
-          }}
-        />
-      </Box>
-      {/* Price */}
-      <Box
-        sx={{
-          width: 124,
-          flexShrink: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Typography
-          sx={{
-            color: "primary.main",
-            fontSize: "14px",
-            fontWeight: 700,
-            lineHeight: "16px",
-            letterSpacing: 0,
-            textAlign: "center",
-            fontFamily: '"Be Vietnam Pro", Helvetica',
-          }}
-        >
-          289.000đ
-        </Typography>
-      </Box>
-      {/* Status Toggle */}
-      <Box
-        sx={{
-          width: 167,
-          flexShrink: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          pl: "48px",
-          pr: 3,
-        }}
-      >
-        <Stack direction="row" alignItems="center" spacing={0.5}>
-          <Switch
-            checked={active}
-            onChange={(e) => setActive(e.target.checked)}
-            size="small"
-            sx={{
-              width: 36,
-              height: 20,
-              padding: 0,
-              "& .MuiSwitch-switchBase": {
-                padding: 0,
-                margin: "2px",
-                transitionDuration: "300ms",
-                "&.Mui-checked": {
-                  transform: "translateX(16px)",
-                  color: "#fff",
-                  "& + .MuiSwitch-track": {
-                    backgroundColor: "primary.main",
-                    opacity: 1,
-                    border: 0,
-                  },
-                },
-              },
-              "& .MuiSwitch-thumb": {
-                boxSizing: "border-box",
-                width: 16,
-                height: 16,
-                boxShadow: "0px 1px 2px rgba(0,0,0,0.2)",
-              },
-              "& .MuiSwitch-track": {
-                borderRadius: 10,
-                backgroundColor: "slate.main",
-                opacity: 1,
-              },
-            }}
-          />
+        <Stack spacing={0}>
           <Typography
             sx={{
-              color: active ? "primary.main" : "slate.main",
-              fontSize: "10px",
-              fontWeight: 700,
-              lineHeight: "18px",
-              letterSpacing: 0,
-              fontFamily: '"Be Vietnam Pro", Helvetica',
-              whiteSpace: "nowrap",
+              fontFamily: '"Epilogue", Helvetica',
+              fontWeight: 900,
+              fontSize: "18px",
+              letterSpacing: "-0.45px",
+              lineHeight: "28px",
+              color: "#230f0f",
             }}
           >
-            {active ? "Đang bán" : "Ngừng bán"}
+            Chi tiết đơn hàng
+          </Typography>
+          <Typography
+            sx={{
+              fontFamily: '"Epilogue", Helvetica',
+              fontWeight: 700,
+              fontSize: "12px",
+              lineHeight: "16px",
+              color: "primary.main",
+            }}
+          >
+            #ORD-9021 • Bàn 12 (VIP)
           </Typography>
         </Stack>
-      </Box>
-      {/* Action Icons */}
+        <IconButton size="small" sx={{ p: 0 }}>
+          <CloseIcon sx={{ fontSize: 14, color: "#230f0f" }} />
+        </IconButton>
+      </Stack>
+      {/* Content */}
+      <Stack spacing={2}>
+        {/* Progress Card */}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "4px",
+            p: 1.5,
+            border: "1px solid",
+            borderColor: "primary.light",
+            bgcolor: "secondary.light",
+            borderRadius: "8px",
+          }}
+        >
+          {/* Start time and guests row */}
+          <Stack direction="row" justifyContent="space-between" pb={1}>
+            <Typography
+              sx={{
+                fontFamily: '"Epilogue", Helvetica',
+                fontWeight: 400,
+                fontSize: "12px",
+                lineHeight: "16px",
+                color: "transparent",
+              }}
+            >
+              <Box component="span" sx={{ color: "#78716c" }}>
+                Bắt đầu:{" "}
+              </Box>
+              <Box
+                component="span"
+                sx={{
+                  fontFamily: '"Epilogue", Helvetica',
+                  fontWeight: 700,
+                  color: "#230f0f",
+                }}
+              >
+                18:45
+              </Box>
+            </Typography>
+            <Typography
+              sx={{
+                fontFamily: '"Epilogue", Helvetica',
+                fontWeight: 400,
+                fontSize: "12px",
+                lineHeight: "16px",
+                color: "transparent",
+              }}
+            >
+              <Box component="span" sx={{ color: "#78716c" }}>
+                Khách:{" "}
+              </Box>
+              <Box
+                component="span"
+                sx={{
+                  fontFamily: '"Epilogue", Helvetica',
+                  fontWeight: 700,
+                  color: "#230f0f",
+                }}
+              >
+                06 người
+              </Box>
+            </Typography>
+          </Stack>
+          {/* Progress bar */}
+          <Box
+            sx={{
+              width: "100%",
+              height: 6,
+              bgcolor: "#e7e5e4",
+              borderRadius: "9999px",
+              overflow: "hidden",
+            }}
+          >
+            <Box
+              sx={{
+                width: "75%",
+                height: "100%",
+                bgcolor: "primary.main",
+              }}
+            />
+          </Box>
+          {/* Progress text */}
+          <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+            <Typography
+              sx={{
+                fontFamily: '"Epilogue", Helvetica',
+                fontWeight: 700,
+                fontSize: "10px",
+                lineHeight: "15px",
+                color: "primary.main",
+                textAlign: "right",
+              }}
+            >
+              Tiến độ phục vụ: 9/12 món
+            </Typography>
+          </Box>
+        </Box>
+        {/* Menu items list */}
+        <Stack spacing={1.5}>
+          {/* Section label */}
+          <Typography
+            sx={{
+              fontFamily: '"Epilogue", Helvetica',
+              fontWeight: 900,
+              fontSize: "10px",
+              letterSpacing: "1px",
+              lineHeight: "15px",
+              color: "#a8a29e",
+            }}
+          >
+            DANH SÁCH MÓN ĐANG PHỤC VỤ
+          </Typography>
+          {/* Food items */}
+          {menuItems.map((item) => (
+            <Stack
+              key={item.id}
+              direction="row"
+              spacing={1.5}
+              alignItems="flex-start"
+            >
+              {/* Food image */}
+              <Box
+                component="img"
+                src={item.image}
+                alt={item.name}
+                sx={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: "8px",
+                  objectFit: "cover",
+                  flexShrink: 0,
+                  boxShadow: "0px 0px 0px 1px #8a00001a",
+                }}
+              />
+              {/* Food details */}
+              <Stack spacing={0.5} flex={1}>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="flex-start"
+                >
+                  <Typography
+                    sx={{
+                      fontFamily: '"Epilogue", Helvetica',
+                      fontWeight: 700,
+                      fontSize: "14px",
+                      lineHeight: "20px",
+                      color: "#230f0f",
+                    }}
+                  >
+                    {item.name}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: '"Epilogue", Helvetica',
+                      fontWeight: 700,
+                      fontSize: "12px",
+                      lineHeight: "16px",
+                      color: "#230f0f",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {item.quantity}
+                  </Typography>
+                </Stack>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Box
+                    sx={{
+                      px: 0.75,
+                      py: 0.25,
+                      borderRadius: "4px",
+                      ...getStatusStyles(item.statusType),
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontFamily: '"Epilogue", Helvetica',
+                        fontWeight: 700,
+                        fontSize: "10px",
+                        lineHeight: "15px",
+                      }}
+                    >
+                      {item.status}
+                    </Typography>
+                  </Box>
+                  <Typography
+                    sx={{
+                      fontFamily: '"Epilogue", Helvetica',
+                      fontWeight: 400,
+                      fontSize: "10px",
+                      lineHeight: "15px",
+                      color: "#a8a29e",
+                    }}
+                  >
+                    {item.time}
+                  </Typography>
+                </Stack>
+              </Stack>
+            </Stack>
+          ))}
+
+          {/* "And 9 more items" row */}
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Box
+              sx={{
+                width: 48,
+                height: 48,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                bgcolor: "secondary.light",
+                borderRadius: "8px",
+                flexShrink: 0,
+              }}
+            >
+              <MoreHorizIcon sx={{ fontSize: 16, color: "#a8a29e" }} />
+            </Box>
+            <Typography
+              sx={{
+                fontFamily: '"Epilogue", Helvetica',
+                fontWeight: 400,
+                fontStyle: "italic",
+                fontSize: "12px",
+                lineHeight: "16px",
+                color: "#a8a29e",
+              }}
+            >
+              Và 9 món khác...
+            </Typography>
+          </Stack>
+        </Stack>
+      </Stack>
+      {/* Footer */}
       <Box
         sx={{
-          flex: 1,
+          borderTop: "1px solid",
+          borderColor: "primary.light",
+          pt: 4,
           display: "flex",
-          alignItems: "center",
-          justifyContent: "flex-end",
-          gap: 1,
-          pr: 2,
+          flexDirection: "column",
+          gap: 2,
         }}
       >
-        <IconButton size="small" aria-label="Edit item">
-          <EditOutlined
+        {/* Subtotal row */}
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Typography
             sx={{
-              width: 18,
-              height: 18,
-              color: "#D4A017",
+              fontFamily: '"Epilogue", Helvetica',
+              fontWeight: 500,
+              fontSize: "14px",
+              lineHeight: "20px",
+              color: "#78716c",
             }}
-          />
-        </IconButton>
-        <IconButton size="small" aria-label="Delete item">
-          <DeleteOutlined
+          >
+            Tạm tính:
+          </Typography>
+          <Typography
             sx={{
-              width: 18,
-              height: 18,
-              color: "#3B82F6",
+              fontFamily: '"Epilogue", Helvetica',
+              fontWeight: 900,
+              fontSize: "18px",
+              lineHeight: "28px",
+              color: "primary.main",
             }}
-          />
-        </IconButton>
+          >
+            2,450,000₫
+          </Typography>
+        </Stack>
+        {/* Action buttons */}
+        <Stack direction="row" spacing={1.5}>
+          <Button
+            variant="outlined"
+            fullWidth
+            sx={{
+              fontFamily: '"Epilogue", Helvetica',
+              fontWeight: 700,
+              fontSize: "12px",
+              lineHeight: "16px",
+              color: "primary.main",
+              borderColor: "secondary.dark",
+              borderRadius: "8px",
+              py: 1.25,
+              textTransform: "none",
+              "&:hover": {
+                borderColor: "primary.main",
+                bgcolor: "secondary.light",
+              },
+            }}
+          >
+            In hóa đơn tạm
+          </Button>
+          <Button
+            variant="contained"
+            fullWidth
+            sx={{
+              fontFamily: '"Epilogue", Helvetica',
+              fontWeight: 700,
+              fontSize: "12px",
+              lineHeight: "16px",
+              bgcolor: "primary.main",
+              color: "white",
+              borderRadius: "8px",
+              py: 1.25,
+              textTransform: "none",
+              "&:hover": {
+                bgcolor: "#6a0000",
+              },
+            }}
+          >
+            Thanh toán
+          </Button>
+        </Stack>
       </Box>
     </Box>
   );
 };
 
-export default MenuRowEntrySection;
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import {
-  Box,
-  Chip,
-  IconButton,
-  Stack,
-  Switch,
-  Typography,
-} from "@mui/material";
+export default OrderDetailSidebarSection;
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { Box, IconButton, Paper, Stack, Typography } from "@mui/material";
+import { useState } from "react";
 
-const IMAGE_URL =
-  "https://ab6axubnnispo1icxciwqt3uj7yorxkqhgtpiuptdogjxnoiktozj-9f8k58xupdrlanjrq6jli7acjhn36herciiavjkxagkbt1sh7ee7-h-fpawayd83kba-hziu96j1amthll2eql30krk6txf86gt3zncwvamty7sgudgtstzaiiqvwk2s7-qjojwpdjvxe2vburcz-cmztlpbp2z5gjepfbog2ncbwmfgeezvxbcft6bsafushccoyw7tdvthmrtako9-xqqpve3gzb-9.png";
+// Table column headers data
+const TABLE_HEADERS = [
+  { label: "MÃ ĐƠN", flex: "0 0 92px" },
+  { label: "SỐ BÀN", flex: "0 0 110px" },
+  { label: "THỜI\nGIAN", flex: "0 0 80px" },
+  { label: "MÓN", flex: "0 0 70px" },
+  { label: "TỔNG TIỀN", flex: "0 0 110px" },
+  { label: "TRẠNG THÁI", flex: "1 1 auto" },
+  { label: "", flex: "0 0 50px" },
+];
 
-export const MenuRowContentSection = () => {
+// Status badge config
+const STATUS_CONFIG = {
+  serving: {
+    label: "Đang\nphục vụ",
+    bgColor: "#dbeafe",
+    dotColor: "#3b82f6",
+    textColor: "#1d4ed8",
+  },
+  waiting: {
+    label: "Chờ\nthanh\ntoán",
+    bgColor: "#fef3c7",
+    dotColor: "#f59e0b",
+    textColor: "#b45309",
+  },
+  done: {
+    label: "Đã hoàn\nthành",
+    bgColor: "#d1fae5",
+    dotColor: "#10b981",
+    textColor: "#047857",
+  },
+};
+
+// Order rows data
+const ORDER_ROWS = [
+  {
+    id: "#ORD-\n9021",
+    tableNum: "12",
+    tableZone: "VIP\nZone",
+    tableNumBg: "#8a00001a",
+    tableNumColor: "#8a0000",
+    time: "18:45",
+    timeAgo: "45 phút\ntrước",
+    dishCount: "12",
+    total: "2,450,000₫",
+    status: "serving",
+    highlighted: true,
+    opacity: 1,
+  },
+  {
+    id: "#ORD-\n9020",
+    tableNum: "05",
+    tableZone: "Sảnh\nchính",
+    tableNumBg: "#f5f5f4",
+    tableNumColor: "#57534e",
+    time: "19:10",
+    timeAgo: "20 phút\ntrước",
+    dishCount: "08",
+    total: "1,890,000₫",
+    status: "waiting",
+    highlighted: false,
+    opacity: 1,
+  },
+  {
+    id: "#ORD-\n9019",
+    tableNum: "22",
+    tableZone: "Sân\nvườn",
+    tableNumBg: "#f5f5f4",
+    tableNumColor: "#57534e",
+    time: "17:30",
+    timeAgo: "Đã xong\n30p",
+    dishCount: "04",
+    total: "750,000₫",
+    status: "done",
+    highlighted: false,
+    opacity: 0.8,
+  },
+  {
+    id: "#ORD-\n9018",
+    tableNum: "08",
+    tableZone: "Sảnh\nchính",
+    tableNumBg: "#f5f5f4",
+    tableNumColor: "#57534e",
+    time: "19:25",
+    timeAgo: "Vừa mới",
+    dishCount: "15",
+    total: "3,120,000₫",
+    status: "serving",
+    highlighted: false,
+    opacity: 1,
+  },
+];
+
+// Status badge component
+const StatusBadge = ({ status }) => {
+  const config = STATUS_CONFIG[status];
   return (
     <Stack
       direction="row"
       alignItems="center"
+      spacing={0.5}
       sx={{
-        height: 84,
-        width: "100%",
-        borderBottom: "1px solid rgba(177, 65, 53, 0.1)",
-        borderTop: "1px solid rgba(177, 65, 53, 0.1)",
-        pr: "140px",
+        backgroundColor: config.bgColor,
+        borderRadius: "999px",
+        px: 1,
+        py: 0.5,
+        display: "inline-flex",
       }}
     >
-      {/* Thumbnail */}
-      <Box sx={{ px: 3, py: "16.5px", flexShrink: 0 }}>
-        <Box
-          component="img"
-          src={IMAGE_URL}
-          alt="Thịt bò Wagyu thượng hạng"
-          sx={{
-            width: 64,
-            height: 48,
-            borderRadius: "8px",
-            objectFit: "cover",
-            boxShadow: "0px 1px 2px #0000000d",
-          }}
-        />
-      </Box>
-      {/* Name & Code */}
-      <Box sx={{ width: 271, px: 3, py: "25.5px", flexShrink: 0 }}>
-        <Typography
-          variant="subtitle2"
-          sx={{
-            color: "text.primary",
-            fontSize: "14px",
-            fontWeight: 700,
-            lineHeight: "16px",
-            letterSpacing: 0,
-          }}
-        >
-          Thịt bò Wagyu thượng hạng
-        </Typography>
-        <Typography
-          sx={{
-            color: "text.secondary",
-            fontSize: "9px",
-            fontWeight: 500,
-            lineHeight: "17px",
-            letterSpacing: 0,
-          }}
-        >
-          Mã: MW-BEEF-001
-        </Typography>
-      </Box>
-      {/* Category Badge */}
       <Box
         sx={{
-          width: 131,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          px: 2,
-          py: 4,
+          width: 5,
+          height: 6,
+          borderRadius: "50%",
+          backgroundColor: config.dotColor,
           flexShrink: 0,
         }}
-      >
-        <Chip
-          label="Thịt bò"
-          size="small"
-          sx={{
-            backgroundColor: "neutral.main",
-            color: "neutral.contrastText",
-            fontSize: "12px",
-            fontWeight: 500,
-            lineHeight: "20px",
-            height: "auto",
-            borderRadius: "4px",
-            "& .MuiChip-label": {
-              px: "8px",
-              py: 0,
-            },
-          }}
-        />
-      </Box>
-      {/* Price */}
-      <Box
+      />
+      <Typography
         sx={{
-          width: 124,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
+          fontFamily: '"Epilogue", Helvetica',
+          fontWeight: 700,
+          fontSize: "10px",
+          lineHeight: "normal",
+          color: config.textColor,
+          whiteSpace: "pre-line",
         }}
       >
-        <Typography
-          sx={{
-            color: "primary.main",
-            fontSize: "14px",
-            fontWeight: 700,
-            lineHeight: "16px",
-            letterSpacing: 0,
-            textAlign: "center",
-          }}
-        >
-          289.000đ
-        </Typography>
-      </Box>
-      {/* Status Toggle */}
-      <Box
-        sx={{
-          width: 167,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-          pl: 6,
-          pr: 3,
-        }}
-      >
-        <Stack direction="row" alignItems="center" spacing={0.5}>
-          <Switch
-            defaultChecked
-            size="small"
-            sx={{
-              "& .MuiSwitch-switchBase.Mui-checked": {
-                color: "#fff",
-              },
-              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                backgroundColor: "primary.main",
-                opacity: 1,
-              },
-              "& .MuiSwitch-track": {
-                borderRadius: "10px",
-              },
-            }}
-          />
-          <Typography
-            sx={{
-              color: "primary.main",
-              fontSize: "10px",
-              fontWeight: 700,
-              lineHeight: "18px",
-              letterSpacing: 0,
-            }}
-          >
-            Đang bán
-          </Typography>
-        </Stack>
-      </Box>
-      {/* Actions */}
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="flex-end"
-        spacing={1}
-        sx={{ flex: 1 }}
-      >
-        <IconButton size="small" sx={{ color: "#b8860b" }}>
-          <EditOutlinedIcon sx={{ width: 18, height: 18 }} />
-        </IconButton>
-        <IconButton size="small" sx={{ color: "#1565c0" }}>
-          <DeleteOutlineOutlinedIcon sx={{ width: 18, height: 18 }} />
-        </IconButton>
-      </Stack>
+        {config.label}
+      </Typography>
     </Stack>
   );
 };
 
-export default MenuRowContentSection;
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import {
-  Box,
-  Chip,
-  IconButton,
-  Stack,
-  Switch,
-  Typography,
-} from "@mui/material";
-import { useState } from "react";
-
-export const MenuRowCollectionSection = () => {
-  const [isActive, setIsActive] = useState(false);
+export const OrderQueueTableSection = () => {
+  const [page, setPage] = useState(1);
+  const totalPages = 4;
 
   return (
-    <Stack
-      component="article"
-      direction="row"
-      alignItems="center"
+    <Paper
+      elevation={1}
       sx={{
         width: "100%",
+        borderRadius: "12px",
+        overflow: "hidden",
+        border: "1px solid #8a00001a",
+        boxShadow: "0px 1px 2px #0000000d",
+        display: "flex",
+        flexDirection: "column",
         backgroundColor: "background.paper",
-        borderTop: "1px solid",
-        borderBottom: "1px solid",
-        borderColor: "border.main",
-        pr: "140px",
       }}
     >
-      {/* Thumbnail */}
-      <Box sx={{ px: 3, py: 2, flexShrink: 0 }}>
-        <Box
-          component="img"
-          src=""
-          alt="Thịt bò Wagyu thượng hạng"
-          sx={{
-            width: 64,
-            height: 48,
-            borderRadius: 2,
-            boxShadow: 5,
-            background:
-              "linear-gradient(0deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.5) 100%)",
-            objectFit: "cover",
-            display: "block",
-          }}
-        />
-      </Box>
-      {/* Name & Code */}
+      {/* Table header row */}
       <Stack
-        direction="column"
-        justifyContent="center"
-        sx={{ px: 3, py: "25.5px", width: 271, flexShrink: 0 }}
+        direction="row"
+        alignItems="stretch"
+        sx={{
+          backgroundColor: "#8a00000d",
+          width: "100%",
+        }}
       >
-        <Typography
-          variant="labelLabel2Bold"
-          sx={{ color: "neutral.dark", lineHeight: "16px" }}
-        >
-          Thịt bò Wagyu thượng hạng
-        </Typography>
-        <Typography
-          variant="captionCaption2Medium"
-          sx={{ color: "text.secondary" }}
-        >
-          Mã: MW-BEEF-001
-        </Typography>
+        {TABLE_HEADERS.map((col, idx) => (
+          <Box
+            key={idx}
+            sx={{
+              flex: col.flex,
+              px: 2,
+              py: "21px",
+              display: "flex",
+              alignItems: "flex-start",
+            }}
+          >
+            <Typography
+              sx={{
+                fontFamily: '"Epilogue", Helvetica',
+                fontWeight: 900,
+                fontSize: "10px",
+                letterSpacing: "1px",
+                lineHeight: "normal",
+                color: "#8a0000",
+                whiteSpace: "pre-line",
+              }}
+            >
+              {col.label}
+            </Typography>
+          </Box>
+        ))}
       </Stack>
-      {/* Category Chip */}
-      <Box
-        sx={{
-          width: 131,
-          flexShrink: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          px: 2,
-          py: 4,
-        }}
-      >
-        <Chip
-          label="Thịt bò"
-          size="small"
-          sx={{
-            backgroundColor: "neutral.main",
-            color: "neutral.contrastText",
-            borderRadius: "4px",
-            height: "20px",
-            "& .MuiChip-label": {
-              px: 1,
-              ...{
-                fontFamily: '"Be Vietnam Pro", Helvetica',
-                fontSize: "12px",
-                fontWeight: 500,
-                lineHeight: "20px",
-              },
-            },
-          }}
-        />
+      {/* Table body rows */}
+      <Box sx={{ width: "100%" }}>
+        {ORDER_ROWS.map((row, idx) => (
+          <Stack
+            key={row.id}
+            direction="row"
+            alignItems="center"
+            sx={{
+              width: "100%",
+              opacity: row.opacity,
+              backgroundColor: row.highlighted ? "#8a00001a" : "transparent",
+              borderTop: idx === 0 ? "none" : "1px solid #8a00000d",
+              boxShadow: row.highlighted
+                ? "inset 0px 0px 0px 1px #8a000033"
+                : "none",
+              position: "relative",
+            }}
+          >
+            {/* MÃ ĐƠN */}
+            <Box sx={{ flex: "0 0 92px", px: 2, py: 2 }}>
+              <Typography
+                sx={{
+                  fontFamily: '"Epilogue", Helvetica',
+                  fontWeight: 700,
+                  fontSize: "14px",
+                  lineHeight: "20px",
+                  color: "#230f0f",
+                  whiteSpace: "pre-line",
+                }}
+              >
+                {row.id}
+              </Typography>
+            </Box>
+            {/* SỐ BÀN */}
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={1}
+              sx={{ flex: "0 0 110px", pl: 2 }}
+            >
+              <Box
+                sx={{
+                  minWidth: 28,
+                  height: 32,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: row.tableNumBg,
+                  borderRadius: "4px",
+                  px: 0.5,
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontFamily: '"Epilogue", Helvetica',
+                    fontWeight: 700,
+                    fontSize: "12px",
+                    lineHeight: "16px",
+                    color: row.tableNumColor,
+                    textAlign: "center",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {row.tableNum}
+                </Typography>
+              </Box>
+              <Typography
+                sx={{
+                  fontFamily: '"Epilogue", Helvetica',
+                  fontWeight: 400,
+                  fontSize: "12px",
+                  lineHeight: "16px",
+                  color: "#57534e",
+                  whiteSpace: "pre-line",
+                }}
+              >
+                {row.tableZone}
+              </Typography>
+            </Stack>
+            {/* THỜI GIAN */}
+            <Box sx={{ flex: "0 0 80px", pl: 3, pr: 2, py: "18.5px" }}>
+              <Typography
+                sx={{
+                  fontFamily: '"Epilogue", Helvetica',
+                  fontWeight: 500,
+                  fontSize: "12px",
+                  lineHeight: "16px",
+                  color: "#230f0f",
+                }}
+              >
+                {row.time}
+              </Typography>
+              <Typography
+                sx={{
+                  fontFamily: '"Epilogue", Helvetica',
+                  fontWeight: 400,
+                  fontSize: "10px",
+                  lineHeight: "normal",
+                  color: "#a8a29e",
+                  whiteSpace: "pre-line",
+                }}
+              >
+                {row.timeAgo}
+              </Typography>
+            </Box>
+            {/* MÓN */}
+            <Box sx={{ flex: "0 0 70px", px: 2, py: "20.5px" }}>
+              <Box
+                sx={{
+                  width: 35,
+                  height: 32,
+                  backgroundColor: "#f5f5f4",
+                  borderRadius: "999px",
+                  position: "relative",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontFamily: '"Epilogue", Helvetica',
+                    fontWeight: 700,
+                    fontSize: "12px",
+                    lineHeight: "16px",
+                    color: "#230f0f",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {row.dishCount}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontFamily: '"Epilogue", Helvetica',
+                    fontWeight: 700,
+                    fontSize: "12px",
+                    lineHeight: "16px",
+                    color: "#230f0f",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  món
+                </Typography>
+              </Box>
+            </Box>
+            {/* TỔNG TIỀN */}
+            <Box sx={{ flex: "0 0 110px", px: 2, py: "26px" }}>
+              <Typography
+                sx={{
+                  fontFamily: '"Epilogue", Helvetica',
+                  fontWeight: 700,
+                  fontSize: "14px",
+                  lineHeight: "20px",
+                  color: "#230f0f",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {row.total}
+              </Typography>
+            </Box>
+            {/* TRẠNG THÁI */}
+            <Box sx={{ flex: "1 1 auto", px: 2, py: "19.5px" }}>
+              <StatusBadge status={row.status} />
+            </Box>
+            {/* Chevron */}
+            <Box
+              sx={{
+                flex: "0 0 50px",
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "center",
+                px: 1,
+                py: "18px",
+              }}
+            >
+              <IconButton size="small" sx={{ p: 0.5 }}>
+                <ChevronRightIcon sx={{ fontSize: "14px", color: "#230f0f" }} />
+              </IconButton>
+            </Box>
+          </Stack>
+        ))}
       </Box>
-      {/* Price */}
-      <Box
-        sx={{
-          width: 124,
-          flexShrink: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Typography
-          variant="labelLabel2Bold"
-          sx={{ color: "neutral.dark", textAlign: "center" }}
-        >
-          289.000đ
-        </Typography>
-      </Box>
-      {/* Status Toggle */}
+      {/* Spacer to push footer down */}
+      <Box sx={{ flex: 1, minHeight: "120px" }} />
+      {/* Footer with pagination */}
       <Stack
         direction="row"
         alignItems="center"
-        spacing={0.5}
+        justifyContent="space-between"
         sx={{
-          width: 167,
-          flexShrink: 0,
-          pl: 6,
-          pr: 3,
-          py: "31.5px",
+          px: 2,
+          py: 1.5,
+          backgroundColor: "rgba(250,250,249,0.5)",
+          borderTop: "1px solid #8a00000d",
+          width: "100%",
         }}
       >
-        <Switch
-          checked={isActive}
-          onChange={(e) => setIsActive(e.target.checked)}
-          size="small"
-          sx={{
-            "& .MuiSwitch-switchBase.Mui-checked": {
-              color: "primary.main",
-            },
-            "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-              backgroundColor: "primary.main",
-            },
-            "& .MuiSwitch-track": {
-              backgroundColor: "slate.main",
-            },
-            "& .MuiSwitch-switchBase": {
-              color: "white",
-            },
-          }}
-        />
         <Typography
-          variant="captionCaption1Bold"
           sx={{
-            color: "slate.main",
+            fontFamily: '"Epilogue", Helvetica',
+            fontWeight: 500,
+            fontSize: "10px",
+            letterSpacing: "1px",
+            lineHeight: "15px",
+            color: "#78716c",
             whiteSpace: "nowrap",
           }}
         >
-          Ngưng bán
+          TRANG {page} / {totalPages}
         </Typography>
-      </Stack>
-      {/* Action Icons */}
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="flex-end"
-        spacing={1}
-        sx={{ flex: 1 }}
-      >
-        <IconButton size="small" aria-label="Edit item">
-          <EditOutlinedIcon sx={{ width: 18, height: 18, color: "#D97706" }} />
-        </IconButton>
-        <IconButton size="small" aria-label="Delete item">
-          <DeleteOutlineIcon sx={{ width: 18, height: 18, color: "#3B82F6" }} />
-        </IconButton>
-      </Stack>
-    </Stack>
-  );
-};
-
-export default MenuRowCollectionSection;
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import {
-  Box,
-  Chip,
-  IconButton,
-  Stack,
-  Switch,
-  Typography,
-} from "@mui/material";
-import { useState } from "react";
-
-export const MenuRowActionSection = () => {
-  const [active, setActive] = useState(false);
-
-  return (
-    <Stack
-      direction="row"
-      alignItems="center"
-      sx={{
-        width: "100%",
-        backgroundColor: "rgba(255,255,255,0.5)",
-        border: "1px solid rgba(177, 65, 53, 0.1)",
-        pr: "140px",
-      }}
-    >
-      {/* Product image */}
-      <Box sx={{ px: 3, py: "16.5px", flexShrink: 0 }}>
-        <Box
-          sx={{
-            width: 64,
-            height: 48,
-            borderRadius: "8px",
-            boxShadow: "0px 1px 2px #0000000d",
-            background:
-              "linear-gradient(0deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.5) 100%), url('https://via.placeholder.com/64x48') center/cover no-repeat",
-            backgroundColor: "#e0e0e0",
-            overflow: "hidden",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        />
-      </Box>
-      {/* Product name and code */}
-      <Box sx={{ px: 3, py: "25.5px", width: "271.55px", flexShrink: 0 }}>
-        <Typography
-          variant="subtitle2"
-          sx={{
-            fontFamily: '"Be Vietnam Pro", Helvetica',
-            fontSize: "14px",
-            fontWeight: 700,
-            lineHeight: "16px",
-            letterSpacing: "0px",
-            color: "text.primary",
-          }}
-        >
-          Thịt bò Wagyu thượng hạng
-        </Typography>
-        <Typography
-          sx={{
-            fontFamily: '"Be Vietnam Pro", Helvetica',
-            fontSize: "9px",
-            fontWeight: 500,
-            lineHeight: "17px",
-            letterSpacing: "0px",
-            color: "secondary.main",
-            mt: "2px",
-          }}
-        >
-          Mã: MW-BEEF-001
-        </Typography>
-      </Box>
-      {/* Category badge */}
-      <Box
-        sx={{
-          width: "131.06px",
-          flexShrink: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          px: 2,
-          py: 4,
-        }}
-      >
-        <Chip
-          label="Thịt bò"
-          size="small"
-          sx={{
-            backgroundColor: "neutral.main",
-            color: "neutral.contrastText",
-            fontFamily: '"Be Vietnam Pro", Helvetica',
-            fontSize: "12px",
-            fontWeight: 500,
-            lineHeight: "20px",
-            height: "auto",
-            borderRadius: "4px",
-            "& .MuiChip-label": {
-              px: "8px",
-              py: 0,
-            },
-          }}
-        />
-      </Box>
-      {/* Price */}
-      <Box
-        sx={{
-          width: "124.25px",
-          flexShrink: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Typography
-          sx={{
-            fontFamily: '"Be Vietnam Pro", Helvetica',
-            fontSize: "14px",
-            fontWeight: 700,
-            lineHeight: "16px",
-            letterSpacing: "0px",
-            color: "text.primary",
-            textAlign: "center",
-          }}
-        >
-          289.000đ
-        </Typography>
-      </Box>
-      {/* Toggle switch with label */}
-      <Box
-        sx={{
-          width: "166.7px",
-          flexShrink: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          pl: 6,
-          pr: 3,
-          py: "31.5px",
-        }}
-      >
-        <Stack direction="row" alignItems="center" spacing={0.5}>
-          <Switch
-            checked={active}
-            onChange={(e) => setActive(e.target.checked)}
+        {/* Pagination prev/next buttons */}
+        <Stack direction="row" spacing={0.5}>
+          <IconButton
             size="small"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
             sx={{
-              "& .MuiSwitch-switchBase.Mui-checked": {
-                color: "primary.main",
-              },
-              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                backgroundColor: "primary.main",
-              },
-              "& .MuiSwitch-track": {
-                backgroundColor: "slate.main",
-              },
-              "& .MuiSwitch-switchBase": {
-                color: "#fff",
-              },
-            }}
-          />
-          <Typography
-            sx={{
-              fontFamily: '"Be Vietnam Pro", Helvetica',
-              fontSize: "10px",
-              fontWeight: 700,
-              lineHeight: "18px",
-              letterSpacing: "0px",
-              color: "slate.main",
-              textAlign: "right",
-              whiteSpace: "nowrap",
+              width: 28,
+              height: 28,
+              border: "1px solid #8a00001a",
+              borderRadius: "6px",
+              backgroundColor: "background.paper",
+              "&:hover": { backgroundColor: "#8a00000d" },
             }}
           >
-            Ngưng bán
-          </Typography>
-        </Stack>
-      </Box>
-      {/* Action icons */}
-      <Stack
-        direction="row"
-        alignItems="center"
-        spacing={1}
-        sx={{ flex: 1, justifyContent: "flex-end" }}
-      >
-        <IconButton size="small" sx={{ color: "#D4A017", p: "2px" }}>
-          <EditOutlinedIcon sx={{ width: 18, height: 18 }} />
-        </IconButton>
-        <IconButton size="small" sx={{ color: "#5B8DD9", p: "2px" }}>
-          <DeleteOutlineIcon sx={{ width: 18, height: 18 }} />
-        </IconButton>
-      </Stack>
-    </Stack>
-  );
-};
-
-export default MenuRowActionSection;
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import {
-  Box,
-  Chip,
-  IconButton,
-  Stack,
-  Switch,
-  Typography,
-} from "@mui/material";
-
-const IMAGE_URL =
-  "https://storage.googleapis.com/ab6axubnnispo1icxciwqt3uj7yorxkqhgtpiuptdogjxnoiktozj-9f8k58xupdrlanjrq6jli7acjhn36herciiavjkxagkbt1sh7ee7-h-fpawayd83kba-hziu96j1amthll2eql30krk6txf86gt3zncwvamty7sgudgtstzaiiqvwk2s7-qjojwpdjvxe2vburcz-cmztlpbp2z5gjepfbog2ncbwmfgeezvxbcft6bsafushccoyw7tdvthmrtako9-xqqpve3gzb.png";
-
-export const MenuItemStatusColumnSection = () => {
-  return (
-    <Stack
-      component="article"
-      direction="row"
-      alignItems="center"
-      sx={{
-        width: "100%",
-        minHeight: 84,
-        borderBottom: "1px solid",
-        borderColor: "border.main",
-        borderTop: "1px solid",
-        borderLeft: "1px solid",
-        borderRight: "1px solid",
-        pr: "140px",
-      }}
-    >
-      {/* Thumbnail */}
-      <Box sx={{ px: 3, py: 2, flexShrink: 0 }}>
-        <Box
-          component="img"
-          src={IMAGE_URL}
-          alt="Thịt bò Wagyu thượng hạng"
-          sx={{
-            width: 64,
-            height: 48,
-            borderRadius: "8px",
-            objectFit: "cover",
-            objectPosition: "center",
-            boxShadow: 5,
-            display: "block",
-          }}
-        />
-      </Box>
-      {/* Name & Code */}
-      <Box sx={{ width: 271, px: 3, py: "25.5px", flexShrink: 0 }}>
-        <Typography
-          variant="labelLabel2Bold"
-          component="p"
-          sx={{
-            color: "text.primary",
-            fontSize: "14px",
-            fontWeight: 700,
-            lineHeight: "16px",
-            mb: 0.5,
-          }}
-        >
-          Thịt bò Wagyu thượng hạng
-        </Typography>
-        <Typography
-          component="div"
-          sx={{
-            color: "text.secondary",
-            fontSize: "9px",
-            fontWeight: 500,
-            lineHeight: "17px",
-          }}
-        >
-          Mã: MW-BEEF-001
-        </Typography>
-      </Box>
-      {/* Category Badge */}
-      <Box
-        sx={{
-          width: 131,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          px: 2,
-          py: 4,
-          flexShrink: 0,
-        }}
-      >
-        <Chip
-          label="Thịt bò"
-          size="small"
-          sx={{
-            backgroundColor: "neutral.main",
-            color: "common.white",
-            fontSize: "12px",
-            fontWeight: 500,
-            lineHeight: "20px",
-            height: "auto",
-            borderRadius: "4px",
-            "& .MuiChip-label": {
-              px: 1,
-              py: 0,
-            },
-          }}
-        />
-      </Box>
-      {/* Price */}
-      <Box
-        sx={{
-          width: 124,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-        }}
-      >
-        <Typography
-          sx={{
-            color: "primary.main",
-            fontSize: "14px",
-            fontWeight: 700,
-            lineHeight: "16px",
-            textAlign: "center",
-          }}
-        >
-          289.000đ
-        </Typography>
-      </Box>
-      {/* Status Toggle */}
-      <Box
-        sx={{
-          width: 167,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          pl: 6,
-          pr: 3,
-          flexShrink: 0,
-        }}
-      >
-        <Stack direction="row" alignItems="center" spacing={0.5}>
-          <Switch
-            defaultChecked
+            <ChevronLeftIcon sx={{ fontSize: "14px", color: "#230f0f" }} />
+          </IconButton>
+          <IconButton
             size="small"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             sx={{
-              "& .MuiSwitch-switchBase.Mui-checked": {
-                color: "common.white",
-              },
-              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                backgroundColor: "primary.main",
-                opacity: 1,
-              },
-              "& .MuiSwitch-track": {
-                borderRadius: "10px",
-              },
-            }}
-          />
-          <Typography
-            sx={{
-              color: "primary.main",
-              fontSize: "10px",
-              fontWeight: 700,
-              lineHeight: "18px",
-              whiteSpace: "nowrap",
+              width: 28,
+              height: 28,
+              border: "1px solid #8a00001a",
+              borderRadius: "6px",
+              backgroundColor: "background.paper",
+              "&:hover": { backgroundColor: "#8a00000d" },
             }}
           >
-            Đang bán
-          </Typography>
+            <ChevronRightIcon sx={{ fontSize: "14px", color: "#230f0f" }} />
+          </IconButton>
         </Stack>
-      </Box>
-      {/* Actions */}
-      <Stack
-        direction="row"
-        alignItems="center"
-        spacing={1}
-        sx={{ flex: 1, justifyContent: "flex-end" }}
-      >
-        <IconButton size="small" aria-label="Edit item">
-          <EditOutlinedIcon
-            sx={{ width: 18, height: 18, color: "text.secondary" }}
-          />
-        </IconButton>
-        <IconButton size="small" aria-label="Delete item">
-          <DeleteOutlineIcon
-            sx={{ width: 18, height: 18, color: "text.secondary" }}
-          />
-        </IconButton>
       </Stack>
-    </Stack>
+    </Paper>
   );
 };
-
-export default MenuItemStatusColumnSection;
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import { Box, Chip, Stack, Switch, Typography } from "@mui/material";
-
-const IMAGE_URL =
-  "https://ab6axubnnispo1icxciwqt3uj7yorxkqhgtpiuptdogjxnoiktozj-9f8k58xupdrlanjrq6jli7acjhn36herciiavjkxagkbt1sh7ee7-h-fpawayd83kba-hziu96j1amthll2eql30krk6txf86gt3zncwvamty7sgudgtstzaiiqvwk2s7-qjojwpdjvxe2vburcz-cmztlpbp2z5gjepfbog2ncbwmfgeezvxbcft6bsafushccoyw7tdvthmrtako9-xqqpve3gzb-7.png";
-
-export const MenuItemEntryOneSection = () => {
-  return (
-    <Box
-      component="article"
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        width: "100%",
-        height: 84,
-        borderBottom: "1px solid",
-        borderColor: "border.main",
-        borderTop: "1px solid",
-        px: 0,
-      }}
-    >
-      {/* Thumbnail */}
-      <Box
-        sx={{
-          width: 125,
-          display: "flex",
-          alignItems: "center",
-          px: 3,
-          flexShrink: 0,
-        }}
-      >
-        <Box
-          component="img"
-          src={IMAGE_URL}
-          alt="Thịt bò Wagyu thượng hạng"
-          sx={{
-            width: 64,
-            height: 48,
-            borderRadius: "8px",
-            objectFit: "cover",
-            objectPosition: "center",
-            boxShadow: 5,
-          }}
-        />
-      </Box>
-      {/* Name & Code */}
-      <Box sx={{ width: 272, px: 3, flexShrink: 0 }}>
-        <Typography
-          variant="subtitle2"
-          sx={{
-            color: "text.primary",
-            fontSize: "14px",
-            fontWeight: 700,
-            lineHeight: "16px",
-            letterSpacing: 0,
-          }}
-        >
-          Thịt bò Wagyu thượng hạng
-        </Typography>
-        <Typography
-          variant="body2"
-          sx={{
-            color: "text.secondary",
-            fontSize: "9px",
-            fontWeight: 500,
-            lineHeight: "17px",
-            letterSpacing: 0,
-            mt: 0.25,
-          }}
-        >
-          Mã: MW-BEEF-001
-        </Typography>
-      </Box>
-      {/* Category Badge */}
-      <Box
-        sx={{
-          width: 131,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-        }}
-      >
-        <Chip
-          label="Thịt bò"
-          size="small"
-          sx={{
-            backgroundColor: "neutral.main",
-            color: "common.white",
-            fontSize: "12px",
-            fontWeight: 500,
-            lineHeight: "20px",
-            height: "auto",
-            borderRadius: "4px",
-            "& .MuiChip-label": {
-              px: 1,
-              py: 0,
-            },
-          }}
-        />
-      </Box>
-      {/* Price */}
-      <Box
-        sx={{
-          width: 124,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-        }}
-      >
-        <Typography
-          sx={{
-            color: "primary.main",
-            fontSize: "14px",
-            fontWeight: 700,
-            lineHeight: "16px",
-            letterSpacing: 0,
-            textAlign: "center",
-          }}
-        >
-          289.000đ
-        </Typography>
-      </Box>
-      {/* Status Toggle */}
-      <Box
-        sx={{
-          width: 167,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-          pl: 6,
-          pr: 3,
-        }}
-      >
-        <Stack direction="row" alignItems="center" spacing={0.5}>
-          <Switch
-            defaultChecked
-            size="small"
-            sx={{
-              "& .MuiSwitch-switchBase.Mui-checked": {
-                color: "common.white",
-              },
-              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                backgroundColor: "primary.main",
-                opacity: 1,
-              },
-              "& .MuiSwitch-track": {
-                borderRadius: "10px",
-              },
-            }}
-          />
-          <Typography
-            sx={{
-              color: "primary.main",
-              fontSize: "10px",
-              fontWeight: 700,
-              lineHeight: "18px",
-              letterSpacing: 0,
-              whiteSpace: "nowrap",
-            }}
-          >
-            Đang bán
-          </Typography>
-        </Stack>
-      </Box>
-      {/* Actions */}
-      <Stack
-        direction="row"
-        spacing={1}
-        alignItems="center"
-        justifyContent="flex-end"
-        sx={{ flex: 1, pr: 2 }}
-      >
-        <EditOutlinedIcon
-          sx={{ width: 18, height: 18, color: "#D4A017", cursor: "pointer" }}
-        />
-        <DeleteOutlineIcon
-          sx={{ width: 18, height: 18, color: "#3B82F6", cursor: "pointer" }}
-        />
-      </Stack>
-    </Box>
-  );
-};
-
-export default MenuItemEntryOneSection;
