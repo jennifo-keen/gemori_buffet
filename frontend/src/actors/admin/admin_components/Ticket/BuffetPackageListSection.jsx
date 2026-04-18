@@ -68,7 +68,7 @@ export const BuffetPackageListSection = ({ tickets, setTickets, loading }) => {
                 <Table>
                     <TableHead>
                         <TableRow sx={{ backgroundColor: "#fff7f3" }}>
-                            {["MÃ VÉ", "TÊN GÓI", "GIÁ (VND)", "MÔ TẢ", "TRẠNG THÁI", "HÀNH ĐỘNG"].map((label) => (
+                            {["MÃ VÉ", "ẢNH", "TÊN GÓI", "GIÁ (VND)", "MÔ TẢ", "TRẠNG THÁI", "HÀNH ĐỘNG"].map((label) => (
                                 <TableCell key={label} align="center" sx={{ fontWeight: 700, fontSize: "12px", color: "#6c0d0a", opacity: 0.6, fontFamily: '"Be Vietnam Pro", sans-serif' }}>
                                     {label}
                                 </TableCell>
@@ -86,6 +86,20 @@ export const BuffetPackageListSection = ({ tickets, setTickets, loading }) => {
                             tickets.map((pkg, index) => (
                                 <TableRow key={pkg.id} sx={{ borderBottom: "1px solid rgba(177, 65, 53, 0.1)", "&:hover": { bgcolor: "rgba(0,0,0,0.01)" } }}>
                                     <TableCell align="center" sx={{ fontWeight: 700 }}>{pkg.code}</TableCell>
+                                    <TableCell align="center">
+                                        <Box
+                                            component="img"
+                                            src={pkg.image_url || "https://via.placeholder.com/60"} // Link dự phòng nếu ko có ảnh
+                                            alt={pkg.name}
+                                            sx={{
+                                                width: 60,
+                                                height: 45,
+                                                borderRadius: "6px",
+                                                objectFit: "cover",
+                                                border: "1px solid #eee"
+                                            }}
+                                        />
+                                    </TableCell>
                                     <TableCell align="left" sx={{ fontWeight: 700 }}>{pkg.name}</TableCell>
                                     <TableCell align="center" sx={{ color: "#6c0d0a", fontWeight: 700 }}>
                                         {new Intl.NumberFormat("vi-VN").format(pkg.price)}

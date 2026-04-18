@@ -4,7 +4,7 @@ import AdminLayout from "../actors/admin/AdminLayout"; // Đường dẫn tới 
 import AdminHome from "../actors/admin/admin_pages/AdminHome";
 import ContentAdAi from "../actors/admin/admin_pages/ContentAdAi";
 import BuffetTicketPage from "../actors/admin/admin_pages/BuffetTicketPage";
-
+import MenuPage from "../actors/admin/admin_pages/MenuPage";
 
 const AdminRouter =
 {
@@ -21,7 +21,7 @@ const AdminRouter =
         },
         {
             path: "quan-ly-menu",
-            element: <div>Trang Quản lý Menu</div>,
+            element: <MenuPage />,
         },
         {
             path: "quan-ly-ve", // Path này phải khớp với 'id' ông đặt trong Sidebar
