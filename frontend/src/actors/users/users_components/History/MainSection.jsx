@@ -12,14 +12,16 @@ export const MainSection = () => {
         sx={{
           display: "flex",
           flexDirection: "column",
-          gap: 4,
-          p: 4,
+          gap: { xs: 3, md: 4 },
+          p: { xs: 2, sm: 3, md: 4 },
           bgcolor: "background.paper",
           borderRadius: 3,
           border: "1px solid",
           borderColor: "primary.light",
           width: "100%",
+          minWidth: 0,
           boxSizing: "border-box",
+          overflow: "hidden",
         }}
       >
         <HeaderSection />
@@ -28,3 +30,5 @@ export const MainSection = () => {
     </ThemeProvider>
   );
 };
+
+export default MainSection;
