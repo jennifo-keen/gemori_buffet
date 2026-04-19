@@ -82,36 +82,39 @@ export const MainLogin = () => {
 
   return (
     <Box
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      px={10}
-      py={12}
-      sx={{ minHeight: "100vh", backgroundColor: "#f8fafc" }}
+      sx={{
+        minHeight: "100vh",
+        backgroundColor: "#f8fafc",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        px: { xs: 2, sm: 3, md: 5, lg: 8 },
+        py: { xs: 4, sm: 5, md: 8 },
+      }}
     >
       <Box
         sx={{
           display: "flex",
           flexDirection: "column",
-          gap: 3,
-          p: "40px",
+          gap: { xs: 2.5, sm: 3 },
+          p: { xs: 2.5, sm: 3.5, md: 5 },
           backgroundColor: "#ffffff",
-          borderRadius: "16px",
+          borderRadius: { xs: "12px", sm: "16px" },
           border: "1px solid rgba(180, 70, 60, 0.05)",
           boxShadow: "0px 1px 2px #0000000d",
           width: "100%",
           maxWidth: "480px",
         }}
       >
-        <Stack spacing={2.5} alignItems="center">
+        <Stack spacing={{ xs: 2, sm: 2.5 }} alignItems="center">
           <Box display="flex" justifyContent="center">
             <Box
               component="img"
               src={logo}
               alt="Logo"
               sx={{
-                width: 130,
-                height: "49.01px",
+                width: { xs: 105, sm: 118, md: 130 },
+                height: "auto",
                 objectFit: "contain",
                 filter:
                   "brightness(0) saturate(100%) invert(32%) sepia(35%) saturate(720%) hue-rotate(335deg)",
@@ -120,13 +123,11 @@ export const MainLogin = () => {
           </Box>
 
           <Typography
-            variant="h4"
             sx={{
               fontFamily: '"Be Vietnam Pro", Helvetica, sans-serif',
-              fontSize: "32px",
+              fontSize: { xs: "26px", sm: "30px", md: "32px" },
               fontWeight: 700,
-              lineHeight: "40px",
-              letterSpacing: "0px",
+              lineHeight: { xs: "34px", sm: "38px", md: "40px" },
               color: "rgba(15, 23, 42, 1)",
               textAlign: "center",
             }}
@@ -137,22 +138,20 @@ export const MainLogin = () => {
           <Typography
             sx={{
               fontFamily: '"Be Vietnam Pro", Helvetica, sans-serif',
-              fontSize: "14px",
+              fontSize: { xs: "14px", sm: "14px" },
               fontWeight: 400,
-              lineHeight: "22px",
-              letterSpacing: "0px",
+              lineHeight: { xs: "24px", sm: "22px" },
               color: "rgba(100, 116, 139, 1)",
               textAlign: "center",
-              px: 1,
+              px: { xs: 0, sm: 1 },
+              maxWidth: "360px",
             }}
           >
-            Đăng nhập để nhận ưu đãi buffet đặc quyền dành
-            <br />
-            riêng cho thành viên
+            Đăng nhập để nhận ưu đãi buffet đặc quyền dành riêng cho thành viên
           </Typography>
         </Stack>
 
-        <Stack spacing={2.5}>
+        <Stack spacing={{ xs: 2, sm: 2.5 }}>
           {error && <Alert severity="error">{error}</Alert>}
 
           <FormControl fullWidth>
@@ -169,6 +168,7 @@ export const MainLogin = () => {
             >
               Email
             </FormLabel>
+
             <OutlinedInput
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -187,7 +187,7 @@ export const MainLogin = () => {
               }
               sx={{
                 fontFamily: '"Be Vietnam Pro", Helvetica, sans-serif',
-                fontSize: "16px",
+                fontSize: { xs: "15px", sm: "16px" },
                 fontWeight: 500,
                 lineHeight: "24px",
                 color: "rgba(15, 23, 42, 1)",
@@ -207,9 +207,9 @@ export const MainLogin = () => {
                   opacity: 1,
                 },
                 "& .MuiInputAdornment-root": {
-                  mr: 1.5,
+                  mr: { xs: 1, sm: 1.5 },
                 },
-                px: 2,
+                px: { xs: 1.5, sm: 2 },
                 py: 0,
               }}
               inputProps={{
@@ -226,9 +226,10 @@ export const MainLogin = () => {
 
           <FormControl fullWidth>
             <Stack
-              direction="row"
+              direction={{ xs: "column", sm: "row" }}
               justifyContent="space-between"
-              alignItems="center"
+              alignItems={{ xs: "flex-start", sm: "center" }}
+              spacing={{ xs: 0.5, sm: 0 }}
               sx={{ mb: "8px", px: "4px" }}
             >
               <FormLabel
@@ -243,6 +244,7 @@ export const MainLogin = () => {
               >
                 Mật khẩu
               </FormLabel>
+
               <Link
                 href="#"
                 underline="none"
@@ -287,16 +289,14 @@ export const MainLogin = () => {
                     {showPassword ? (
                       <VisibilityOutlinedIcon sx={{ width: 22, height: 22 }} />
                     ) : (
-                      <VisibilityOffOutlinedIcon
-                        sx={{ width: 22, height: 22 }}
-                      />
+                      <VisibilityOffOutlinedIcon sx={{ width: 22, height: 22 }} />
                     )}
                   </IconButton>
                 </InputAdornment>
               }
               sx={{
                 fontFamily: '"Be Vietnam Pro", Helvetica, sans-serif',
-                fontSize: "16px",
+                fontSize: { xs: "15px", sm: "16px" },
                 fontWeight: 500,
                 lineHeight: "24px",
                 color: "rgba(15, 23, 42, 1)",
@@ -316,9 +316,9 @@ export const MainLogin = () => {
                   opacity: 1,
                 },
                 "& .MuiInputAdornment-root": {
-                  mr: 1.5,
+                  mr: { xs: 1, sm: 1.5 },
                 },
-                px: 2,
+                px: { xs: 1.5, sm: 2 },
                 py: 0,
               }}
               inputProps={{
@@ -343,12 +343,11 @@ export const MainLogin = () => {
               backgroundColor: "rgba(180, 70, 60, 1)",
               color: "#ffffff",
               fontFamily: '"Be Vietnam Pro", Helvetica, sans-serif',
-              fontSize: "16px",
+              fontSize: { xs: "15px", sm: "16px" },
               fontWeight: 700,
               lineHeight: "24px",
-              letterSpacing: "0px",
               borderRadius: "12px",
-              py: 2,
+              py: { xs: 1.6, sm: 2 },
               textTransform: "none",
               "&:hover": {
                 backgroundColor: "rgba(160, 50, 40, 1)",
@@ -363,13 +362,18 @@ export const MainLogin = () => {
           </Button>
         </Stack>
 
-        <Box sx={{ borderTop: "1px solid rgba(245, 245, 245, 1)", pt: 3 }}>
+        <Box
+          sx={{
+            borderTop: "1px solid rgba(245, 245, 245, 1)",
+            pt: { xs: 2.5, sm: 3 },
+          }}
+        >
           <Stack
-            direction="row"
+            direction={{ xs: "column", sm: "row" }}
             alignItems="center"
             justifyContent="center"
-            spacing={0.5}
-            sx={{ px: 1 }}
+            spacing={{ xs: 0.5, sm: 0.75 }}
+            sx={{ px: 1, textAlign: "center" }}
           >
             <Typography
               sx={{
@@ -378,11 +382,11 @@ export const MainLogin = () => {
                 fontWeight: 400,
                 lineHeight: "22px",
                 color: "rgba(71, 85, 105, 1)",
-                whiteSpace: "nowrap",
               }}
             >
               Chưa có tài khoản thành viên?
             </Typography>
+
             <Link
               href="/register"
               underline="none"
@@ -390,9 +394,8 @@ export const MainLogin = () => {
                 fontFamily: '"Be Vietnam Pro", Helvetica, sans-serif',
                 fontSize: "14px",
                 fontWeight: 700,
-                lineHeight: "16px",
+                lineHeight: "20px",
                 color: "rgba(180, 70, 60, 1)",
-                whiteSpace: "nowrap",
                 cursor: "pointer",
               }}
             >

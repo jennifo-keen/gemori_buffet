@@ -47,48 +47,63 @@ export const ProfileSidebar = () => {
   const location = useLocation();
 
   const user = JSON.parse(localStorage.getItem("user")) || {};
-  const userName = user.full_name || user.name || "Người dùng";
+  const userName = user.full_name || user.fullName || user.name || "Người dùng";
 
   return (
     <Box
       component="aside"
       sx={{
-        width: 256,
+        width: { xs: "100%", md: 256 },
+        minWidth: 0,
         flexShrink: 0,
         alignSelf: "stretch",
       }}
     >
       <Box
         sx={{
-          width: 256,
+          width: "100%",
           bgcolor: "background.paper",
-          borderRadius: "12px",
+          borderRadius: { xs: "10px", sm: "12px" },
           border: "1px solid rgba(177, 65, 53, 0.1)",
-          p: 3,
+          p: { xs: 2, sm: 3 },
           boxSizing: "border-box",
         }}
       >
-        <Stack direction="row" alignItems="center" spacing={2} mb={2}>
-          <Avatar alt={userName} sx={{ width: 44, height: 44 }} />
-          <Stack spacing={0}>
+        <Stack
+          direction="row"
+          alignItems="center"
+          spacing={2}
+          mb={2}
+          sx={{ minWidth: 0 }}
+        >
+          <Avatar
+            alt={userName}
+            sx={{
+              width: { xs: 40, sm: 44 },
+              height: { xs: 40, sm: 44 },
+              flexShrink: 0,
+            }}
+          />
+
+          <Stack spacing={0} sx={{ minWidth: 0 }}>
             <Typography
-              variant="captionCaption2Medium"
               sx={{
                 color: "rgba(15, 23, 42, 1)",
-                fontSize: "9px",
+                fontSize: "11px",
                 fontWeight: 500,
                 lineHeight: "17px",
               }}
             >
               Xin chào
             </Typography>
+
             <Typography
-              variant="labelLabel1Bold"
               sx={{
                 color: "rgba(15, 23, 42, 1)",
-                fontSize: "16px",
+                fontSize: { xs: "15px", sm: "16px" },
                 fontWeight: 700,
                 lineHeight: "24px",
+                wordBreak: "break-word",
               }}
             >
               {userName}
@@ -98,7 +113,11 @@ export const ProfileSidebar = () => {
 
         <List
           disablePadding
-          sx={{ display: "flex", flexDirection: "column", gap: "4px" }}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+          }}
         >
           {menuItems.map((item) => {
             const isActive =
@@ -111,23 +130,23 @@ export const ProfileSidebar = () => {
                 key={item.id}
                 onClick={() => navigate(item.path)}
                 sx={{
-                  px: 2,
-                  py: 1.5,
+                  px: { xs: 1.5, sm: 2 },
+                  py: { xs: 1.25, sm: 1.5 },
                   borderRadius: "8px",
                   bgcolor: isActive ? "#b4463c" : "background.paper",
                   cursor: "pointer",
                   gap: 1.5,
                   transition: "0.2s",
+                  minHeight: { xs: 48, sm: 50 },
                   "&:hover": {
-                    bgcolor: isActive
-                      ? "#b4463c"
-                      : "rgba(177, 65, 53, 0.05)",
+                    bgcolor: isActive ? "#b4463c" : "rgba(177, 65, 53, 0.05)",
                   },
                 }}
               >
                 <ListItemIcon
                   sx={{
                     minWidth: "unset",
+                    flexShrink: 0,
                     color: isActive ? "#ffffff" : "rgba(71, 85, 105, 1)",
                   }}
                 >
@@ -139,15 +158,16 @@ export const ProfileSidebar = () => {
                   primaryTypographyProps={{
                     sx: {
                       fontFamily: '"Be Vietnam Pro", Helvetica, sans-serif',
-                      fontSize: "14px",
+                      fontSize: { xs: "13px", sm: "14px" },
                       fontWeight: 500,
                       lineHeight: "22px",
                       letterSpacing: "0px",
                       color: isActive ? "#ffffff" : "rgba(71, 85, 105, 1)",
-                      whiteSpace: "nowrap",
+                      whiteSpace: { xs: "normal", sm: "nowrap" },
+                      wordBreak: "break-word",
                     },
                   }}
-                  sx={{ m: 0 }}
+                  sx={{ m: 0, minWidth: 0 }}
                 />
               </ListItem>
             );

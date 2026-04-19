@@ -9,7 +9,6 @@ import {
   Box,
   Button,
   CircularProgress,
-  Grid,
   Paper,
   Stack,
   TextField,
@@ -18,7 +17,6 @@ import {
 import axios from "axios";
 
 const BORDER_COLOR = "rgba(177, 65, 53, 0.1)";
-
 const API_BASE_URL = "http://localhost:3000/api";
 
 const formatDateForInput = (dateString) => {
@@ -32,8 +30,31 @@ const formatDateForDisplay = (dateString) => {
   if (!dateString) return "Chưa cập nhật";
   const date = new Date(dateString);
   if (Number.isNaN(date.getTime())) return "Chưa cập nhật";
-
   return date.toLocaleDateString("vi-VN");
+};
+
+const fieldLabelSx = {
+  fontSize: 13,
+  color: "#9ca3af",
+  mb: 1,
+};
+
+const fieldValueSx = {
+  fontSize: { xs: 15, sm: 16 },
+  fontWeight: 600,
+  wordBreak: "break-word",
+};
+
+const fieldRowSx = {
+  display: "flex",
+  flexDirection: { xs: "column", sm: "row" },
+  justifyContent: "space-between",
+  gap: { xs: 2, sm: 3, md: 4 },
+};
+
+const fieldColSx = {
+  width: { xs: "100%", sm: "50%" },
+  minWidth: 0,
 };
 
 export const DetailsSection = () => {
@@ -137,13 +158,9 @@ export const DetailsSection = () => {
         address: formData.address,
       };
 
-      const response = await axios.put(
-        `${API_BASE_URL}/profile/me`,
-        payload,
-        {
-          headers: authHeaders,
-        }
-      );
+      const response = await axios.put(`${API_BASE_URL}/profile/me`, payload, {
+        headers: authHeaders,
+      });
 
       const updatedData = response.data?.data;
 
@@ -225,26 +242,39 @@ export const DetailsSection = () => {
       <Paper
         elevation={0}
         sx={{
-          p: 4,
-          borderRadius: "12px",
+          p: { xs: 2, sm: 3, md: 4 },
+          borderRadius: { xs: "10px", sm: "12px" },
           border: `1px solid ${BORDER_COLOR}`,
           display: "flex",
           flexDirection: "column",
-          gap: 4,
+          gap: { xs: 3, sm: 4 },
+          overflow: "hidden",
         }}
       >
         <Stack
-          direction="row"
+          direction={{ xs: "column", sm: "row" }}
           justifyContent="space-between"
-          alignItems="center"
-          flexWrap="wrap"
+          alignItems={{ xs: "stretch", sm: "center" }}
           gap={2}
         >
-          <Box>
-            <Typography variant="h5" sx={{ color: "#1f2937", fontWeight: 700 }}>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography
+              variant="h5"
+              sx={{
+                color: "#1f2937",
+                fontWeight: 700,
+                fontSize: { xs: 22, sm: 24 },
+              }}
+            >
               Hồ sơ cá nhân
             </Typography>
-            <Typography sx={{ color: "#6b7280", fontSize: 14 }}>
+            <Typography
+              sx={{
+                color: "#6b7280",
+                fontSize: { xs: 13, sm: 14 },
+                mt: 0.5,
+              }}
+            >
               Quản lý thông tin tài khoản và bảo mật của bạn
             </Typography>
           </Box>
@@ -254,18 +284,24 @@ export const DetailsSection = () => {
               variant="contained"
               startIcon={<EditOutlinedIcon sx={{ width: 18, height: 18 }} />}
               onClick={handleEdit}
+              fullWidth={false}
               sx={{
                 backgroundColor: "#b14135",
                 px: 2,
                 py: 1,
                 borderRadius: "8px",
+                width: { xs: "100%", sm: "auto" },
                 "&:hover": { backgroundColor: "#99372d" },
               }}
             >
               Chỉnh sửa
             </Button>
           ) : (
-            <Stack direction="row" spacing={1}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={1}
+              sx={{ width: { xs: "100%", sm: "auto" } }}
+            >
               <Button
                 variant="outlined"
                 startIcon={<CloseOutlinedIcon />}
@@ -273,6 +309,7 @@ export const DetailsSection = () => {
                 disabled={saving}
                 sx={{
                   borderRadius: "8px",
+                  width: { xs: "100%", sm: "auto" },
                 }}
               >
                 Hủy
@@ -286,6 +323,7 @@ export const DetailsSection = () => {
                 sx={{
                   backgroundColor: "#b14135",
                   borderRadius: "8px",
+                  width: { xs: "100%", sm: "auto" },
                   "&:hover": { backgroundColor: "#99372d" },
                 }}
               >
@@ -301,13 +339,9 @@ export const DetailsSection = () => {
         <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
           {/* BOX 1 */}
           <Box sx={{ pb: 2, borderBottom: `1px solid ${BORDER_COLOR}` }}>
-            <Box sx={{ display: "flex", justifyContent: "space-between", gap: 4 }}>
-              
-              {/* Họ và tên */}
-              <Box sx={{ width: "50%" }}>
-                <Typography sx={{ fontSize: 13, color: "#9ca3af", mb: 1 }}>
-                  Họ và tên
-                </Typography>
+            <Box sx={fieldRowSx}>
+              <Box sx={fieldColSx}>
+                <Typography sx={fieldLabelSx}>Họ và tên</Typography>
 
                 {isEditing ? (
                   <TextField
@@ -317,35 +351,27 @@ export const DetailsSection = () => {
                     onChange={handleChange("fullName")}
                   />
                 ) : (
-                  <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
+                  <Typography sx={fieldValueSx}>
                     {profile?.fullName || "Chưa cập nhật"}
                   </Typography>
                 )}
               </Box>
 
-              {/* Email */}
-              <Box sx={{ width: "50%" }}>
-                <Typography sx={{ fontSize: 13, color: "#9ca3af", mb: 1 }}>
-                  Email
-                </Typography>
+              <Box sx={fieldColSx}>
+                <Typography sx={fieldLabelSx}>Email</Typography>
 
-                <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
+                <Typography sx={fieldValueSx}>
                   {profile?.email || "Chưa cập nhật"}
                 </Typography>
               </Box>
-
             </Box>
           </Box>
 
           {/* BOX 2 */}
           <Box sx={{ pb: 2, borderBottom: `1px solid ${BORDER_COLOR}` }}>
-            <Box sx={{ display: "flex", justifyContent: "space-between", gap: 4 }}>
-              
-              {/* SĐT */}
-              <Box sx={{ width: "50%" }}>
-                <Typography sx={{ fontSize: 13, color: "#9ca3af", mb: 1 }}>
-                  Số điện thoại
-                </Typography>
+            <Box sx={fieldRowSx}>
+              <Box sx={fieldColSx}>
+                <Typography sx={fieldLabelSx}>Số điện thoại</Typography>
 
                 {isEditing ? (
                   <TextField
@@ -355,17 +381,14 @@ export const DetailsSection = () => {
                     onChange={handleChange("phone")}
                   />
                 ) : (
-                  <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
+                  <Typography sx={fieldValueSx}>
                     {profile?.phone || "Chưa cập nhật"}
                   </Typography>
                 )}
               </Box>
 
-              {/* Ngày sinh */}
-              <Box sx={{ width: "50%" }}>
-                <Typography sx={{ fontSize: 13, color: "#9ca3af", mb: 1 }}>
-                  Ngày sinh
-                </Typography>
+              <Box sx={fieldColSx}>
+                <Typography sx={fieldLabelSx}>Ngày sinh</Typography>
 
                 {isEditing ? (
                   <TextField
@@ -377,20 +400,17 @@ export const DetailsSection = () => {
                     InputLabelProps={{ shrink: true }}
                   />
                 ) : (
-                  <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
+                  <Typography sx={fieldValueSx}>
                     {formatDateForDisplay(profile?.dateOfBirth)}
                   </Typography>
                 )}
               </Box>
-
             </Box>
           </Box>
 
           {/* BOX 3 */}
           <Box sx={{ pb: 2, borderBottom: `1px solid ${BORDER_COLOR}` }}>
-            <Typography sx={{ fontSize: 13, color: "#9ca3af", mb: 1 }}>
-              Địa chỉ
-            </Typography>
+            <Typography sx={fieldLabelSx}>Địa chỉ</Typography>
 
             {isEditing ? (
               <TextField
@@ -402,7 +422,7 @@ export const DetailsSection = () => {
                 onChange={handleChange("address")}
               />
             ) : (
-              <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
+              <Typography sx={fieldValueSx}>
                 {profile?.address || "Chưa cập nhật"}
               </Typography>
             )}
@@ -411,7 +431,7 @@ export const DetailsSection = () => {
 
         <Box
           sx={{
-            pt: 4,
+            pt: { xs: 3, sm: 4 },
             borderTop: `1px solid ${BORDER_COLOR}`,
             display: "flex",
             flexDirection: "column",
@@ -431,6 +451,7 @@ export const DetailsSection = () => {
                   p: 2,
                   borderRadius: "12px",
                   border: `1px solid ${BORDER_COLOR}`,
+                  minWidth: 0,
                 }}
               >
                 <Box
@@ -448,9 +469,13 @@ export const DetailsSection = () => {
                   {card.icon}
                 </Box>
 
-                <Box>
+                <Box sx={{ minWidth: 0 }}>
                   <Typography
-                    sx={{ fontSize: 13, color: "#6b7280", fontWeight: 600 }}
+                    sx={{
+                      fontSize: 13,
+                      color: "#6b7280",
+                      fontWeight: 600,
+                    }}
                   >
                     {card.label}
                   </Typography>
@@ -465,21 +490,27 @@ export const DetailsSection = () => {
           <Box
             sx={{
               display: "flex",
-              alignItems: "center",
+              flexDirection: { xs: "column", sm: "row" },
+              alignItems: { xs: "stretch", sm: "center" },
               justifyContent: "space-between",
               gap: 2,
               p: 2,
               borderRadius: "12px",
               backgroundColor: "#fff7f5",
               border: `1px solid ${BORDER_COLOR}`,
-              flexWrap: "wrap",
             }}
           >
-            <Box>
+            <Box sx={{ minWidth: 0 }}>
               <Typography sx={{ fontWeight: 700, color: "#374151", mb: 0.5 }}>
                 Xóa tài khoản
               </Typography>
-              <Typography sx={{ fontSize: 13, color: "#6b7280" }}>
+              <Typography
+                sx={{
+                  fontSize: 13,
+                  color: "#6b7280",
+                  wordBreak: "break-word",
+                }}
+              >
                 Một khi bạn xóa tài khoản, mọi dữ liệu sẽ không thể khôi phục.
               </Typography>
             </Box>
@@ -492,6 +523,8 @@ export const DetailsSection = () => {
                 px: 3,
                 py: 1,
                 borderRadius: "8px",
+                width: { xs: "100%", sm: "auto" },
+                flexShrink: 0,
                 "&:hover": { backgroundColor: "#99372d" },
               }}
             >
