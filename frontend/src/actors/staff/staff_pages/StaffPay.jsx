@@ -11,6 +11,7 @@ import { Box, Stack, Typography, TextField, Button, Grid, CircularProgress } fro
 
 import { validateVoucher, checkout } from '../staff_api/paymentApi';
 import { getTableOrder }             from '../staff_api/tableApi';
+import { createZaloPayOrder } from '../staff_api/paymentApi';
 
 import useAuthStaff from '../staff_hook/useAuthStaff';
 import useDialog    from '../staff_hook/useDialog'
@@ -75,6 +76,22 @@ const StaffPay = () => {
     }
   };
 
+  const handleZaloPay = async () => {
+    try {
+      setSubmitting(true);
+      const res = await createZaloPayOrder({ orderId, tableCode });
+      // Mở trang ZaloPay Sandbox — user thanh toán thử
+      window.location.href = res.data.order_url;
+    } catch (err) {
+      showError({
+        title: 'Lỗi tạo đơn ZaloPay',
+        subtitle: err.response?.data?.message || 'Vui lòng thử lại',
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+  
   // Thanh toán
   const handleConfirm = async () => {
     if (!selectedMethod) {
@@ -275,8 +292,8 @@ const StaffPay = () => {
               selectedMethod={selectedMethod}
               onSelect={setSelectedMethod}
               onConfirm={handleConfirm}
-              loading={submitting}/>
-            
+              onZaloPay={handleZaloPay}  
+              loading={submitting}/>    
           </Box>
         </Grid>
       </Grid>

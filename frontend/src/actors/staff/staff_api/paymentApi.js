@@ -11,3 +11,6 @@ export const getCustomerByPhone = (phone) =>
 // Thanh toán
 export const checkout = (data) =>
   axiosInstance.post('/payment/checkout', data);
+
+export const createZaloPayOrder = (data) =>
+  axiosInstance.post('/payment/zalopay/create', data);
