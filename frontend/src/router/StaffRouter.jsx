@@ -10,13 +10,13 @@ import StaffLogin from '../actors/staff/staff_pages/StaffLogin.jsx';
 import StaffOrders from '../actors/staff/staff_pages/StaffOrders.jsx';
 import StaffCheckOut from '../actors/staff/staff_pages/StaffCheckOut.jsx';
 import StaffPay from '../actors/staff/staff_pages/StaffPay.jsx';
+import StaffZaloPayResult from '../actors/staff/staff_pages/StaffZaloPayResult';
 
-
+// staffRouter.jsx
 const staffRouter = {
   path: "/staff",
   element: <AuthStaffProvider />, 
   children: [
-
     {
       path: "login",
       element: <StaffLogin />,
@@ -37,12 +37,12 @@ const staffRouter = {
           path: "checkout", 
           children: [
             { index: true, element: <StaffCheckOut /> },
-            { path: "pay", element: <StaffPay /> } 
+            { path: "pay", element: <StaffPay /> },
           ]
         },
+        { path: "zalopay-result", element: <StaffZaloPayResult /> },
       ],
     },
-
   ],
 };
 
