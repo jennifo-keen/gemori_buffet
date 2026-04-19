@@ -83,16 +83,10 @@ export const FloorStatusGridSection = ({ tables, onChangeStatus }) => {
 
         // ✅ bàn có khách → vào checkout
         if (table.status === "ordering") {
-
-            // 🔥 SET BYPASS TRƯỚC
-            localStorage.setItem("bypass_staff", "true");
-
-            navigate(
-                `/staff/checkout?tableId=${table.id}&tableCode=${table.table_code}`
-            );
+            // Không cần set bypass nữa vì mình sẽ dùng token admin đã lưu khi login
+            navigate(`/staff/checkout?tableId=${table.id}&tableCode=${table.table_code}`);
             return;
         }
-
         // ✅ bảo trì → trống
         if (table.status === "closed") {
             onChangeStatus(table.id, "empty");

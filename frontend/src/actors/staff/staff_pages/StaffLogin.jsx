@@ -1,25 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-
-import  useAuthStaff  from '../staff_hook/useAuthStaff';
-
+import useAuthStaff from '../staff_hook/useAuthStaff';
 import Logo1 from "../../../assets/img/Logo 1.png";
 
-import LockOutlinedIcon          from "@mui/icons-material/LockOutlined";
-import PersonOutlineIcon         from "@mui/icons-material/PersonOutline";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
-import VisibilityOutlinedIcon    from "@mui/icons-material/VisibilityOutlined";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import {
-  Box, 
-  Button, 
-  IconButton, 
+  Box,
+  Button,
+  IconButton,
   InputAdornment,
-  Link, 
-  Paper, 
-  Stack, 
-  TextField, 
-  Typography, 
-  Alert, 
+  Link,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
+  Alert,
   CircularProgress,
 } from "@mui/material";
 
@@ -49,10 +47,30 @@ const StaffLogin = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // 🔥 LOGIC "LỌT KHE": Tự động vào thẳng nếu đã có token Admin
+  useEffect(() => {
+    const adminToken = localStorage.getItem('token');
+    const adminUser = localStorage.getItem('user');
+
+    if (adminToken && adminUser) {
+      // Lấy các tham số tableId, tableCode từ URL (nếu có)
+      const params = new URLSearchParams(location.search);
+      const tableId = params.get('tableId');
+      const tableCode = params.get('tableCode');
+
+      if (tableId && tableCode) {
+        // Nếu đi từ trang sơ đồ bàn sang -> Vào thẳng Checkout
+        navigate(`/staff/checkout?tableId=${tableId}&tableCode=${tableCode}`, { replace: true });
+      } else {
+        // Nếu vào trang login bình thường mà đã có token admin -> Vào trang chính Staff
+        navigate('/staff', { replace: true });
+      }
+    }
+  }, [navigate, location]);
+
   const handleTogglePassword = () => setShowPassword((prev) => !prev);
 
   const handleLogin = async () => {
-    // Validate
     if (!username.trim() || !password.trim()) {
       setError('Vui lòng nhập đầy đủ tài khoản và mật khẩu');
       return;
@@ -61,10 +79,8 @@ const StaffLogin = () => {
     try {
       setLoading(true);
       setError('');
+      await loginStaff(username, password);
 
-      const admin = await loginStaff(username, password);
-
-      // Redirect theo URL hiện tại - nếu từ /kitchen/login thì vô /kitchen, /staff/login thì vô /staff
       if (location.pathname.includes('/kitchen')) {
         navigate('/kitchen');
       } else {
@@ -77,14 +93,12 @@ const StaffLogin = () => {
     }
   };
 
-  // Cho phép nhấn Enter để đăng nhập
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') handleLogin();
   };
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", bgcolor: "background.default" }}>
-
       {/* Header */}
       <Box component="header" sx={{ bgcolor: "white", boxShadow: "0px 1px 4px rgba(0,0,0,0.08)", px: 4, py: 2 }}>
         <GemoriLogo />
@@ -102,28 +116,23 @@ const StaffLogin = () => {
             width: "100%", maxWidth: 440, bgcolor: "white",
           }}
         >
-          {/* Logo + heading */}
           <Stack alignItems="center" spacing={2.5}>
             <GemoriLogo />
             <Typography variant="h5" component="h1" sx={{ fontWeight: 700, color: "#0f172a", textAlign: "center", fontSize: "1.375rem" }}>
               Chào mừng trở lại
             </Typography>
             <Typography variant="body2" sx={{ color: "#64748b", textAlign: "center", lineHeight: 1.6, px: 1 }}>
-              Đăng nhập để truy cập trang giành cho nhân viên.
+              Đăng nhập để truy cập trang dành cho nhân viên.
             </Typography>
           </Stack>
 
-          {/* Hiện lỗi */}
           {error && (
             <Alert severity="error" sx={{ borderRadius: 2 }}>
               {error}
             </Alert>
           )}
 
-          {/* Form */}
           <Stack spacing={2.5}>
-
-            {/* Username */}
             <Stack spacing={0.875}>
               <Typography component="label" htmlFor="username-input" sx={{ fontWeight: 600, fontSize: "0.875rem", color: "#334155" }}>
                 Tài khoản
@@ -150,18 +159,16 @@ const StaffLogin = () => {
                     "&:hover fieldset": { borderColor: "#cbd5e1" },
                   },
                   "& .MuiInputBase-input": { color: "#0f172a", fontSize: "0.9375rem", py: 1.75 },
-                  "& .MuiInputBase-input::placeholder": { color: "#94a3b8", opacity: 1 },
                 }}
               />
             </Stack>
 
-            {/* Password */}
             <Stack spacing={1}>
               <Stack direction="row" justifyContent="space-between" alignItems="center" px={0.125}>
                 <Typography component="label" htmlFor="password-input" sx={{ fontWeight: 600, fontSize: "0.875rem", color: "#334155" }}>
                   Mật khẩu
                 </Typography>
-                <Link href="#" underline="none" sx={{ fontWeight: 700, fontSize: "0.75rem", color: "#b4463c", cursor: "pointer", "&:hover": { textDecoration: "underline" } }}>
+                <Link href="#" underline="none" sx={{ fontWeight: 700, fontSize: "0.75rem", color: "#b4463c", cursor: "pointer" }}>
                   Quên mật khẩu?
                 </Link>
               </Stack>
@@ -182,11 +189,8 @@ const StaffLogin = () => {
                   ),
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={handleTogglePassword} edge="end" size="small" sx={{ color: "#94a3b8" }}>
-                        {showPassword
-                          ? <VisibilityOutlinedIcon sx={{ fontSize: 22 }} />
-                          : <VisibilityOffOutlinedIcon sx={{ fontSize: 22 }} />
-                        }
+                      <IconButton onClick={handleTogglePassword} edge="end" size="small">
+                        {showPassword ? <VisibilityOutlinedIcon /> : <VisibilityOffOutlinedIcon />}
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -198,12 +202,10 @@ const StaffLogin = () => {
                     "&:hover fieldset": { borderColor: "#cbd5e1" },
                   },
                   "& .MuiInputBase-input": { color: "#0f172a", fontSize: "0.9375rem", py: 1.75 },
-                  "& .MuiInputBase-input::placeholder": { color: "#94a3b8", opacity: 1 },
                 }}
               />
             </Stack>
 
-            {/* Nút đăng nhập */}
             <Button
               variant="contained"
               fullWidth
@@ -212,33 +214,21 @@ const StaffLogin = () => {
               sx={{
                 bgcolor: "#b4463c", color: "white", fontWeight: 700,
                 fontSize: "1rem", py: 1.75, borderRadius: 3, textTransform: "none",
-                boxShadow: "0px 10px 15px -3px rgba(177,65,53,0.2), 0px 4px 6px -4px rgba(177,65,53,0.2)",
                 "&:hover": { bgcolor: "#9e3b32" },
-                "&:disabled": { bgcolor: "#e2a09a", color: "white" },
               }}
             >
               {loading ? <CircularProgress size={24} color="inherit" /> : 'Đăng nhập ngay'}
             </Button>
-
           </Stack>
         </Paper>
       </Box>
 
       {/* Footer */}
       <Box component="footer" sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1, p: 3 }}>
-        <Typography variant="caption" sx={{ color: "#94a3b8", textAlign: "center", fontSize: "0.75rem" }}>
+        <Typography variant="caption" sx={{ color: "#94a3b8", fontSize: "0.75rem" }}>
           © 2026 Gemori Buffet. All rights reserved.
         </Typography>
-        <Stack direction="row" spacing={2} justifyContent="center">
-          <Link href="#" underline="none" sx={{ color: "#94a3b8", fontSize: "0.75rem", "&:hover": { color: "#64748b" } }}>
-            Điều khoản sử dụng
-          </Link>
-          <Link href="#" underline="none" sx={{ color: "#94a3b8", fontSize: "0.75rem", "&:hover": { color: "#64748b" } }}>
-            Chính sách bảo mật
-          </Link>
-        </Stack>
       </Box>
-
     </Box>
   );
 };

@@ -6,8 +6,17 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem('staff_token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  // 🟢 Lấy cả 2 loại token
+  const staffToken = localStorage.getItem('staff_token');
+  const adminToken = localStorage.getItem('token'); // Token từ login Admin (uyen.le)
+
+  // Ưu tiên staff_token, nếu không có thì dùng adminToken
+  const token = staffToken || adminToken;
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
   return config;
 });
 
@@ -15,9 +24,14 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      if (!window.location.pathname.includes('/staff/login')) {
+      // Chỉ đá về login nếu thực sự không có cả 2 loại token
+      const hasToken = localStorage.getItem('staff_token') || localStorage.getItem('token');
+
+      if (!window.location.pathname.includes('/staff/login') && !hasToken) {
         localStorage.removeItem('staff_token');
         localStorage.removeItem('staff_info');
+        // Lưu ý: Cân nhắc việc có nên xóa cả 'token' admin không, 
+        // nhưng tạm thời cứ để để tránh lỗi chéo.
         window.location.href = '/staff/login';
       }
     }

@@ -10,6 +10,8 @@ router.use('/admin/tickets', require('../actors/admin/ticket/ticket.route'));
 router.use('/admin/menus', require("../actors/admin/menu/menu.route"));
 router.use('/admin/tables', require("../actors/admin/table/table.route"));
 router.use('/admin/orders', require("../actors/admin/order/order.route"));
+router.use('/admin/login', require("../actors/admin/login/login.route"));
+
 
 router.use('/auth', require('../actors/admin/auth/auth.route'));
 router.use('/staff', require('../actors/staff/routes/staff.route'));
