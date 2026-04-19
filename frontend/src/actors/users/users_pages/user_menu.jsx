@@ -66,9 +66,7 @@ export const Main = () => {
         setLoadingList(true);
         setError("");
 
-        const response = await axios.get(
-          `${API_BASE_URL}/buffet-tickets`
-        );
+        const response = await axios.get(`${API_BASE_URL}/buffet-tickets`);
 
         const list = response?.data?.data || [];
         setBuffetList(list);
@@ -132,18 +130,34 @@ export const Main = () => {
 
   return (
     <Stack
-      direction="row"
-      spacing={6}
+      direction={{ xs: "column", md: "row" }}
+      spacing={{ xs: 3, sm: 4, md: 5, lg: 6 }}
       sx={{
-        px: "72px",
-        py: 4,
+        px: { xs: 2, sm: 3, md: 5, lg: 9 },
+        py: { xs: 3, sm: 4 },
         alignItems: "flex-start",
         justifyContent: "center",
+        width: "100%",
+        maxWidth: "1400px",
+        mx: "auto",
       }}
     >
       {/* Left Sidebar Navigation */}
-      <Box sx={{ width: 256, flexShrink: 0 }}>
-        <Box sx={{ borderTop: "1px solid", borderColor: "grey.100" }}>
+      <Box
+        sx={{
+          width: { xs: "100%", md: 256 },
+          flexShrink: 0,
+        }}
+      >
+        <Box
+          sx={{
+            borderTop: "1px solid",
+            borderColor: "grey.100",
+            borderRadius: { xs: 2, md: 0 },
+            overflow: "hidden",
+            bgcolor: "background.paper",
+          }}
+        >
           {menu.map((section) => (
             <Box
               key={section.id}
@@ -156,7 +170,7 @@ export const Main = () => {
                 justifyContent="space-between"
                 onClick={() => toggleSection(section.id)}
                 sx={{
-                  px: 1,
+                  px: { xs: 1.5, sm: 2 },
                   py: 2,
                   bgcolor: "background.paper",
                   cursor: "pointer",
@@ -176,12 +190,10 @@ export const Main = () => {
                   <Typography
                     sx={{
                       fontFamily: '"Be Vietnam Pro", Helvetica',
-                      fontSize: "16px",
+                      fontSize: { xs: "15px", sm: "16px" },
                       fontWeight: 700,
                       lineHeight: "24px",
-                      letterSpacing: "0px",
                       color: section.id === "buffet" ? "#f97316" : "#64748b",
-                      whiteSpace: "nowrap",
                     }}
                   >
                     {section.label}
@@ -203,7 +215,14 @@ export const Main = () => {
 
               {/* Section Items */}
               {expandedSections[section.id] && (
-                <Stack spacing={2} sx={{ pl: 2, pr: 0, py: 1 }}>
+                <Stack
+                  spacing={1.5}
+                  sx={{
+                    pl: { xs: 1.5, sm: 2 },
+                    pr: { xs: 1.5, sm: 1 },
+                    py: 1,
+                  }}
+                >
                   {loadingList && section.id === "buffet" ? (
                     <Stack
                       direction="row"
@@ -244,18 +263,19 @@ export const Main = () => {
                         sx={{
                           cursor: "pointer",
                           pb: index === section.items.length - 1 ? 1 : 0,
+                          gap: 1.5,
                         }}
                       >
                         <Typography
                           sx={{
                             fontFamily: '"Be Vietnam Pro", Helvetica',
-                            fontSize: "16px",
+                            fontSize: { xs: "15px", sm: "16px" },
                             fontWeight: 500,
                             lineHeight: "24px",
-                            letterSpacing: "0px",
                             color:
                               activeItem === item.id ? "#f97316" : "#4b5563",
-                            whiteSpace: "nowrap",
+                            wordBreak: "break-word",
+                            flex: 1,
                           }}
                         >
                           {item.label}
@@ -272,7 +292,12 @@ export const Main = () => {
                           />
                         ) : (
                           <AddIcon
-                            sx={{ width: 16, height: 16, color: "#4b5563" }}
+                            sx={{
+                              width: 16,
+                              height: 16,
+                              color: "#4b5563",
+                              flexShrink: 0,
+                            }}
                           />
                         )}
                       </Stack>
@@ -298,17 +323,23 @@ export const Main = () => {
 
       {/* Main Content Area */}
       <Stack
-        direction="row"
-        spacing={4}
-        sx={{ flex: 1, alignItems: "flex-start" }}
+        direction={{ xs: "column", lg: "row" }}
+        spacing={{ xs: 3, sm: 4 }}
+        sx={{ flex: 1, alignItems: "flex-start", width: "100%" }}
       >
         {/* Image with navigation arrows */}
-        <Box sx={{ flex: 1, position: "relative" }}>
+        <Box
+          sx={{
+            width: "100%",
+            flex: 1,
+            position: "relative",
+          }}
+        >
           <Box
             sx={{
               borderRadius: "16px",
               boxShadow: "0px 1px 2px #0000000d",
-              aspectRatio: "0.75",
+              aspectRatio: { xs: "1 / 1.15", sm: "1 / 1", md: "0.9", lg: "0.75" },
               backgroundImage: `url(${
                 buffetDetail?.image_url || FALLBACK_IMAGE
               })`,
@@ -323,43 +354,48 @@ export const Main = () => {
             onClick={handlePrev}
             sx={{
               position: "absolute",
-              left: 8,
+              left: { xs: 8, sm: 12 },
               top: "50%",
               transform: "translateY(-50%)",
               bgcolor: "rgba(255,255,255,0.8)",
               borderRadius: "50%",
-              p: 1,
+              p: { xs: 0.75, sm: 1 },
               "&:hover": { bgcolor: "rgba(255,255,255,0.9)" },
             }}
           >
-            <ChevronLeftIcon sx={{ width: 24, height: 24 }} />
+            <ChevronLeftIcon sx={{ width: { xs: 22, sm: 24 }, height: { xs: 22, sm: 24 } }} />
           </IconButton>
 
           <IconButton
             onClick={handleNext}
             sx={{
               position: "absolute",
-              right: 8,
+              right: { xs: 8, sm: 12 },
               top: "50%",
               transform: "translateY(-50%)",
               bgcolor: "rgba(255,255,255,0.8)",
               borderRadius: "50%",
-              p: 1,
+              p: { xs: 0.75, sm: 1 },
               "&:hover": { bgcolor: "rgba(255,255,255,0.9)" },
             }}
           >
-            <ChevronRightIcon sx={{ width: 24, height: 24 }} />
+            <ChevronRightIcon sx={{ width: { xs: 22, sm: 24 }, height: { xs: 22, sm: 24 } }} />
           </IconButton>
         </Box>
 
         {/* Product Info */}
-        <Box sx={{ width: 420, flexShrink: 0 }}>
+        <Box
+          sx={{
+            width: { xs: "100%", lg: 420 },
+            flexShrink: 0,
+          }}
+        >
           <Box
             component="header"
             sx={{
               borderBottom: "1px solid",
               borderColor: "grey.100",
-              pb: 1,
+              pb: 1.5,
             }}
           >
             {loadingDetail ? (
@@ -381,27 +417,30 @@ export const Main = () => {
                 <Typography
                   sx={{
                     fontFamily: '"Be Vietnam Pro", Helvetica',
-                    fontSize: "32px",
+                    fontSize: { xs: "24px", sm: "28px", md: "32px" },
                     fontWeight: 700,
-                    lineHeight: "40px",
-                    letterSpacing: "0px",
+                    lineHeight: { xs: "32px", sm: "36px", md: "40px" },
                     color: "#1f2937",
+                    wordBreak: "break-word",
                   }}
                 >
                   {buffetDetail?.name || "Chưa có dữ liệu"}
                 </Typography>
 
                 {/* Price Row */}
-                <Stack direction="row" alignItems="baseline" spacing={0.5}>
+                <Stack
+                  direction="row"
+                  alignItems="baseline"
+                  spacing={0.5}
+                  sx={{ flexWrap: "wrap", mt: 0.5 }}
+                >
                   <Typography
                     sx={{
                       fontFamily: '"Be Vietnam Pro", Helvetica',
-                      fontSize: "24px",
+                      fontSize: { xs: "20px", sm: "22px", md: "24px" },
                       fontWeight: 700,
                       lineHeight: "32px",
-                      letterSpacing: "0px",
                       color: "#1f2937",
-                      whiteSpace: "nowrap",
                     }}
                   >
                     {formatPrice(buffetDetail?.price)}
@@ -410,12 +449,10 @@ export const Main = () => {
                   <Typography
                     sx={{
                       fontFamily: '"Be Vietnam Pro", Helvetica',
-                      fontSize: "16px",
+                      fontSize: { xs: "14px", sm: "15px", md: "16px" },
                       fontWeight: 500,
                       lineHeight: "24px",
-                      letterSpacing: "0px",
                       color: "#6b7280",
-                      whiteSpace: "nowrap",
                     }}
                   >
                     /người
@@ -430,9 +467,7 @@ export const Main = () => {
                     fontSize: "12px",
                     fontWeight: 400,
                     lineHeight: "20px",
-                    letterSpacing: "0px",
                     color: "#9ca3af",
-                    whiteSpace: "nowrap",
                   }}
                 >
                   (Giá chưa bao gồm VAT)
@@ -443,11 +478,12 @@ export const Main = () => {
                   sx={{
                     mt: 2,
                     fontFamily: '"Be Vietnam Pro", Helvetica',
-                    fontSize: "16px",
+                    fontSize: { xs: "14px", sm: "15px", md: "16px" },
                     fontWeight: 400,
-                    lineHeight: "28px",
+                    lineHeight: { xs: "24px", sm: "26px", md: "28px" },
                     color: "#4b5563",
                     whiteSpace: "pre-line",
+                    wordBreak: "break-word",
                   }}
                 >
                   {buffetDetail?.description || "Chưa có mô tả"}
