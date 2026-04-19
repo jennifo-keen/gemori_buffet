@@ -1,4 +1,4 @@
-const { pool } = require("../../../config/db"); // Đường dẫn tới file kết nối db của bạn
+const { pool } = require("../../../config/db");
 
 const voucherService = {
     getAllVouchers: async () => {

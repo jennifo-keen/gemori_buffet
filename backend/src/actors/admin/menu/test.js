@@ -1,333 +1,272 @@
-import ExitToAppIcon from "@mui/icons-material/ExitToApp";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import {
-  Box,
-  Button,
-  Checkbox,
-  FormControlLabel,
-  IconButton,
-  InputAdornment,
-  OutlinedInput,
-  Stack,
-  Typography,
-} from "@mui/material";
-import { useState } from "react";
+import { Box, Paper, Stack, Typography } from "@mui/material";
 
-export const BackgroundBorder = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-  const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
+// Chart bar data: each entry has time label, forecast height, actual height
+const chartData = [
+  { time: "10:00", forecastH: 120, actualH: 114 },
+  { time: "12:00", forecastH: 255, actualH: 264 },
+  { time: "14:00", forecastH: 180, actualH: 174 },
+  { time: "18:00", forecastH: 276, actualH: 270 },
+  { time: "20:00", forecastH: 240, actualH: 246 },
+  { time: "22:00", forecastH: 135, actualH: 126 },
+];
 
-  const handleTogglePassword = () => setShowPassword((prev) => !prev);
+const Y_AXIS_LABELS = [100, 80, 60, 40, 20, 0];
+const BAR_MAX_HEIGHT = 300;
 
+export const MainComparison = () => {
   return (
-    <Box
+    <Paper
+      elevation={0}
       sx={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        maxWidth: "1200px",
-        width: "1200px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
         bgcolor: "background.paper",
-        borderRadius: "12px",
+        borderRadius: "16px",
         overflow: "hidden",
-        border: "1px solid",
-        borderColor: "divider",
+        border: "1px solid rgba(127, 29, 29, 0.05)",
       }}
     >
-      {/* Left panel - hero image with overlay */}
-      <Box
+      {/* Header */}
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
         sx={{
-          position: "relative",
-          backgroundImage: "url(/manwah-heritage-culinary-art.png)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          minHeight: "727px",
+          px: 3,
+          py: 3,
+          width: "100%",
+          borderBottom: "1px solid rgba(127, 29, 29, 0.05)",
+          boxSizing: "border-box",
         }}
       >
-        {/* Gradient overlay */}
-        <Stack
-          justifyContent="flex-end"
-          sx={{
-            width: "100%",
-            height: "100%",
-            p: 6,
-            background:
-              "linear-gradient(0deg, rgba(162,26,22,1) 0%, rgba(177,65,53,0.1) 100%)",
-          }}
-        >
-          {/* Heading */}
-          <Box pb={2}>
-            <Typography
-              variant="h4"
-              sx={{
-                color: "common.white",
-                fontFamily: '"Be Vietnam Pro", Helvetica',
-                fontSize: "32px",
-                fontWeight: 700,
-                lineHeight: "40px",
-                letterSpacing: "0px",
-              }}
-            >
-              Gìn giữ di sản,
-              <br />
-              Quản trị hiện đại.
-            </Typography>
-          </Box>
-          {/* Subtitle */}
+        {/* Title block */}
+        <Stack spacing={0}>
           <Typography
             sx={{
-              color: "rgba(255,255,255,0.8)",
               fontFamily: '"Be Vietnam Pro", Helvetica',
-              fontSize: "16px",
-              fontWeight: 400,
-              lineHeight: "24px",
-              letterSpacing: "0px",
-              maxWidth: "384px",
-            }}
-          >
-            Truy cập hệ thống quản trị chuyên sâu dành cho
-            <br />
-            đội ngũ vận hành Manwah Heritage Group.
-          </Typography>
-        </Stack>
-      </Box>
-      {/* Right panel - login form */}
-      <Stack
-        justifyContent="center"
-        alignItems="flex-start"
-        sx={{ p: 8, height: "727px" }}
-      >
-        {/* Brand + headings */}
-        <Box pb={5} width="100%">
-          {/* Brand name */}
-          <Box pb={3}>
-            <Typography
-              sx={{
-                fontFamily: '"Be Vietnam Pro", Helvetica',
-                fontSize: "24px",
-                fontWeight: 700,
-                lineHeight: "32px",
-                color: "primary.main",
-                letterSpacing: "0px",
-              }}
-            >
-              GEMORI
-            </Typography>
-          </Box>
-          {/* Login title */}
-          <Box pb={1}>
-            <Typography
-              sx={{
-                fontFamily: '"Epilogue-Bold", Helvetica',
-                fontWeight: 700,
-                fontSize: "24px",
-                letterSpacing: "-0.60px",
-                lineHeight: "32px",
-                color: "text.primary",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Đăng nhập hệ thống
-            </Typography>
-          </Box>
-          {/* Subtitle */}
-          <Typography
-            sx={{
-              fontFamily: '"Epilogue-Regular", Helvetica',
-              fontWeight: 400,
-              fontSize: "14px",
-              letterSpacing: "0px",
-              lineHeight: "20px",
-              color: "text.secondary",
+              fontWeight: 700,
+              fontSize: "18px",
+              lineHeight: "28px",
+              color: "rgba(15, 23, 42, 1)",
               whiteSpace: "nowrap",
             }}
           >
-            Vui lòng nhập thông tin để tiếp tục.
+            Báo cáo Dự báo vs Thực tế
           </Typography>
-        </Box>
-        {/* Form fields */}
-        <Box pb={2} width="100%">
-          <Stack spacing={3} width="100%">
-            {/* Username field */}
-            <Stack spacing={1} width="100%">
-              <Typography
-                sx={{
-                  fontFamily: '"Epilogue-Bold", Helvetica',
-                  fontWeight: 700,
-                  fontSize: "10px",
-                  letterSpacing: "1px",
-                  lineHeight: "15px",
-                  color: "custom.textBrown",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                TÀI KHOẢN
-              </Typography>
-              <OutlinedInput
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="admin_"
-                startAdornment={
-                  <InputAdornment position="start">
-                    <PersonOutlineIcon
-                      sx={{ color: "custom.textBrown", width: 16, height: 16 }}
-                    />
-                  </InputAdornment>
-                }
-                sx={{
-                  bgcolor: "rgba(177,65,53,0.05)",
-                  borderRadius: "8px",
-                  "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-                  "& input": {
-                    fontFamily: '"Be Vietnam Pro", Helvetica',
-                    fontWeight: 400,
-                    fontSize: "14px",
-                    lineHeight: "normal",
-                    color: "rgba(90,64,60,0.4)",
-                    py: "15px",
-                    px: 0,
-                  },
-                  "& .MuiInputAdornment-root": { mr: 1 },
-                }}
-              />
-            </Stack>
-            {/* Password field */}
-            <Stack spacing={1} width="100%">
-              <Typography
-                sx={{
-                  fontFamily: '"Epilogue-Bold", Helvetica',
-                  fontWeight: 700,
-                  fontSize: "10px",
-                  letterSpacing: "1px",
-                  lineHeight: "15px",
-                  color: "custom.textBrown",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                MẬT KHẨU
-              </Typography>
-              <OutlinedInput
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                startAdornment={
-                  <InputAdornment position="start">
-                    <LockOutlinedIcon
-                      sx={{ color: "custom.textBrown", width: 16, height: 16 }}
-                    />
-                  </InputAdornment>
-                }
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={handleTogglePassword}
-                      edge="end"
-                      size="small"
-                      sx={{ color: "custom.textBrown" }}
-                    >
-                      {showPassword ? (
-                        <VisibilityOffOutlinedIcon
-                          sx={{ width: 16, height: 16 }}
-                        />
-                      ) : (
-                        <VisibilityOutlinedIcon
-                          sx={{ width: 16, height: 16 }}
-                        />
-                      )}
-                    </IconButton>
-                  </InputAdornment>
-                }
-                sx={{
-                  bgcolor: "rgba(177,65,53,0.05)",
-                  borderRadius: "8px",
-                  "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-                  "& input": {
-                    fontFamily: '"Be Vietnam Pro", Helvetica',
-                    fontWeight: 500,
-                    fontSize: "14px",
-                    lineHeight: "22px",
-                    color: "rgba(90,64,60,0.4)",
-                    py: "15px",
-                    px: 0,
-                  },
-                  "& .MuiInputAdornment-root:first-of-type": { mr: 1 },
-                }}
-              />
-            </Stack>
-            {/* Remember me checkbox */}
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  size="small"
-                  sx={{
-                    p: 0,
-                    mr: 1,
-                    width: 16,
-                    height: 16,
-                    borderRadius: "2px",
-                    bgcolor: "rgba(138,0,0,0.05)",
-                    border: "1px solid rgba(138,0,0,0.1)",
-                    color: "transparent",
-                    "&.Mui-checked": {
-                      color: "primary.main",
-                    },
-                    "& .MuiSvgIcon-root": { fontSize: 14 },
-                  }}
-                />
-              }
-              label={
-                <Typography
-                  sx={{
-                    fontFamily: '"Epilogue-Regular", Helvetica',
-                    fontWeight: 400,
-                    fontSize: "14px",
-                    letterSpacing: "0px",
-                    lineHeight: "20px",
-                    color: "custom.textBrown",
-                  }}
-                >
-                  Ghi nhớ đăng nhập
-                </Typography>
-              }
-              sx={{ m: 0, alignItems: "center" }}
-            />
-            {/* Login button */}
-            <Button
-              variant="contained"
-              endIcon={<ExitToAppIcon sx={{ width: 16, height: 16 }} />}
-              fullWidth
+          <Typography
+            sx={{
+              fontFamily: '"Be Vietnam Pro", Helvetica',
+              fontWeight: 400,
+              fontSize: "12px",
+              lineHeight: "16px",
+              color: "rgba(100, 116, 139, 1)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Phân tích hiệu suất theo khung giờ - Hôm nay, 24 Tháng 10
+          </Typography>
+        </Stack>
+        {/* Legend badges */}
+        <Stack direction="row" spacing={1} alignItems="center">
+          {/* Thực tế badge */}
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={1}
+            sx={{
+              px: 1.5,
+              py: 0.75,
+              bgcolor: "rgba(127, 29, 29, 0.05)",
+              borderRadius: "999px",
+            }}
+          >
+            <Box
               sx={{
-                bgcolor: "#6c0d0a",
-                color: "common.white",
-                borderRadius: "8px",
-                py: 2,
-                px: 3,
-                boxShadow: "0px 1px 2px rgba(0,0,0,0.05)",
+                width: 12,
+                height: 12,
+                bgcolor: "rgba(127, 29, 29, 1)",
+                borderRadius: "50%",
+                flexShrink: 0,
+              }}
+            />
+            <Typography
+              sx={{
                 fontFamily: '"Be Vietnam Pro", Helvetica',
                 fontWeight: 700,
-                fontSize: "14px",
-                letterSpacing: "0px",
-                lineHeight: "16px",
-                textTransform: "uppercase",
-                "&:hover": {
-                  bgcolor: "primary.dark",
-                },
+                fontSize: "10px",
+                lineHeight: "15px",
+                color: "rgba(51, 65, 85, 1)",
+                whiteSpace: "nowrap",
               }}
             >
-              ĐĂNG NHẬP
-            </Button>
+              Thực tế
+            </Typography>
           </Stack>
-        </Box>
+          {/* AI Dự báo badge */}
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={1}
+            sx={{
+              px: 1.5,
+              py: 0.75,
+              bgcolor: "rgba(241, 245, 249, 1)",
+              borderRadius: "999px",
+              border: "1px dashed rgba(148, 163, 184, 1)",
+            }}
+          >
+            <Box
+              sx={{
+                width: 12,
+                height: 12,
+                bgcolor: "rgba(148, 163, 184, 1)",
+                borderRadius: "50%",
+                flexShrink: 0,
+              }}
+            />
+            <Typography
+              sx={{
+                fontFamily: '"Be Vietnam Pro", Helvetica',
+                fontWeight: 700,
+                fontSize: "10px",
+                lineHeight: "15px",
+                color: "rgba(51, 65, 85, 1)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              AI Dự báo
+            </Typography>
+          </Stack>
+        </Stack>
       </Stack>
-    </Box>
+      {/* Chart area */}
+      <Box
+        sx={{
+          position: "relative",
+          width: "100%",
+          height: 450,
+          background:
+            "linear-gradient(90deg, rgba(138,0,0,0.05) 3%, rgba(138,0,0,0) 3%), linear-gradient(180deg, rgba(138,0,0,0.05) 3%, rgba(138,0,0,0) 3%)",
+          display: "flex",
+          alignItems: "flex-end",
+          justifyContent: "space-between",
+          pl: "32px",
+          pr: "32px",
+          py: "32px",
+          boxSizing: "border-box",
+        }}
+      >
+        {/* Y-axis labels */}
+        <Stack
+          justifyContent="space-between"
+          sx={{
+            position: "absolute",
+            top: 32,
+            left: 24,
+            height: "calc(100% - 80px)",
+          }}
+        >
+          {Y_AXIS_LABELS.map((label) => (
+            <Typography
+              key={label}
+              sx={{
+                fontFamily: '"Be Vietnam Pro", Helvetica',
+                fontWeight: 700,
+                fontSize: "10px",
+                lineHeight: "15px",
+                color: "rgba(148, 163, 184, 1)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {label}
+            </Typography>
+          ))}
+        </Stack>
+        {/* SVG curve overlay */}
+        <Box
+          component="svg"
+          sx={{
+            position: "absolute",
+            top: 32,
+            left: 64,
+            width: "calc(100% - 96px)",
+            height: 290,
+            overflow: "visible",
+            pointerEvents: "none",
+          }}
+          viewBox="0 0 862 290"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M 0 175 C 60 155, 100 80, 143 68 C 186 56, 220 60, 286 68 C 352 76, 380 120, 430 130 C 480 140, 500 20, 572 10 C 620 3, 650 60, 715 68 C 760 74, 800 130, 862 175"
+            fill="none"
+            stroke="rgba(252, 165, 165, 1)"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          />
+        </Box>
+        {/* Bar groups */}
+        {chartData.map((item) => (
+          <Stack
+            key={item.time}
+            alignItems="center"
+            sx={{ flex: 1, position: "relative" }}
+          >
+            {/* Bar pair container */}
+            <Stack
+              direction="row"
+              alignItems="flex-end"
+              spacing={0.25}
+              sx={{
+                width: 60,
+                maxWidth: 60,
+                height: BAR_MAX_HEIGHT,
+              }}
+            >
+              {/* Forecast bar (dashed border, slate) */}
+              <Box
+                sx={{
+                  width: "50%",
+                  height: item.forecastH,
+                  bgcolor: "rgba(226, 232, 240, 1)",
+                  borderRadius: "2px 2px 0 0",
+                  border: "1px dashed rgba(148, 163, 184, 1)",
+                  borderBottom: "none",
+                  boxSizing: "border-box",
+                  flexShrink: 0,
+                }}
+              />
+              {/* Actual bar (solid dark red) */}
+              <Box
+                sx={{
+                  width: "50%",
+                  height: item.actualH,
+                  bgcolor: "rgba(127, 29, 29, 1)",
+                  borderRadius: "2px 2px 0 0",
+                  flexShrink: 0,
+                }}
+              />
+            </Stack>
+            {/* Time label */}
+            <Typography
+              sx={{
+                fontFamily: '"Be Vietnam Pro", Helvetica',
+                fontWeight: 700,
+                fontSize: "11px",
+                lineHeight: "16.5px",
+                color: "rgba(100, 116, 139, 1)",
+                whiteSpace: "nowrap",
+                pt: 2,
+              }}
+            >
+              {item.time}
+            </Typography>
+          </Stack>
+        ))}
+      </Box>
+    </Paper>
   );
 };
 
-export default BackgroundBorder;
+export default MainComparison;

@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Stack } from "@mui/material";
 import { DailyRevenueChartSection } from "../admin_components/DailyRevenue/DailyRevenueChartSection";
 import Ai from "../admin_components/Ai/Ai.index";
+import { AccuracyChart } from '../admin_components/Ai/Chart';
 
 const ContentAdAi = () => {
     return (
@@ -29,6 +30,7 @@ const ContentAdAi = () => {
 
                 {/* Phần AI và Dự báo món ăn phía dưới */}
                 <Ai />
+                <AccuracyChart />
             </Stack>
         </Box>
     );
