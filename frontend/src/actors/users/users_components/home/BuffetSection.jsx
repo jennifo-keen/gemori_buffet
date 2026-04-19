@@ -17,7 +17,10 @@ function BuffetSection() {
   useEffect(() => {
     const fetchBuffetPackages = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/home/buffet-tickets");
+        const API_URL = import.meta.env.VITE_SOCKET_URL;
+
+        const response = await fetch(`${API_URL}/home/buffet-tickets`);
+        
         const result = await response.json();
 
         if (result.success) {
