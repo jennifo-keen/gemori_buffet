@@ -8,7 +8,7 @@ const ordersController = require('../controllers/orders.controller');
 const paymentController = require('../controllers/payment.controller');
 const tablesController = require('../controllers/tables.controller');
 const vouchersController = require('../controllers/vouchers.controller');
-
+const zalopayController = require('../controllers/zalopay.controller');
 const router = Router();
 
 // ============ AUTH ROUTES (no auth required) ============
@@ -47,5 +47,10 @@ router.get('/tables/:tableCode/order', tablesController.getTableOrder);
 
 // ============ VOUCHERS ROUTES ============
 router.post('/vouchers/validate', requireRole('staff', 'admin'), vouchersController.validate);
+
+// ============ ZALOPAY ROUTES ============
+router.post('/payment/zalopay/create',          requireRole('staff', 'admin'), zalopayController.createOrder);
+router.post('/payment/zalopay/callback',        zalopayController.callback);           //  Không auth — ZaloPay gọi
+router.post('/payment/zalopay/verify-redirect', requireRole('staff', 'admin'), zalopayController.verifyRedirect); 
 
 module.exports = router;
