@@ -44,7 +44,7 @@ const navSections = [
     {
         sectionLabel: "MARKETING & KHO",
         items: [
-            { id: "voucher", path: "/admin/voucher", label: "Voucher & Khuyến mãi", icon: <LocalOfferOutlinedIcon /> },
+            { id: "voucher", path: "/admin/quan-ly-voucher", label: "Voucher & Khuyến mãi", icon: <LocalOfferOutlinedIcon /> },
             { id: "quan-ly-kho", path: "/admin/quan-ly-kho", label: "Quản lý Kho", icon: <WarehouseOutlinedIcon /> },
         ],
     },
