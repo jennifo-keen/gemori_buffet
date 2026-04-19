@@ -70,15 +70,15 @@ export const ChangePass = () => {
       [field]: value,
     }));
 
-    // clear lỗi khi user nhập lại
     setErrors((prev) => ({
       ...prev,
       [field]: "",
+      api: "",
     }));
   };
 
   const validate = () => {
-    let newErrors = {};
+    const newErrors = {};
 
     if (!form.currentPassword) {
       newErrors.currentPassword = "Vui lòng nhập mật khẩu hiện tại";
@@ -121,7 +121,6 @@ export const ChangePass = () => {
 
       setSuccess(res.data.message);
 
-      // reset form
       setForm({
         currentPassword: "",
         newPassword: "",
@@ -139,37 +138,55 @@ export const ChangePass = () => {
   return (
     <Box
       sx={{
+        flex: 1,
         width: "100%",
+        minWidth: 0,
         bgcolor: "#fff",
         border: "1px solid rgba(177, 65, 53, 0.12)",
         borderRadius: 3,
-        p: 4,
+        p: { xs: 2, sm: 3, md: 4 },
+        boxSizing: "border-box",
       }}
     >
-      {/* Header */}
-      <Box mb={4}>
-        <Typography sx={{ fontSize: 24, fontWeight: 700 }}>
+      <Box mb={{ xs: 3, md: 4 }} sx={{ minWidth: 0 }}>
+        <Typography
+          sx={{
+            fontSize: { xs: 22, sm: 24 },
+            fontWeight: 700,
+            wordBreak: "break-word",
+          }}
+        >
           Thay đổi mật khẩu
         </Typography>
-        <Typography sx={{ mt: 0.5, color: "#475569" }}>
+
+        <Typography
+          sx={{
+            mt: 0.5,
+            color: "#475569",
+            fontSize: { xs: 14, sm: 15 },
+            wordBreak: "break-word",
+          }}
+        >
           Thay đổi mật khẩu của bạn
         </Typography>
       </Box>
 
-      {/* Form */}
       <Box
         sx={{
           border: "1px solid rgba(177, 65, 53, 0.12)",
-          borderRadius: "20px",
-          p: 4,
+          borderRadius: { xs: "14px", sm: "20px" },
+          p: { xs: 2, sm: 3, md: 4 },
+          width: "100%",
+          minWidth: 0,
+          boxSizing: "border-box",
         }}
       >
-        <Stack spacing={3}>
+        <Stack spacing={{ xs: 2.5, sm: 3 }}>
           {passwordFields.map((field) => (
-            <Stack key={field.id} spacing={1}>
+            <Stack key={field.id} spacing={1} sx={{ minWidth: 0 }}>
               <FormLabel
                 sx={{
-                  fontSize: "14px",   // 👈 chỉnh ở đây
+                  fontSize: "14px",
                   fontWeight: 500,
                   color: "#674242",
                 }}
@@ -188,9 +205,7 @@ export const ChangePass = () => {
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => toggleVisibility(field.id)}
-                      >
+                      <IconButton onClick={() => toggleVisibility(field.id)}>
                         {showPassword[field.id] ? (
                           <VisibilityOffOutlined />
                         ) : (
@@ -204,33 +219,52 @@ export const ChangePass = () => {
                   "& .MuiOutlinedInput-root": {
                     backgroundColor: "rgba(177, 65, 53, 0.10)",
                     borderRadius: "8px",
-                    height: 56,
+                    minHeight: 56,
                   },
                 }}
               />
             </Stack>
           ))}
 
-          {/* Error API */}
-          {errors.api && (
-            <Typography color="error">{errors.api}</Typography>
-          )}
+          {errors.api && <Typography color="error">{errors.api}</Typography>}
 
-          {/* Success */}
-          {success && (
-            <Typography color="green">{success}</Typography>
-          )}
+          {success && <Typography color="green">{success}</Typography>}
 
-          {/* Security */}
-          <Box sx={{ p: 3, bgcolor: "#fff4f2", borderRadius: "16px" }}>
-            <Stack direction="row" spacing={1.5}>
-              <InfoOutlined sx={{ color: "#b4463c" }} />
-              <Box>
-                <Typography fontWeight={700} color="#b4463c">
+          <Box
+            sx={{
+              p: { xs: 2, sm: 3 },
+              bgcolor: "#fff4f2",
+              borderRadius: "16px",
+              minWidth: 0,
+            }}
+          >
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={{ xs: 1, sm: 1.5 }}
+              alignItems={{ xs: "flex-start", sm: "flex-start" }}
+              sx={{ minWidth: 0 }}
+            >
+              <InfoOutlined sx={{ color: "#b4463c", flexShrink: 0 }} />
+
+              <Box sx={{ minWidth: 0 }}>
+                <Typography
+                  fontWeight={700}
+                  color="#b4463c"
+                  sx={{ wordBreak: "break-word", mb: 0.5 }}
+                >
                   Yêu cầu bảo mật:
                 </Typography>
+
                 {securityRequirements.map((req, i) => (
-                  <Typography key={i} fontSize={14} color="#b4463c">
+                  <Typography
+                    key={i}
+                    sx={{
+                      fontSize: 14,
+                      color: "#b4463c",
+                      lineHeight: 1.7,
+                      wordBreak: "break-word",
+                    }}
+                  >
                     {req}
                   </Typography>
                 ))}
@@ -238,17 +272,26 @@ export const ChangePass = () => {
             </Stack>
           </Box>
 
-          {/* Button */}
-          <Box display="flex" justifyContent="center">
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
             <Button
               variant="contained"
               onClick={handleSubmit}
               disabled={loading}
               sx={{
-                width: 228,
-                height: 48,
+                width: { xs: "100%", sm: 228 },
+                minHeight: 48,
                 borderRadius: "8px",
                 bgcolor: "#b4463c",
+                textTransform: "none",
+                fontWeight: 700,
+                "&:hover": {
+                  bgcolor: "#9e3c33",
+                },
               }}
             >
               {loading ? "Đang xử lý..." : "Cập nhật mật khẩu"}
