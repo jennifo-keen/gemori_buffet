@@ -26,7 +26,6 @@ const promotions = [
     metaLabel: "Hạn dùng",
     metaValue: "31/12/2026",
     buttonText: "Nhận ưu đãi",
-    // Buffet food image - using a reliable placeholder food image
     imageUrl:
       "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=80",
   },
@@ -62,30 +61,38 @@ const promotions = [
 
 export const PromotionsCardsSection = () => {
   return (
-    <Stack
-      direction="row"
-      spacing={3}
-      sx={{ width: "100%", alignItems: "stretch" }}
+    <Box
+      sx={{
+        width: "100%",
+        display: "grid",
+        gridTemplateColumns: {
+          xs: "1fr",
+          sm: "1fr",
+          md: "repeat(2, 1fr)",
+          lg: "repeat(3, 1fr)",
+        },
+        gap: { xs: 2, sm: 3, md: 3 },
+        alignItems: "stretch",
+      }}
     >
       {promotions.map((promo, index) => (
         <Card
           key={index}
           sx={{
-            flex: 1,
             display: "flex",
             flexDirection: "column",
-            borderRadius: "12px",
+            height: "100%",
+            borderRadius: 3,
             overflow: "hidden",
             border: "1px solid #cbd5e1",
             boxShadow: "0px 1px 2px #0000000d",
             bgcolor: "background.paper",
           }}
         >
-          {/* Image section with gradient overlay */}
           <Box
             sx={{
               position: "relative",
-              height: 224,
+              height: { xs: 200, sm: 220, md: 224 },
               flexShrink: 0,
               backgroundImage: `linear-gradient(0deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%), url(${promo.imageUrl})`,
               backgroundSize: "cover",
@@ -94,12 +101,11 @@ export const PromotionsCardsSection = () => {
               flexDirection: "column",
               justifyContent: "space-between",
               alignItems: "flex-start",
-              pt: 1.75,
-              pb: 2,
-              px: 2,
+              pt: { xs: 1.5, sm: 1.75 },
+              pb: { xs: 1.5, sm: 2 },
+              px: { xs: 1.5, sm: 2 },
             }}
           >
-            {/* Badge */}
             <Chip
               label={promo.badge}
               size="small"
@@ -110,7 +116,7 @@ export const PromotionsCardsSection = () => {
                 fontSize: "10px",
                 fontWeight: 700,
                 lineHeight: "18px",
-                height: "18px",
+                height: "22px",
                 borderRadius: "999px",
                 "& .MuiChip-label": {
                   px: 1.5,
@@ -119,37 +125,33 @@ export const PromotionsCardsSection = () => {
               }}
             />
 
-            {/* Title */}
             <Typography
-              variant="h6"
               sx={{
                 color: "#ffffff",
                 fontFamily: '"Be Vietnam Pro", Helvetica',
-                fontSize: "20px",
+                fontSize: { xs: "18px", sm: "20px" },
                 fontWeight: 700,
-                lineHeight: "28px",
+                lineHeight: { xs: "26px", sm: "28px" },
               }}
             >
               {promo.title}
             </Typography>
           </Box>
 
-          {/* Content section */}
           <CardContent
             sx={{
               flex: 1,
               display: "flex",
               flexDirection: "column",
-              p: 3,
-              "&:last-child": { pb: 3 },
+              p: { xs: 2, sm: 2.5, md: 3 },
+              "&:last-child": { pb: { xs: 2, sm: 2.5, md: 3 } },
             }}
           >
-            {/* Subtitle with icon */}
             <Stack
               direction="row"
               spacing={1}
               alignItems="center"
-              sx={{ pb: 1 }}
+              sx={{ pb: 1.25, flexWrap: "wrap" }}
             >
               {promo.icon}
               <Typography
@@ -157,16 +159,14 @@ export const PromotionsCardsSection = () => {
                   fontFamily: '"Be Vietnam Pro", Helvetica',
                   fontSize: "14px",
                   fontWeight: 700,
-                  lineHeight: "16px",
+                  lineHeight: "20px",
                   color: "#b4463c",
-                  whiteSpace: "nowrap",
                 }}
               >
                 {promo.subtitle}
               </Typography>
             </Stack>
 
-            {/* Description */}
             <Typography
               sx={{
                 flex: 1,
@@ -176,20 +176,21 @@ export const PromotionsCardsSection = () => {
                 lineHeight: "22px",
                 color: "#475569",
                 whiteSpace: "pre-line",
+                mb: 2,
               }}
             >
               {promo.description}
             </Typography>
 
-            {/* Footer */}
             <Box>
               <Divider sx={{ borderColor: "#cbd5e1", mb: 2 }} />
+
               <Stack
-                direction="row"
+                direction={{ xs: "column", sm: "row" }}
                 justifyContent="space-between"
-                alignItems="center"
+                alignItems={{ xs: "stretch", sm: "center" }}
+                spacing={{ xs: 1.5, sm: 2 }}
               >
-                {/* Meta info */}
                 <Stack spacing={0}>
                   <Typography
                     sx={{
@@ -202,6 +203,7 @@ export const PromotionsCardsSection = () => {
                   >
                     {promo.metaLabel}
                   </Typography>
+
                   <Typography
                     sx={{
                       fontFamily: '"Be Vietnam Pro", Helvetica',
@@ -209,17 +211,17 @@ export const PromotionsCardsSection = () => {
                       fontWeight: 700,
                       lineHeight: "20px",
                       color: "#334155",
-                      whiteSpace: "nowrap",
                     }}
                   >
                     {promo.metaValue}
                   </Typography>
                 </Stack>
 
-                {/* Action button */}
                 <Button
                   variant="contained"
+                  fullWidth={false}
                   sx={{
+                    alignSelf: { xs: "stretch", sm: "center" },
                     bgcolor: "#b4463c",
                     color: "#ffffff",
                     fontFamily: '"Be Vietnam Pro", Helvetica',
@@ -230,8 +232,8 @@ export const PromotionsCardsSection = () => {
                     px: 2.5,
                     py: 1,
                     textTransform: "none",
-                    whiteSpace: "nowrap",
                     boxShadow: "none",
+                    minWidth: { xs: "100%", sm: "auto" },
                     "&:hover": {
                       bgcolor: "#9e3c33",
                       boxShadow: "none",
@@ -245,7 +247,7 @@ export const PromotionsCardsSection = () => {
           </CardContent>
         </Card>
       ))}
-    </Stack>
+    </Box>
   );
 };
 

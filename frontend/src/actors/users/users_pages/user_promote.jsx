@@ -8,12 +8,7 @@ import { ThemeProvider } from "../users_components/layout/ThemeProvider";
 export const Main = () => {
   return (
     <ThemeProvider>
-      <Box component="main" 
-            sx={{ 
-              px: 9, 
-              py: 4,
-              backgroundColor: "#F5F5F5",
-                }}>
+      <Box component="main">
         <Box sx={{ px: 3, py: 4, width: "100%" }}>
           <PromotionsHeaderSection />
           <PromotionsCardsSection />
