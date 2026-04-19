@@ -44,6 +44,11 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', time: new Date() });
 });
 
+app.use('/api/staff/payment/zalopay/callback', (req, res, next) => {
+  res.setHeader('ngrok-skip-browser-warning', 'true');
+  next();
+});
+
 // Routes
 app.use('/api', routes);
 
