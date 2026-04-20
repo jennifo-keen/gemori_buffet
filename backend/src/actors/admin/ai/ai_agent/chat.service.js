@@ -16,22 +16,22 @@ const formatResponse = (sql, rows, question) => {
 
     const first = rows[0];
 
-    // 💳 payment
+    //payment
     if (first.payment_method && first.total !== undefined) {
         return `💳 Phương thức phổ biến: ${first.payment_method} (${first.total} lượt)`;
     }
 
-    // 🎟 voucher
+    // voucher
     if (first.code && first.total !== undefined && !first.start_date) {
         return `🎟 Voucher phổ biến: ${first.code} (${first.total} lượt)`;
     }
 
-    // 🪑 bàn
+    // bàn
     if (first.table_code && first.status) {
         return `🪑 Có ${rows.length} bàn (${first.status})`;
     }
 
-    // 🔥 món
+    // món
     if (first.name && (first.total !== undefined || first.sum !== undefined)) {
         let text = "🍽 Danh sách món:\n";
         rows.forEach((r, i) => {
@@ -40,7 +40,7 @@ const formatResponse = (sql, rows, question) => {
         return text;
     }
 
-    // 💰 doanh thu
+    // doanh thu
     if (sql.toLowerCase().includes("sum(amount)")) {
         return `💰 Doanh thu: ${formatMoney(first.total)}`;
     }
@@ -48,7 +48,7 @@ const formatResponse = (sql, rows, question) => {
     return "📊 " + JSON.stringify(rows);
 };
 
-// 🧠 gọi python semantic
+//  gọi python semantic
 const semanticSearch = (question) => {
     return new Promise((resolve) => {
 
@@ -82,33 +82,33 @@ const semanticSearch = (question) => {
     });
 };
 
-// 🚀 MAIN
+//  MAIN
 const askAI = async (question) => {
     try {
         console.log("QUESTION:", question);
 
-        // 🧠 1. AI chọn SQL
+        // 1. AI chọn SQL
         const ai = await semanticSearch(question);
         console.log("AI RESULT:", ai);
 
         if (!ai.sql || ai.confidence < 0.3) {
-            return { answer: "🤔 Tui chưa hiểu câu hỏi này lắm, hỏi rõ hơn giúp tui nha!" };
+            return { answer: " Tui chưa hiểu câu hỏi này lắm, hỏi rõ hơn giúp tui nha!" };
         }
 
-        // 🧠 2. xử lý SQL dynamic
+        //  2. xử lý SQL dynamic
         const finalSQL = processSQL(ai.sql, question);
         console.log("FINAL SQL:", finalSQL);
 
-        // 🧠 3. query DB
+        // query DB
         const result = await pool.query(finalSQL);
         console.log("ROWS:", result.rows);
 
-        // 🧠 4. 👉 AI thật sinh câu trả lời
+        //  AI sinh câu trả lời
         let answer = await generateAnswer(question, finalSQL, result.rows);
 
-        // ⚠️ fallback nếu AI lỗi hoặc trả rỗng
+        //fallback nếu AI lỗi hoặc trả rỗng
         if (!answer || answer.length < 5) {
-            console.log("⚠️ FALLBACK RESPONSE");
+            console.log(" FALLBACK RESPONSE");
             answer = formatResponse(finalSQL, result.rows, question);
         }
 

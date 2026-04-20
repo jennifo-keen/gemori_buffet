@@ -5,38 +5,36 @@ import os
 import warnings
 from datetime import datetime, timedelta
 
-# Tắt cảnh báo để đầu ra sạch
+#Tắt cảnh báo để đầu ra sạch
 warnings.filterwarnings("ignore", category=UserWarning)
 
 def main():
-    # --- 1. ĐƯỜNG DẪN TUYỆT ĐỐI ---
+    # ĐƯỜNG DẪN TUYỆT ĐỐI
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     MODEL_PATH = os.path.join(BASE_DIR, "models", "forecast_model.pkl")
     ENCODER_PATH = os.path.join(BASE_DIR, "models", "label_encoder.pkl")
 
-    # --- 2. LOAD MODEL ---
+    #LOAD MODEL
     try:
         model = joblib.load(MODEL_PATH)
         le = joblib.load(ENCODER_PATH)
     except Exception as e:
-        # Nếu lỗi load model, trả về mảng rỗng để Node không crash
         print(json.dumps([]))
         return
 
-    # --- 3. XỬ LÝ DỮ LIỆU ĐẦU VÀO ---
+    #XỬ LÝ DỮ LIỆU ĐẦU VÀO
     if len(sys.argv) < 2:
         print(json.dumps([]))
         return
 
     try:
         raw_data = json.loads(sys.argv[1])
-        # Node gửi result.rows, ta cần lấy các menu_id duy nhất
         menu_ids = list(set([item['menu_id'] for item in raw_data if 'menu_id' in item]))
     except:
         print(json.dumps([]))
         return
 
-    # --- 4. DỰ ĐOÁN ---
+    #DỰ ĐOÁN
     now = datetime.now()
     next_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
     forecast_time_str = next_hour.strftime("%Y-%m-%d %H:00:00")
@@ -63,7 +61,7 @@ def main():
         except:
             continue
 
-    # --- 5. TÍNH % ---
+    #TÍNH %
     final_output = []
     for item in results:
         percent = (item["predicted_quantity"] / total_quantity * 100) if total_quantity > 0 else 0

@@ -4,7 +4,6 @@ const getMonthlyAccuracyReport = async (req, res) => {
     try {
         const rows = await ChartService.getMonthlyAccuracyData();
         const result = rows.map(row => {
-            // Nếu ngày đó hoàn toàn không có dữ liệu gì thì trả về null để Frontend lọc bỏ
             if (row.actual === 0 && row.forecast === 0) {
                 return { time: row.time, accuracy: null };
             }
