@@ -13,7 +13,7 @@ const OrderPage = () => {
         // Định nghĩa hàm async ngay bên trong useEffect
         const fetchAndCountOrders = async () => {
             try {
-                const res = await fetch("http://localhost:3000/api/admin/orders");
+                const res = await fetch(`${import.meta.env.VITE_SOCKET_URL}/admin/orders`);
                 const json = await res.json();
                 const data = json.data || [];
 

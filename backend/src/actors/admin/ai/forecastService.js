@@ -19,7 +19,7 @@ const runForecast = async () => {
         const pyPath = path.join(__dirname, "../ai/ai/forecast.py");
 
         // Gọi Python bằng lệnh 'py' (Windows)
-        const py = spawn("py", [pyPath, JSON.stringify(data)]);
+        const py = spawn("python3", [pyPath, JSON.stringify(data)]);
 
         let output = "";
         let errorOutput = "";
