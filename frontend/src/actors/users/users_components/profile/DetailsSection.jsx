@@ -200,26 +200,7 @@ export const DetailsSection = () => {
     }
   };
 
-  const statsCards = [
-    {
-      label: "Đơn hàng",
-      value: profile?.stats?.orders ?? 0,
-      icon: (
-        <ShoppingBagOutlinedIcon
-          sx={{ width: 24, height: 24, color: "primary.main" }}
-        />
-      ),
-    },
-    {
-      label: "Voucher",
-      value: profile?.stats?.vouchers ?? 0,
-      icon: (
-        <ConfirmationNumberOutlinedIcon
-          sx={{ width: 24, height: 24, color: "primary.main" }}
-        />
-      ),
-    },
-  ];
+
 
   if (loading) {
     return (
@@ -432,60 +413,11 @@ export const DetailsSection = () => {
         <Box
           sx={{
             pt: { xs: 3, sm: 4 },
-            borderTop: `1px solid ${BORDER_COLOR}`,
             display: "flex",
             flexDirection: "column",
             gap: 2,
           }}
         >
-          <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
-            {statsCards.map((card) => (
-              <Paper
-                key={card.label}
-                elevation={0}
-                sx={{
-                  flex: 1,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 2,
-                  p: 2,
-                  borderRadius: "12px",
-                  border: `1px solid ${BORDER_COLOR}`,
-                  minWidth: 0,
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: "8px",
-                    backgroundColor: BORDER_COLOR,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                  }}
-                >
-                  {card.icon}
-                </Box>
-
-                <Box sx={{ minWidth: 0 }}>
-                  <Typography
-                    sx={{
-                      fontSize: 13,
-                      color: "#6b7280",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {card.label}
-                  </Typography>
-                  <Typography sx={{ fontSize: 22, fontWeight: 700 }}>
-                    {card.value}
-                  </Typography>
-                </Box>
-              </Paper>
-            ))}
-          </Stack>
 
           <Box
             sx={{
