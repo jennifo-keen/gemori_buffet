@@ -28,7 +28,7 @@ const MenuPage = () => {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const res = await fetch("http://localhost:3000/api/admin/menus");
+            const res = await fetch(`${import.meta.env.VITE_SOCKET_URL}/admin/menus`);
             const result = await res.json();
 
             if (result.success) {
@@ -58,7 +58,7 @@ const MenuPage = () => {
         setLoadingToggleId(id);
 
         try {
-            await fetch(`http://localhost:3000/api/admin/menus/${id}/status`, {
+            await fetch(`${import.meta.env.VITE_SOCKET_URL}/admin/menus/${id}/status`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ status: !currentStatus }),
@@ -80,7 +80,7 @@ const MenuPage = () => {
     // 🔥 ADD DISH
     const handleAddDish = async () => {
         try {
-            const res = await fetch("http://localhost:3000/api/admin/menus", {
+            const res = await fetch(`${import.meta.env.VITE_SOCKET_URL}/admin/menus`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newDish),

@@ -147,7 +147,7 @@ export const DishForecastSection = () => {
     const fetchForecast = useCallback(async () => {
         try {
             setLoading(true);
-            const response = await axios.get("http://localhost:3000/api/admin/forecast");
+            const response = await axios.get(`${import.meta.env.VITE_SOCKET_URL}/admin/forecast`);
             const rawData = response.data || [];
 
             const processedData = rawData.map(d => ({

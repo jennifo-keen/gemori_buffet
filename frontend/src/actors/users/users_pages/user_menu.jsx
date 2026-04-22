@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:3000/api/menu";
+const API_BASE_URL = `${import.meta.env.VITE_SOCKET_URL}/menu`;
 const FALLBACK_IMAGE =
   "https://res.cloudinary.com/dbifhgaic/image/upload/v1771769449/ChatGPT_Image_21_10_29_22_thg_2_2026_yfyu9j.png";
 

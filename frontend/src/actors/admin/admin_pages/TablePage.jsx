@@ -6,10 +6,9 @@ import { FloorStatusGridSection } from "../admin_components/Table/FloorStatusGri
 const TablePage = () => {
     const [tables, setTables] = useState([]);
 
-    // ✅ lấy danh sách bàn
     const fetchTables = async () => {
         try {
-            const res = await fetch("http://localhost:3000/api/admin/tables", {
+            const res = await fetch(`${import.meta.env.VITE_SOCKET_URL}/admin/tables`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" },
             });
@@ -36,10 +35,10 @@ const TablePage = () => {
         fetchTables();
     }, []);
 
-    // ✅ đổi trạng thái bàn
+    //  đổi trạng thái bàn
     const handleChangeStatus = async (id, newStatus) => {
         try {
-            await fetch(`http://localhost:3000/api/admin/tables/${id}/status`, {
+            await fetch(`${import.meta.env.VITE_SOCKET_URL}/admin/tables/${id}/status`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ status: newStatus }),
@@ -54,7 +53,7 @@ const TablePage = () => {
     // ✅ thêm bàn
     const handleAddTable = async () => {
         try {
-            const res = await fetch("http://localhost:3000/api/admin/tables", {
+            const res = await fetch(`${import.meta.env.VITE_SOCKET_URL}/admin/tables`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
             });
