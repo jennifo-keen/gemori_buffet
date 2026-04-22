@@ -1,11 +1,26 @@
 const { pool } = require('../../../config/db');
 const { getIO } = require('../../../config/socket');
 
-// Lấy tất cả bàn
+// Lấy tất cả bàn với thông tin số món
 const getAllTables = async () => {
-  const result = await pool.query(
-    'SELECT * FROM tables ORDER BY table_code ASC'
-  );
+  const result = await pool.query(`
+    SELECT 
+      t.*,
+      COALESCE(oi.total_items, 0) as total_items,
+      COALESCE(oi.served_items, 0) as served_items
+    FROM tables t
+    LEFT JOIN (
+      SELECT 
+        o.table_id,
+        COUNT(oi.id) as total_items,
+        COUNT(CASE WHEN oi.status = 'done' THEN 1 END) as served_items
+      FROM orders o
+      LEFT JOIN order_items oi ON oi.order_id = o.id
+      WHERE o.status = 'ordering'
+      GROUP BY o.table_id
+    ) oi ON t.id = oi.table_id
+    ORDER BY t.table_code ASC
+  `);
   return result.rows;
 };
 
