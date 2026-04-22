@@ -1,5 +1,5 @@
 import React, { useEffect, useState }  from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import ClockUser from "../../../assets/icon/ClockUser.svg?react";
 import CallBell  from "../../../assets/icon/CallBell.svg?react";
@@ -26,7 +26,7 @@ import {
 export const MenuKitchen = () => {
   const navigate = useNavigate();
   const { logoutStaff } = useAuthStaff();
-  const [activeItem, setActiveItem] = useState("so-do-ban");
+  const location = useLocation();
   const [stats, setStats] = useState({ pending_count: 0, cooking_count: 0, active_tables: 0 });
   
   const handleLogout = () => {
@@ -41,6 +41,16 @@ export const MenuKitchen = () => {
   const handleOrderAllClick = () => {
     navigate(`/kitchen/all`);
   };
+
+  const getActiveItem = (pathname) => {
+  if (pathname.startsWith('/kitchen/detail'))    return 'don-goi-moi';
+  if (pathname.startsWith('/kitchen/all'))       return 'tat-ca-don';
+  if (pathname.startsWith('/kitchen/table'))     return 'so-do-ban'; // detail từ sơ đồ
+  if (pathname.startsWith('/kitchen/ord'))       return 'don-goi-moi';
+  return 'so-do-ban'; 
+};
+
+const activeItem = getActiveItem(location.pathname);
 
 useEffect(() => {
   const fetchStats = async () => {
@@ -109,7 +119,6 @@ const menuItems = [
             <ListItem
               key={item.id}
               onClick={() => {
-                setActiveItem(item.id);
                 if (item.onClick) {
                   item.onClick();
                 } else if (item.path) {
