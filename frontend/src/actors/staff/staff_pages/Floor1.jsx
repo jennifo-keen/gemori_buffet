@@ -12,8 +12,6 @@ import { handleTableAction }                from '../staff_config/tablesActions'
 import useAuthStaff from '../staff_hook/useAuthStaff';
 import useDialog    from '../staff_hook/useDialog';
 
-
-
 const Floor1 = ({ onTableClick, basePath = '/staff' }) => {
   const navigate = useNavigate();
   const { showError } = useDialog();
@@ -53,26 +51,33 @@ const Floor1 = ({ onTableClick, basePath = '/staff' }) => {
     };
   });
 
-const renderRow = (row) => row.map(({ code, chairTop, chairBottom }) => (
-    <Box
-      key={code}
-      onClick={() => handleClick(code)}
-      sx={{ cursor: 'pointer' }}
-    >
-      <SquareTable
-        table={{
-          tableNumber: code,
-          capacity: chairTop + chairBottom + ' người',
-          foodStatus: 'Món đã ra:....',
-          status: getStatus(getTable(code)),
-        }}
-        tableActiveColor={getTableColor(getTable(code))}
-        chairActiveColor={getChairColor(getTable(code))}
-        chairTop={chairTop}
-        chairBottom={chairBottom}
-      />
-    </Box>
-  ));
+const renderRow = (row) => row.map(({ code, chairTop, chairBottom }) => {
+    const table = getTable(code);
+    const served = table?.served_items || 0;
+    const total = table?.total_items || 0;
+    const foodStatus = total === 0 ? '' : `Món đã ra: ${served}/${total}`;
+    
+    return (
+      <Box
+        key={code}
+        onClick={() => handleClick(code)}
+        sx={{ cursor: 'pointer' }}
+      >
+        <SquareTable
+          table={{
+            tableNumber: code,
+            capacity: chairTop + chairBottom + ' người',
+            foodStatus: foodStatus,
+            status: getStatus(getTable(code)),
+          }}
+          tableActiveColor={getTableColor(getTable(code))}
+          chairActiveColor={getChairColor(getTable(code))}
+          chairTop={chairTop}
+          chairBottom={chairBottom}
+        />
+      </Box>
+    );
+  });
 
   return (
     <Box sx={{ p: "32px", gap: "22px" }}>

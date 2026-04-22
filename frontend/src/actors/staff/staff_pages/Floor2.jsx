@@ -55,6 +55,9 @@ const Floor2 = ({ onTableClick, basePath = '/staff' }) => {
   const renderTable = ({ code, type, chairTop, chairBottom, chairLeft, chairRight, tableColor, chairColor }) => {
     const table = getTable(code);
     const status = getStatus(table);
+    const served = table?.served_items || 0;
+    const total = table?.total_items || 0;
+    const foodStatus = total === 0 ? '' : `Món đã ra: ${served}/${total}`;
 
     const wrapper = (children) => (
       <Box key={code} onClick={() => handleClick(code)} sx={{ cursor: 'pointer' }}>
@@ -63,15 +66,15 @@ const Floor2 = ({ onTableClick, basePath = '/staff' }) => {
     );
 
     if (type === 'Table_8') return wrapper(
-      <Table_8 key={code} table={{ tableNumber: code, capacity: '8 người', foodStatus: 'Món đã ra: 5/7', status }} />
+      <Table_8 key={code} table={{ tableNumber: code, capacity: '8 người', foodStatus, status }} />
     );
 
     if (type === 'Table_4') return wrapper (
-      <Table_4 key={code} table={{ tableNumber: code, capacity: '4 người', foodStatus: 'Món đã ra: 5/7', status }} />
+      <Table_4 key={code} table={{ tableNumber: code, capacity: '4 người', foodStatus, status }} />
     );
  return wrapper(
       <SquareTable
-        table={{ tableNumber: code, capacity: (chairTop + chairBottom) + ' người', foodStatus: 'Món đã ra: 5/7', status }}
+        table={{ tableNumber: code, capacity: (chairTop + chairBottom) + ' người', foodStatus, status }}
         tableActiveColor={tableColor || getTableColor(table)}
         chairActiveColor={chairColor || getChairColor(table)}
         chairTop={chairTop} chairBottom={chairBottom}
