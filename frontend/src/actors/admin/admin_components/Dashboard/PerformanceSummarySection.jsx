@@ -2,7 +2,6 @@ import AttachMoneyOutlinedIcon from "@mui/icons-material/AttachMoneyOutlined";
 import PeopleOutlineIcon from "@mui/icons-material/PeopleOutline";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import TableChartOutlinedIcon from "@mui/icons-material/TableChartOutlined";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 
 import { Box, Card, Grid, Stack, Typography } from "@mui/material";
 
@@ -12,7 +11,6 @@ const formatMoney = (v) =>
 const SummaryCard = ({
     title,
     value,
-    change,
     icon: Icon,
     iconBg,
     iconColor
@@ -22,35 +20,41 @@ const SummaryCard = ({
         <Card
             elevation={0}
             sx={{
-                height: 158,
-                px: 4,
-                py: 3,
+                height: 150, // Giảm chiều cao xuống để card trông gọn hơn
+                px: 3,
+                py: 2.5,
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
+                borderRadius: "16px", // Bo góc nhiều hơn một chút cho hiện đại
                 border: "1px solid",
-                borderColor: "divider",
-                boxShadow: "0px 1px 2px rgba(0,0,0,0.05)"
+                borderColor: "rgba(177, 19, 53, 0.08)",
+                boxShadow: "0px 2px 4px rgba(0,0,0,0.02)",
+                transition: "all 0.2s ease-in-out",
+                "&:hover": {
+                    boxShadow: "0px 4px 12px rgba(0,0,0,0.05)",
+                    transform: "translateY(-2px)"
+                }
             }}
         >
-            <Stack direction="row" justifyContent="space-between">
-                <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: iconBg }}>
-                    {Icon && <Icon sx={{ color: iconColor }} />}
-                </Box>
+            {/* Khung chứa icon đã được thu nhỏ lại */}
+            <Box sx={{
+                width: 40, // Cố định chiều rộng
+                height: 40, // Cố định chiều cao
+                borderRadius: "10px",
+                bgcolor: iconBg,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+            }}>
+                {Icon && <Icon sx={{ color: iconColor, fontSize: 20 }} />}
+            </Box>
 
-                <Stack direction="row" spacing={0.5}>
-                    <Typography fontSize={12} color="green">
-                        {change}
-                    </Typography>
-                    <TrendingUpIcon sx={{ fontSize: 14, color: "green" }} />
-                </Stack>
-            </Stack>
-
-            <Box>
-                <Typography fontSize={13} color="text.secondary">
+            <Box sx={{ mt: 1 }}>
+                <Typography fontSize={13} fontWeight={500} color="text.secondary" sx={{ mb: 0.5 }}>
                     {title}
                 </Typography>
-                <Typography fontSize={20} fontWeight={600}>
+                <Typography fontSize={22} fontWeight={700} color="slate.900">
                     {value}
                 </Typography>
             </Box>
@@ -64,40 +68,36 @@ const PerformanceSummarySection = ({ stats }) => {
         {
             title: "Doanh thu hôm nay",
             value: formatMoney(stats?.totalRevenue),
-            change: "+0%",
             icon: AttachMoneyOutlinedIcon,
             iconBg: "rgba(162,26,22,0.1)",
             iconColor: "#A21A16"
         },
         {
-            title: "Tổng đơn hàng",
+            title: "Tổng đơn hàng hôm nay",
             value: stats?.dailyOrders || 0,
-            change: "+0%",
             icon: SaveOutlinedIcon,
-            iconBg: "#FFF1B9",
+            iconBg: "rgba(244, 202, 102, 0.15)",
             iconColor: "#9A7B00"
         },
         {
             title: "Bàn đang hoạt động",
             value: `${stats?.activeTables || 0}/${stats?.totalTables || 0}`,
-            change: "+0%",
             icon: TableChartOutlinedIcon,
-            iconBg: "#E3F2FD",
+            iconBg: "rgba(37, 99, 235, 0.1)",
             iconColor: "#1976D2"
         },
         {
             title: "Khách hàng mới",
             value: stats?.newCustomers || 0,
-            change: "+0%",
             icon: PeopleOutlineIcon,
-            iconBg: "#E8F5E9",
+            iconBg: "rgba(46, 125, 50, 0.1)",
             iconColor: "#2E7D32"
         }
     ];
 
     return (
-        <Box mb={3}>
-            <Grid container spacing={2}>
+        <Box mb={4}>
+            <Grid container spacing={2.5}>
                 {items.map((item, index) => (
                     <Grid item xs={12} sm={6} md={3} key={index}>
                         <SummaryCard {...item} />
