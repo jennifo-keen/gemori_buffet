@@ -51,14 +51,28 @@ const createTicket = async (req, res) => {
 const updateTicket = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, price, description, menu_ids } = req.body;
+        let { name, price, description, menu_ids } = req.body;
 
-        // Nếu m dùng multer, ảnh sẽ nằm trong req.file. 
-        // Nếu không gửi file mới, image_url sẽ là null và Service sẽ giữ ảnh cũ.
         const image_url = req.file ? req.file.path : null;
 
-        // Ép kiểu menu_ids về mảng nếu FE gửi lên dạng string hoặc undefined
-        const parsedMenuIds = Array.isArray(menu_ids) ? menu_ids : (menu_ids ? [menu_ids] : []);
+        // 🔥 FIX QUAN TRỌNG: parse JSON đúng cách
+        let parsedMenuIds = [];
+
+        if (menu_ids) {
+            try {
+                // FE gửi JSON string
+                if (typeof menu_ids === "string") {
+                    parsedMenuIds = JSON.parse(menu_ids);
+                }
+                // FE gửi array (hiếm)
+                else if (Array.isArray(menu_ids)) {
+                    parsedMenuIds = menu_ids;
+                }
+            } catch (err) {
+                console.error("🔥 parse menu_ids error:", err);
+                parsedMenuIds = [];
+            }
+        }
 
         const updated = await buffetService.updateTicket(id, {
             name,
@@ -94,7 +108,6 @@ const deleteTicket = async (req, res) => {
 
         res.json({ message: "Xóa vé thành công", deletedTicket: deleted });
     } catch (error) {
-        // Nếu lỗi do ràng buộc dữ liệu (mã 23503 trong Postgres)
         if (error.code === '23503') {
             return res.status(400).json({
                 message: "Vé này đã có dữ liệu giao dịch/hóa đơn, không thể xóa vĩnh viễn. Hãy dùng chức năng 'Tạm ngưng'!"
@@ -104,4 +117,10 @@ const deleteTicket = async (req, res) => {
     }
 };
 
-module.exports = { getTickets, patchStatus, createTicket, deleteTicket, updateTicket };
+module.exports = {
+    getTickets,
+    patchStatus,
+    createTicket,
+    deleteTicket,
+    updateTicket
+};

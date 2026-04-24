@@ -7,5 +7,5 @@ router.get("/", buffetController.getTickets);
 router.patch("/:id/status", buffetController.patchStatus);
 router.post("/create_ticket", uploadTickets.single('image'), buffetController.createTicket);
 router.delete("/:id", buffetController.deleteTicket);
-router.put('/:id', buffetController.updateTicket);
+router.patch('/:id', buffetController.updateTicket);
 module.exports = router;

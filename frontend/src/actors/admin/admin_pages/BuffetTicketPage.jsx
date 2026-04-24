@@ -38,16 +38,15 @@ const BuffetTicketPage = () => {
             const response = await fetch("http://localhost:3000/api/admin/menus");
             const result = await response.json();
 
-            // Gia cố: Kiểm tra tương tự cho Menu
-            if (Array.isArray(result)) {
-                setAllMenus(result);
-            } else if (result?.menus && Array.isArray(result.menus)) {
-                setAllMenus(result.menus);
-            } else if (result?.data && Array.isArray(result.data)) {
-                setAllMenus(result.data);
+            console.log("MENU API:", result);
+
+            // ✅ FIX CHÍNH Ở ĐÂY
+            if (Array.isArray(result?.data?.menus)) {
+                setAllMenus(result.data.menus);
             } else {
                 setAllMenus([]);
             }
+
         } catch (error) {
             console.error("Lỗi fetch menus:", error);
             setAllMenus([]);

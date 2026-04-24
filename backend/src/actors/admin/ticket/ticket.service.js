@@ -45,24 +45,43 @@ const updateTicket = async (id, ticketData) => {
 
         // 1. Update thông tin vé chính
         const updateTicketQuery = `
-            UPDATE public.buffet_tickets 
-            SET name = $1, price = $2, description = $3, 
-                image_url = COALESCE($4, image_url)
-            WHERE id = $5 RETURNING *;
-        `;
-        const ticketRes = await client.query(updateTicketQuery, [name, price, description, image_url, id]);
+    UPDATE public.buffet_tickets 
+    SET 
+       name = COALESCE(NULLIF($1, ''), name),
+price = COALESCE($2, price),
+description = COALESCE(NULLIF($3, ''), description),
+image_url = COALESCE($4, image_url)
+    WHERE id = $5
+    RETURNING *;
+`;
+        const ticketRes = await client.query(updateTicketQuery, [
+            name ?? null,
+            price ? Number(price) : null,
+            description ?? null,
+            image_url ?? null,
+            id
+        ]);
 
         // 2. Xử lý bảng trung gian: Xóa cũ - Thêm mới
         if (Array.isArray(menu_ids)) {
-            await client.query('DELETE FROM public.buffet_ticket_menus WHERE buffet_ticket_id = $1', [id]);
+
             if (menu_ids.length > 0) {
-                const insertQuery = `
-                    INSERT INTO public.buffet_ticket_menus (buffet_ticket_id, menu_id)
-                    SELECT $1, unnest($2::uuid[])
-                `;
-                await client.query(insertQuery, [id, menu_ids]);
+                await client.query(
+                    'DELETE FROM public.buffet_ticket_menus WHERE buffet_ticket_id = $1',
+                    [id]
+                );
+
+                await client.query(`
+            INSERT INTO public.buffet_ticket_menus (buffet_ticket_id, menu_id)
+            SELECT $1, unnest($2::uuid[])
+        `, [id, menu_ids]);
+
+            } else {
+                // ❌ KHÔNG DELETE nếu không có menu mới
+                console.log("⚠️ Skip update menus vì rỗng");
             }
         }
+
 
         await client.query('COMMIT');
         return ticketRes.rows[0];
