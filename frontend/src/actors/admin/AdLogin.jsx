@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 export const AdLogin = () => {
     // --- STATE UI ---
     const [showPassword, setShowPassword] = useState(false);
@@ -33,52 +34,60 @@ export const AdLogin = () => {
     const handleTogglePassword = () => setShowPassword((prev) => !prev);
 
     const handleLogin = async () => {
-        if (!username || !password) {
+        // Kiểm tra validation cơ bản
+        if (!username.trim() || !password.trim()) {
             return alert("Vui lòng nhập đầy đủ thông tin tài khoản và mật khẩu.");
         }
 
         try {
             setLoading(true);
 
-            const response = await fetch(`${import.meta.env.VITE_SOCKET_URL}/admin/login`, 
-                {
+            const response = await fetch(`${import.meta.env.VITE_SOCKET_URL}/admin/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    username,
-                    password,
+                    username: username.trim(),
+                    password: password.trim(),
                 }),
             });
 
-            const result = await response.json(); // Chuyển response sang JSON
+            const result = await response.json();
 
-            // Với fetch, bạn phải check response.ok (status 200-299)
             if (response.ok && result.success) {
-                const { token, user } = result.data; // Lấy từ result.data theo cấu trúc Postman của bạn
+                const { token, user } = result.data;
 
-                // Lưu thông tin dựa trên Remember Me
+                // 1. DỌN DẸP DỮ LIỆU CŨ (Tránh xung đột Local và Session)
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                sessionStorage.removeItem("token");
+                sessionStorage.removeItem("user");
+
+                // 2. LƯU THÔNG TIN MỚI
                 const storage = rememberMe ? localStorage : sessionStorage;
                 storage.setItem("token", token);
                 storage.setItem("user", JSON.stringify(user));
 
-                // Điều hướng dựa trên role
+                // 3. ĐIỀU HƯỚNG DỰA TRÊN ROLE
                 const roleRedirects = {
                     admin: "/admin",
                     staff: "/staff",
                     kitchen: "/kitchen"
                 };
 
-                navigate(roleRedirects[user.role] || "/");
+                // Chờ một chút để storage kịp cập nhật trước khi navigate
+                const targetPath = roleRedirects[user.role] || "/admin";
+                navigate(targetPath, { replace: true });
+
             } else {
-                // Hiển thị message lỗi từ backend nếu có
+                // Hiển thị lỗi từ backend (ví dụ: "Sai mật khẩu", "Tài khoản bị khóa")
                 alert(result.message || "Đăng nhập thất bại. Vui lòng thử lại.");
             }
 
         } catch (err) {
             console.error("Login Error:", err);
-            alert("Lỗi kết nối đến server. Vui lòng kiểm tra lại.");
+            alert("Lỗi kết nối đến hệ thống. Vui lòng kiểm tra lại đường truyền hoặc Server.");
         } finally {
             setLoading(false);
         }
@@ -91,14 +100,14 @@ export const AdLogin = () => {
                 minHeight: "100vh",
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: "#f5f5f5", // Background xám nhạt bên ngoài
+                backgroundColor: "#f5f5f5",
                 p: 2
             }}
         >
             <Box
                 sx={{
                     display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
+                    gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
                     maxWidth: "1200px",
                     width: "100%",
                     bgcolor: "background.paper",
@@ -109,7 +118,7 @@ export const AdLogin = () => {
                     boxShadow: "0px 4px 20px rgba(0,0,0,0.1)"
                 }}
             >
-                {/* Left panel - hero image with overlay */}
+                {/* Left panel - hero image */}
                 <Box
                     sx={{
                         position: "relative",
@@ -119,13 +128,13 @@ export const AdLogin = () => {
                 >
                     <Box
                         component="img"
-                        src="../../../public/login_bgr.png" // ảnh đã có chữ sẵn
-                        alt="Manwah Heritage"
+                        src="/login_bgr.png" // Đường dẫn nên để từ root public
+                        alt="Gemori Buffet"
                         sx={{
                             width: "100%",
                             height: "100%",
-                            objectFit: "cover",     // giống background-size: cover
-                            objectPosition: "center", // giống background-position: center
+                            objectFit: "cover",
+                            objectPosition: "center",
                         }}
                     />
                 </Box>
@@ -134,7 +143,7 @@ export const AdLogin = () => {
                 <Stack
                     justifyContent="center"
                     alignItems="flex-start"
-                    sx={{ p: 8, height: "727px" }}
+                    sx={{ p: { xs: 4, md: 8 }, height: "727px" }}
                 >
                     <Box pb={5} width="100%">
                         <Box pb={3}>
@@ -143,7 +152,7 @@ export const AdLogin = () => {
                                     fontFamily: '"Be Vietnam Pro", Helvetica',
                                     fontSize: "24px",
                                     fontWeight: 700,
-                                    color: "#A21A16", // Màu đỏ Manwah
+                                    color: "#A21A16",
                                 }}
                             >
                                 GEMORI
@@ -168,11 +177,11 @@ export const AdLogin = () => {
                                 color: "text.secondary",
                             }}
                         >
-                            Vui lòng nhập thông tin để tiếp tục.
+                            Vui lòng nhập thông tin để quản lý nhà hàng.
                         </Typography>
                     </Box>
 
-                    <Box pb={2} width="100%">
+                    <Box width="100%">
                         <Stack spacing={3} width="100%">
                             {/* Username field */}
                             <Stack spacing={1} width="100%">
@@ -182,15 +191,17 @@ export const AdLogin = () => {
                                         fontWeight: 700,
                                         fontSize: "10px",
                                         letterSpacing: "1px",
-                                        color: "#5A403C", // textBrown
+                                        color: "#5A403C",
                                     }}
                                 >
                                     TÀI KHOẢN
                                 </Typography>
                                 <OutlinedInput
+                                    fullWidth
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
-                                    placeholder="admin_username"
+                                    onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+                                    placeholder="Tên đăng nhập"
                                     startAdornment={
                                         <InputAdornment position="start">
                                             <PersonOutlineIcon sx={{ color: "#5A403C", width: 18 }} />
@@ -218,6 +229,7 @@ export const AdLogin = () => {
                                     MẬT KHẨU
                                 </Typography>
                                 <OutlinedInput
+                                    fullWidth
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     type={showPassword ? "text" : "password"}
@@ -268,6 +280,7 @@ export const AdLogin = () => {
                                     py: 1.5,
                                     fontWeight: 700,
                                     "&:hover": { bgcolor: "#8a1a16" },
+                                    "&.Mui-disabled": { bgcolor: "#ccc" }
                                 }}
                             >
                                 {loading ? <CircularProgress size={24} color="inherit" /> : "ĐĂNG NHẬP"}

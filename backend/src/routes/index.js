@@ -3,6 +3,7 @@ const { Router } = require('express');
 
 const router = Router();
 
+router.use('/admin/dashboard', require("../actors/admin/dashboard/dashboard.route"));
 router.use('/admin/report', require('../actors/admin/report/report.route'));
 router.use('/admin/forecast', require('../actors/admin/ai/forecastRoutes'));
 router.use('/admin/chat', require('../actors/admin/ai/chatagentRoutes'));
@@ -13,6 +14,7 @@ router.use('/admin/orders', require("../actors/admin/order/order.route"));
 router.use('/admin/login', require("../actors/admin/login/login.route"));
 router.use('/admin/vouchers', require("../actors/admin/voucher/voucher.route"));
 router.use('/admin/ai/charts', require("../actors/admin/ai/chart/chart.route"));
+
 
 router.use('/auth', require('../actors/admin/auth/auth.route'));
 router.use('/staff', require('../actors/staff/routes/staff.route'));

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
     Avatar,
@@ -9,6 +9,7 @@ import {
     ListItemText,
     Stack,
     Typography,
+    IconButton,
 } from "@mui/material";
 
 // Import icons
@@ -61,28 +62,44 @@ const navSections = [
 export const AdminSidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const [activeItem, setActiveItem] = useState("tong-quan");
 
-    // Các biến màu để đồng bộ toàn bộ sidebar
+    // Các biến màu đồng bộ theo phong cách Manwah
     const baseColor = "#B14135";
-    const bgLight = "rgba(177, 65, 53, 0.05)"; // Nền sidebar 5%
-    const bgActive = "rgba(177, 65, 53, 0.1)"; // Item đang chọn 10%
-    const scrollbarThumb = "rgba(177, 65, 53, 0.2)"; // Thanh trượt đậm hơn chút để dễ thấy
+    const bgLight = "rgba(177, 65, 53, 0.05)";
+    const bgActive = "rgba(177, 65, 53, 0.1)";
+    const scrollbarThumb = "rgba(177, 65, 53, 0.2)";
 
-    useEffect(() => {
-        const currentPath = location.pathname;
-        navSections.forEach(section => {
-            section.items.forEach(item => {
-                if (item.path === currentPath) {
-                    setActiveItem(item.id);
-                }
-            });
-        });
-    }, [location.pathname]);
+    // Khởi tạo userData: Ưu tiên lấy fullName, nếu không có mới lấy name hoặc username
+    const [userData] = useState(() => {
+        const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
+        if (storedUser) {
+            try {
+                const user = JSON.parse(storedUser);
+                return {
+                    // Check mọi trường có thể chứa tên thật
+                    fullName: user.fullName || user.name || user.username || "Quản trị viên",
+                    role: user.role === 'admin' ? "Quản trị viên" : "Nhân viên",
+                    avatar: user.avatar || ""
+                };
+            } catch (error) {
+                console.error("Lỗi parse user data:", error);
+            }
+        }
+        return { fullName: "Admin", role: "Hệ thống", avatar: "" };
+    });
 
-    const handleItemClick = (id, path) => {
-        setActiveItem(id);
-        navigate(path);
+    const getActiveId = () => {
+        for (const section of navSections) {
+            const activeItem = section.items.find(item => location.pathname === item.path);
+            if (activeItem) return activeItem.id;
+        }
+        return "tong-quan";
+    };
+
+    const handleLogout = () => {
+        localStorage.clear();
+        sessionStorage.clear();
+        navigate("/admin/login", { replace: true });
     };
 
     return (
@@ -103,10 +120,7 @@ export const AdminSidebar = () => {
             {/* Logo section */}
             <Box
                 sx={{
-                    px: 3,
-                    py: 2,
-                    borderBottom: "1px solid",
-                    borderColor: "rgba(0, 0, 0, 0.05)",
+                    px: 3, py: 3,
                     display: "flex",
                     alignItems: "center",
                     cursor: 'pointer'
@@ -117,96 +131,72 @@ export const AdminSidebar = () => {
                     src={logo}
                     alt="Logo"
                     sx={{
-                        filter: "invert(24%) sepia(51%) saturate(1478%) hue-rotate(346deg) brightness(88%) contrast(91%)",
-                        maxWidth: 200,
-                        maxHeight: 100,
-                        width: "40%",
+                        maxWidth: 160,
                         height: "auto",
                         objectFit: "contain"
                     }}
                 />
             </Box>
 
-            {/* Navigation sections với Custom Scrollbar */}
+            {/* Navigation sections */}
             <Box
                 sx={{
-                    flex: 1,
-                    px: 2,
-                    py: 2,
+                    flex: 1, px: 2, py: 2,
                     overflowY: "auto",
-                    // Tùy chỉnh Scrollbar cho Chrome, Edge, Safari
-                    '&::-webkit-scrollbar': {
-                        width: '6px', // Độ rộng thanh cuộn
-                    },
-                    '&::-webkit-scrollbar-track': {
-                        backgroundColor: 'transparent', // Để lộ nền sidebar phía dưới
-                    },
+                    '&::-webkit-scrollbar': { width: '6px' },
                     '&::-webkit-scrollbar-thumb': {
                         backgroundColor: scrollbarThumb,
                         borderRadius: '10px',
-                        '&:hover': {
-                            backgroundColor: 'rgba(108, 13, 10, 0.4)', // Đây là màu #6C0D0A với alpha 0.4
-                        }
                     },
-                    // Tùy chỉnh cho Firefox
                     scrollbarWidth: 'thin',
-                    scrollbarColor: `${scrollbarThumb} transparent`,
                 }}
             >
                 {navSections.map((section) => (
                     <Box key={section.sectionLabel} sx={{ pb: 2 }}>
-                        <Box sx={{ px: 1.5, pb: 1 }}>
-                            <Typography
-                                sx={{
-                                    fontFamily: '"Be Vietnam Pro", sans-serif',
-                                    fontSize: "12px",
-                                    fontWeight: 700,
-                                    color: baseColor,
-                                    textTransform: "uppercase",
-                                    letterSpacing: "0.5px",
-                                    opacity: 0.8
-                                }}
-                            >
-                                {section.sectionLabel}
-                            </Typography>
-                        </Box>
+                        <Typography
+                            sx={{
+                                px: 1.5, pb: 1,
+                                fontSize: "11px",
+                                fontWeight: 700,
+                                color: baseColor,
+                                textTransform: "uppercase",
+                                opacity: 0.7,
+                                letterSpacing: '0.5px'
+                            }}
+                        >
+                            {section.sectionLabel}
+                        </Typography>
 
                         <List disablePadding>
                             {section.items.map((item) => {
-                                const isActive = activeItem === item.id;
+                                const isActive = getActiveId() === item.id;
                                 return (
                                     <ListItem
                                         key={item.id}
-                                        onClick={() => handleItemClick(item.id, item.path)}
+                                        onClick={() => navigate(item.path)}
                                         sx={{
-                                            px: 1.5,
-                                            py: 1.25,
-                                            borderRadius: 2,
+                                            px: 1.5, py: 1.2,
+                                            borderRadius: "8px",
                                             cursor: "pointer",
                                             bgcolor: isActive ? bgActive : "transparent",
                                             color: isActive ? baseColor : "#334155",
+                                            mb: 0.5,
+                                            transition: "all 0.2s ease",
                                             "&:hover": {
                                                 bgcolor: isActive ? bgActive : "rgba(177, 65, 53, 0.08)",
                                             },
-                                            mb: 0.25,
-                                            transition: "all 0.2s ease",
                                         }}
                                     >
-                                        <ListItemIcon
-                                            sx={{
-                                                minWidth: 36,
-                                                color: "inherit",
-                                            }}
-                                        >
+                                        <ListItemIcon sx={{ minWidth: 36, color: "inherit" }}>
                                             {item.icon}
                                         </ListItemIcon>
                                         <ListItemText
                                             primary={item.label}
                                             primaryTypographyProps={{
                                                 sx: {
-                                                    fontFamily: '"Be Vietnam Pro", sans-serif',
-                                                    fontSize: "15px",
+                                                    fontSize: "14px",
                                                     fontWeight: isActive ? 700 : 500,
+                                                    fontFamily: '"Be Vietnam Pro", sans-serif',
                                                 },
                                             }}
                                         />
@@ -220,27 +210,40 @@ export const AdminSidebar = () => {
 
             {/* User profile section */}
             <Box sx={{ borderTop: "1px solid", borderColor: "rgba(0, 0, 0, 0.05)", p: 2 }}>
-                <Stack direction="row" alignItems="center" spacing={1.5} sx={{ px: 1.5, py: 1 }}>
+                <Stack direction="row" alignItems="center" spacing={1.5} sx={{ px: 1, py: 1 }}>
                     <Avatar
-                        src="/admin.png"
-                        sx={{ width: 40, height: 40, bgcolor: "rgba(177, 65, 53, 0.2)" }}
-                    />
+                        src={userData.avatar}
+                        sx={{
+                            width: 38, height: 38,
+                            bgcolor: baseColor,
+                            fontWeight: 700,
+                            fontSize: '14px'
+                        }}
+                    >
+                        {userData.fullName.charAt(0).toUpperCase()}
+                    </Avatar>
                     <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography noWrap sx={{ fontSize: "14px", fontWeight: 700 }}>
-                            Trần Hoàng Nam
+                        <Typography
+                            noWrap
+                            sx={{
+                                fontSize: "14px",
+                                fontWeight: 700,
+                                textTransform: 'capitalize' // Tự động viết hoa chữ cái đầu cho đẹp
+                            }}
+                        >
+                            {userData.fullName}
                         </Typography>
-                        <Typography sx={{ fontSize: "12px", color: "text.secondary" }}>
-                            Quản trị viên
+                        <Typography sx={{ fontSize: "11px", color: "text.secondary" }}>
+                            {userData.role}
                         </Typography>
                     </Box>
-                    <LogoutOutlinedIcon
-                        onClick={() => navigate("/login")}
-                        sx={{
-                            cursor: "pointer",
-                            transition: "color 0.2s",
-                            "&:hover": { color: baseColor },
-                        }}
-                    />
+                    <IconButton
+                        size="small"
+                        onClick={handleLogout}
+                        sx={{ "&:hover": { color: baseColor } }}
+                    >
+                        <LogoutOutlinedIcon fontSize="small" />
+                    </IconButton>
                 </Stack>
             </Box>
         </Box>
