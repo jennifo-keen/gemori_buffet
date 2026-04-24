@@ -94,6 +94,12 @@ const addItems = async (tableCode, items) => {
       [order.id, item.menuId, item.quantity]
     );
 
+    // TRỪ KHOẢNG TỪ NGAY ĐÂY (khi khách gọi)
+    await pool.query(
+      'UPDATE inventory SET stock_quantity = stock_quantity - $1, updated_at = NOW() WHERE menu_id = $2',
+      [item.quantity, item.menuId]
+    );
+
     // Lấy tên món để emit socket
 const menuResult = await pool.query(
       'SELECT name, image_url, category FROM menus WHERE id = $1',
@@ -137,6 +143,12 @@ const check = await pool.query(
   if (item.status !== 'pending' && item.status !== 'cooking') 
     throw { status: 400, message: 'Chỉ có thể hủy món đang chờ xử lý hoặc đang làm' };
  
+  // CỘNG LẠI KHO khi khách trả lại món
+  await pool.query(
+    'UPDATE inventory SET stock_quantity = stock_quantity + $1, updated_at = NOW() WHERE menu_id = $2',
+    [item.quantity, item.menu_id]
+  );
+
   await pool.query('DELETE FROM order_items WHERE id = $1', [itemId]);
 
   // Notify bếp và staff

@@ -128,6 +128,12 @@ const cancelItem = async (itemId, tableCode) => {
   if (item.status !== 'pending' && item.status !== 'cooking')
     throw { status: 400, message: 'Chỉ có thể hủy món đang chờ hoặc đang làm' };
 
+  // 🔥 CỘNG LẠI KHO khi hủy món
+  await pool.query(
+    'UPDATE inventory SET stock_quantity = stock_quantity + $1, updated_at = NOW() WHERE menu_id = $2',
+    [item.quantity, item.menu_id]
+  );
+
   await pool.query('DELETE FROM order_items WHERE id = $1', [itemId]);
 
   try {

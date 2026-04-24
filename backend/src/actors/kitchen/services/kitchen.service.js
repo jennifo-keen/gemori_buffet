@@ -74,26 +74,8 @@ const updateItemStatus = async (itemId, status) => {
   const item = check.rows[0];
   if (!item) throw { status: 404, message: 'Món không tồn tại' };
 
-  // Nếu chuyển sang 'done', kiểm tra và trừ tồn kho
-  if (status === 'done') {
-    const inventoryCheck = await pool.query(
-      'SELECT stock_quantity FROM inventory WHERE menu_id = $1',
-      [item.menu_id]
-    );
-    const inventory = inventoryCheck.rows[0];
-    if (!inventory) {
-      throw { status: 400, message: 'Món này chưa có thông tin tồn kho' };
-    }
-    if (inventory.stock_quantity < item.quantity) {
-      throw { status: 400, message: `Không đủ tồn kho. Còn ${inventory.stock_quantity}, cần ${item.quantity}` };
-    }
-    // Trừ tồn kho
-    await pool.query(
-      'UPDATE inventory SET stock_quantity = stock_quantity - $1, updated_at = NOW() WHERE menu_id = $2',
-      [item.quantity, item.menu_id]
-    );
-  }
-
+  // 🔥 KHÔNG trừ kho nữa - kho đã trừ từ khi khách gọi
+  // Chỉ cập nhật trạng thái
   await pool.query(
     'UPDATE order_items SET status = $1 WHERE id = $2',
     [status, itemId]
@@ -167,28 +149,7 @@ const updateAllItemsByTable = async (tableCode, status) => {
 
   const itemIds = itemsResult.rows.map(r => r.id);
 
-  // Nếu chuyển sang 'done', kiểm tra và trừ tồn kho cho từng món
-  if (status === 'done') {
-    for (const item of itemsResult.rows) {
-      const inventoryCheck = await pool.query(
-        'SELECT stock_quantity FROM inventory WHERE menu_id = $1',
-        [item.menu_id]
-      );
-      const inventory = inventoryCheck.rows[0];
-      if (!inventory) {
-        throw { status: 400, message: `Món ${item.menu_id} chưa có thông tin tồn kho` };
-      }
-      if (inventory.stock_quantity < item.quantity) {
-        throw { status: 400, message: `Không đủ tồn kho cho món ${item.menu_id}. Còn ${inventory.stock_quantity}, cần ${item.quantity}` };
-      }
-      // Trừ tồn kho
-      await pool.query(
-        'UPDATE inventory SET stock_quantity = stock_quantity - $1, updated_at = NOW() WHERE menu_id = $2',
-        [item.quantity, item.menu_id]
-      );
-    }
-  }
-
+  // Chỉ cập nhật trạng thái
   await pool.query(
     'UPDATE order_items SET status = $1 WHERE id = ANY($2)',
     [status, itemIds]
