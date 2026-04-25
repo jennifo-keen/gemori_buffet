@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -13,8 +14,10 @@ import StarIcon from "@mui/icons-material/Star";
 function BuffetSection() {
   const [buffetPackages, setBuffetPackages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    
     const fetchBuffetPackages = async () => {
       try {
 
@@ -23,6 +26,8 @@ function BuffetSection() {
         const response = await fetch(`${API_URL}/home/buffet-tickets`);
 
         const result = await response.json();
+
+        
 
         if (result.success) {
           const mappedData = result.data.slice(0, 3).map((item, index) => ({
@@ -268,6 +273,7 @@ function BuffetSection() {
               <Button
                 fullWidth
                 variant={item.highlighted ? "contained" : "outlined"}
+                onClick={() => navigate("/menu")}
                 sx={{
                   mt: 4,
                   height: 48,
