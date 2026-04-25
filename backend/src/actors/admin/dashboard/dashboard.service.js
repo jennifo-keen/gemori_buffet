@@ -28,10 +28,12 @@ const formatChartByHour = (rows) => {
 };
 
 const formatInventoryAlerts = (rows) => rows.map(item => ({
-    name: item.name,
-    image: item.image_url, // Thêm dòng này
-    title: Number(item.stock_quantity) === 0 ? `Hết hàng` : `Sắp hết hàng`,
-    time: `Kho: ${item.stock_quantity} | Định mức: ${item.min_quantity}`,
+    // Đổi title thành tên món ăn
+    title: item.name,
+
+    // Đổi time thành dòng thông báo chi tiết
+    time: `${Number(item.stock_quantity) === 0 ? 'Hết hàng' : 'Sắp hết'} | Kho: ${item.stock_quantity} / Định mức: ${item.min_quantity}`,
+
     isCritical: Number(item.stock_quantity) === 0
 }));
 

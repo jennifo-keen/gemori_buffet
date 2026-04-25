@@ -182,67 +182,44 @@ const OperationsOverviewSection = ({ data, onChangeDate }) => {
 
                                 <Stack spacing={3}>
                                     {data?.inventoryAlerts?.map((alert, index) => {
-                                        // Màu chỉ thị: Đỏ nếu hết (Critical), Vàng nếu sắp hết
                                         const statusColor = alert.isCritical ? BRAND_COLOR : "#f4ca66";
-                                        const textSlate700 = "#334155"; // Mã màu xám đậm bạn yêu cầu
+                                        const textSlate700 = "#334155";
 
                                         return (
-                                            <Stack key={index} direction="row" spacing={2} alignItems="flex-start">
-                                                {/* Vạch màu chỉ thị đầu dòng */}
+                                            <Stack key={index} direction="row" spacing={1.5} alignItems="center">
+                                                {/* Vạch chỉ thị màu thay cho ảnh */}
                                                 <Box sx={{
-                                                    minWidth: 4,
-                                                    height: 42,
+                                                    width: 6,
+                                                    height: 38,
                                                     bgcolor: statusColor,
-                                                    borderRadius: 1
+                                                    borderRadius: 1,
+                                                    flexShrink: 0
                                                 }} />
 
-                                                <Box sx={{ flex: 1 }}>
-                                                    {/* Tên món/Tiêu đề */}
+                                                <Box sx={{ flex: 1, minWidth: 0 }}>
+                                                    {/* TÊN MÓN - Bây giờ chắc chắn sẽ hiện vì title = item.name */}
                                                     <Typography
-                                                        variant="bodyBody3Medium"
+                                                        variant="body2"
                                                         fontWeight={700}
-                                                        sx={{
-                                                            color: alert.isCritical ? BRAND_COLOR : "text.primary",
-                                                            display: "block",
-                                                            mb: 0.5
-                                                        }}
+                                                        noWrap
+                                                        sx={{ color: alert.isCritical ? BRAND_COLOR : "text.primary" }}
                                                     >
                                                         {alert.title}
                                                     </Typography>
 
-                                                    {/* Khoảng an toàn cho thông số Kho & Định mức */}
-                                                    <Box sx={{ pl: 1.5 }}>
-                                                        <Typography
-                                                            variant="captionCaption1Medium"
-                                                            sx={{
-                                                                display: "inline-block",
-                                                                bgcolor: "rgba(51, 65, 85, 0.05)", // Nền xám cực nhạt để nổi bật chữ xám đậm
-                                                                color: textSlate700, // Sử dụng màu 334155
-                                                                px: 1,
-                                                                py: 0.2,
-                                                                borderRadius: 1,
-                                                                fontSize: "0.75rem",
-                                                                fontWeight: 600
-                                                            }}
-                                                        >
-                                                            {alert.time}
-                                                        </Typography>
-                                                    </Box>
-                                                </Box>
-
-                                                {/* Gắn nhãn trạng thái nhỏ ở cuối hàng */}
-                                                {alert.isCritical && (
+                                                    {/* THÔNG TIN KHO */}
                                                     <Typography
                                                         variant="caption"
-                                                        sx={{
-                                                            fontWeight: 900,
-                                                            color: BRAND_COLOR,
-                                                            fontSize: 10,
-                                                            mt: 0.5,
-                                                            letterSpacing: 0.5
-                                                        }}
+                                                        sx={{ color: textSlate700, opacity: 0.8, fontSize: "0.7rem" }}
                                                     >
-                                                        NGUY CẤP
+                                                        {alert.time}
+                                                    </Typography>
+                                                </Box>
+
+                                                {/* Tag nhỏ báo Hết hàng nếu cần */}
+                                                {alert.isCritical && (
+                                                    <Typography variant="caption" sx={{ fontWeight: 900, color: BRAND_COLOR, fontSize: 10 }}>
+                                                        HẾT
                                                     </Typography>
                                                 )}
                                             </Stack>

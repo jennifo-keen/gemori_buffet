@@ -22,7 +22,7 @@ const updateStatus = async (id, isActive) => {
 
 const createTicket = async (ticketData) => {
     const { name, price, description, image_url } = ticketData;
-
+    console.log("DỮ LIỆU CHUẨN BỊ INSERT:", { name, price, image_url });
     // Câu lệnh SQL INSERT
     const query = `
         INSERT INTO public.buffet_tickets (name, price, description, image_url, is_active)
@@ -43,45 +43,37 @@ const updateTicket = async (id, ticketData) => {
     try {
         await client.query('BEGIN');
 
-        // 1. Update thông tin vé chính
+        // Log chuẩn để debug:
+        console.log("SQL Input:", { name, price, description, image_url, id });
+
         const updateTicketQuery = `
-    UPDATE public.buffet_tickets 
-    SET 
-       name = COALESCE(NULLIF($1, ''), name),
-price = COALESCE($2, price),
-description = COALESCE(NULLIF($3, ''), description),
-image_url = COALESCE($4, image_url)
-    WHERE id = $5
-    RETURNING *;
-`;
+            UPDATE public.buffet_tickets 
+            SET 
+                name = COALESCE($1, name),
+                price = COALESCE($2, price),
+                description = COALESCE($3, description),
+                image_url = COALESCE($4, image_url)
+            WHERE id = $5
+            RETURNING *;
+        `;
+
         const ticketRes = await client.query(updateTicketQuery, [
-            name ?? null,
-            price ? Number(price) : null,
-            description ?? null,
-            image_url ?? null,
+            name || null,
+            price, // Đã parse số ở controller
+            description || null,
+            image_url, // Nếu null thì COALESCE giữ ảnh cũ
             id
         ]);
 
-        // 2. Xử lý bảng trung gian: Xóa cũ - Thêm mới
         if (Array.isArray(menu_ids)) {
-
+            await client.query('DELETE FROM public.buffet_ticket_menus WHERE buffet_ticket_id = $1', [id]);
             if (menu_ids.length > 0) {
-                await client.query(
-                    'DELETE FROM public.buffet_ticket_menus WHERE buffet_ticket_id = $1',
-                    [id]
-                );
-
                 await client.query(`
-            INSERT INTO public.buffet_ticket_menus (buffet_ticket_id, menu_id)
-            SELECT $1, unnest($2::uuid[])
-        `, [id, menu_ids]);
-
-            } else {
-                // ❌ KHÔNG DELETE nếu không có menu mới
-                console.log("⚠️ Skip update menus vì rỗng");
+                    INSERT INTO public.buffet_ticket_menus (buffet_ticket_id, menu_id)
+                    SELECT $1, unnest($2::uuid[])
+                `, [id, menu_ids]);
             }
         }
-
 
         await client.query('COMMIT');
         return ticketRes.rows[0];

@@ -77,32 +77,37 @@ export const BuffetPackageListSection = ({ tickets = [], setTickets, loading, al
                 : [...prev, menuId]
         );
     };
-
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImageFile(file);
+            setPreviewImg(URL.createObjectURL(file)); // Xem trước ảnh mới
+        }
+    };
     const handleUpdate = async () => {
+        console.log("Dữ liệu FE chuẩn bị gửi:", selectedTicket);
+        console.log("Menu IDs chuẩn bị gửi:", selectedMenuIds);
         try {
             if (!selectedTicket?.id) {
-                console.error("❌ ID bị undefined:", selectedTicket);
                 alert("Lỗi: Không có ID vé!");
                 return;
             }
 
-            console.log("🔥 ID gửi lên:", selectedTicket.id);
-
             const formData = new FormData();
+            // Luôn gửi các thông tin hiện tại trong state
+            formData.append("name", selectedTicket.name || "");
+            formData.append("price", selectedTicket.price || 0);
+            formData.append("description", selectedTicket.description || "");
 
-            formData.append("name", selectedTicket.name);
-            formData.append("price", selectedTicket.price);
-            formData.append("description", selectedTicket.description);
-            formData.append("menu_ids", JSON.stringify(selectedMenuIds));
+            // Chỉ append menu_ids một lần duy nhất
+            // Gửi cả khi mảng rỗng để có thể xóa trắng menu nếu muốn
+            formData.append("menu_ids", JSON.stringify(selectedMenuIds || []));
 
-            if (imageFile) formData.append("image", imageFile);
-            if (selectedMenuIds && selectedMenuIds.length > 0) {
-                formData.append("menu_ids", JSON.stringify(selectedMenuIds));
+            if (imageFile) {
+                formData.append("image", imageFile);
             }
-            const url = `http://localhost:3000/api/admin/tickets/${selectedTicket.id}`;
-            console.log("🔥 CALL API:", url);
 
-            const response = await fetch(url, {
+            const response = await fetch(`http://localhost:3000/api/admin/tickets/${selectedTicket.id}`, {
                 method: "PATCH",
                 body: formData,
             });
@@ -296,6 +301,30 @@ export const BuffetPackageListSection = ({ tickets = [], setTickets, loading, al
                                                 border: "1px solid #ddd"
                                             }}
                                         />
+                                        <Button
+                                            variant="outlined"
+                                            component="label"
+                                            fullWidth
+                                            sx={{
+                                                mt: 1,
+                                                color: "#a21a16",               // Chữ màu đỏ
+                                                borderColor: "#a21a16",         // Viền màu đỏ
+                                                fontWeight: 700,
+                                                "&:hover": {
+                                                    bgcolor: "#a21a16",         // Nền đỏ khi hover
+                                                    color: "#fff",              // Chữ trắng khi hover
+                                                    borderColor: "#a21a16",     // Giữ viền đỏ
+                                                }
+                                            }}
+                                        >
+                                            Đổi ảnh
+                                            <input
+                                                type="file"
+                                                hidden
+                                                accept="image/*"
+                                                onChange={handleFileChange}
+                                            />
+                                        </Button>
                                     </Box>
 
                                     <TextField
