@@ -44,7 +44,14 @@ export const MainLogin = () => {
 
       setLoading(true);
 
-      const res = await fetch("http://localhost:3000/api/users/login", {
+      const API_URL = import.meta.env.VITE_SOCKET_URL;
+
+      if (!API_URL) {
+        setError("Thiếu cấu hình API");
+        return;
+      }
+
+      const res = await fetch(`${API_URL}/users/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
