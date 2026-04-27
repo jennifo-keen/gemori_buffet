@@ -33,16 +33,6 @@ const TableCard = ({ data, onComplete, onUpdateItem }) => {
         <ItemListOpt items={data?.items || []} onUpdateItem={onUpdateItem} />
       </Box>
 
-      {/* Caret Down Icon */}
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="center"
-        sx={{ px: 0, py: 0.75, width: "100%" }}
-      >
-        <KeyboardArrowDownIcon sx={{ width: 24, height: 24 }} />
-      </Stack>
-
       {/* Bottom Action Bar */}
       <Box
         sx={{

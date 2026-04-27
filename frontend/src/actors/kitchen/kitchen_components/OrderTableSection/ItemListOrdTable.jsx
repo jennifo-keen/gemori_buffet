@@ -179,10 +179,6 @@ export const ItemListOrdTable = ({ items = [], onUpdateItem }) => {
         );
       })}
 
-      {/* Caret down indicator */}
-     <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 1 }}>
-        <KeyboardArrowDownIcon sx={{ width: 32, height: 32, color: "text.secondary" }} />
-      </Box>
     </Box>
   );
 };
