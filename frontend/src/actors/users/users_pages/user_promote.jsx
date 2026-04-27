@@ -9,7 +9,10 @@ export const Main = () => {
   return (
     <ThemeProvider>
       <Box component="main">
-        <Box sx={{ px: 3, py: 4, width: "100%" }}>
+        <Box sx={{
+        px: { xs: 2, sm: 3, md: 6, lg: "72px" },
+        py: "24px",
+      }}>
           <PromotionsHeaderSection />
           <PromotionsCardsSection />
           <FooterTermsSection />
