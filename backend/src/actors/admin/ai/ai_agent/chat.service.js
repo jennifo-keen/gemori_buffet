@@ -51,8 +51,9 @@ const formatResponse = (sql, rows, question) => {
 //  gọi python semantic
 const semanticSearch = (question) => {
     return new Promise((resolve) => {
-
-        const py = spawn("py", [
+        // Sử dụng lệnh Python phù hợp cho từng hệ điều hành
+        const pythonCmd = process.platform === "win32" ? "py" : "python3";
+        const py = spawn(pythonCmd, [
             "./src/actors/admin/ai/ai_agent/nlp/samantic_search.py",
             JSON.stringify({ question })
         ]);
