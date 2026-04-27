@@ -22,7 +22,7 @@ const updateStatus = async (id, isActive) => {
 
 const createTicket = async (ticketData) => {
     const { name, price, description, image_url } = ticketData;
-
+    console.log("DỮ LIỆU CHUẨN BỊ INSERT:", { name, price, image_url });
     // Câu lệnh SQL INSERT
     const query = `
         INSERT INTO public.buffet_tickets (name, price, description, image_url, is_active)
@@ -43,24 +43,35 @@ const updateTicket = async (id, ticketData) => {
     try {
         await client.query('BEGIN');
 
-        // 1. Update thông tin vé chính
+        // Log chuẩn để debug:
+        console.log("SQL Input:", { name, price, description, image_url, id });
+
         const updateTicketQuery = `
             UPDATE public.buffet_tickets 
-            SET name = $1, price = $2, description = $3, 
+            SET 
+                name = COALESCE($1, name),
+                price = COALESCE($2, price),
+                description = COALESCE($3, description),
                 image_url = COALESCE($4, image_url)
-            WHERE id = $5 RETURNING *;
+            WHERE id = $5
+            RETURNING *;
         `;
-        const ticketRes = await client.query(updateTicketQuery, [name, price, description, image_url, id]);
 
-        // 2. Xử lý bảng trung gian: Xóa cũ - Thêm mới
+        const ticketRes = await client.query(updateTicketQuery, [
+            name || null,
+            price, // Đã parse số ở controller
+            description || null,
+            image_url, // Nếu null thì COALESCE giữ ảnh cũ
+            id
+        ]);
+
         if (Array.isArray(menu_ids)) {
             await client.query('DELETE FROM public.buffet_ticket_menus WHERE buffet_ticket_id = $1', [id]);
             if (menu_ids.length > 0) {
-                const insertQuery = `
+                await client.query(`
                     INSERT INTO public.buffet_ticket_menus (buffet_ticket_id, menu_id)
                     SELECT $1, unnest($2::uuid[])
-                `;
-                await client.query(insertQuery, [id, menu_ids]);
+                `, [id, menu_ids]);
             }
         }
 

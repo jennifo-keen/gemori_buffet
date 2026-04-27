@@ -56,17 +56,17 @@ export const BuffetManagementHeaderSection = ({ onTicketAdded }) => {
 
         try {
             setLoading(true);
-
             // QUAN TRỌNG: Dùng FormData để gửi file thay vì JSON
             const data = new FormData();
-            data.append("name", formData.name);
-            data.append("price", formData.price);
-            data.append("description", formData.description);
-
             if (selectedFile) {
                 // Key "image" phải khớp với uploadTickets.single('image') ở Backend
                 data.append("image", selectedFile);
             }
+            data.append("name", formData.name);
+            data.append("price", formData.price);
+            data.append("description", formData.description);
+
+
             const response = await fetch("http://localhost:3000/api/admin/tickets/create_ticket", {
                 method: "POST",
                 body: data

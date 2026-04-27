@@ -5,6 +5,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Box,
+  Button,
   CircularProgress,
   IconButton,
   Stack,
@@ -13,6 +14,7 @@ import {
 import axios from "axios";
 
 const API_BASE_URL = `${import.meta.env.VITE_SOCKET_URL}/menu`;
+
 const FALLBACK_IMAGE =
   "https://res.cloudinary.com/dbifhgaic/image/upload/v1771769449/ChatGPT_Image_21_10_29_22_thg_2_2026_yfyu9j.png";
 
@@ -34,6 +36,17 @@ export const Main = () => {
   const [loadingList, setLoadingList] = useState(true);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [error, setError] = useState("");
+
+  const [menuPage, setMenuPage] = useState(1);
+  const itemsPerPage = 6;
+
+  const comboMenus = buffetDetail?.menus || [];
+  const totalMenuPages = Math.ceil(comboMenus.length / itemsPerPage);
+
+  const paginatedComboMenus = comboMenus.slice(
+    (menuPage - 1) * itemsPerPage,
+    menuPage * itemsPerPage
+  );
 
   const toggleSection = (sectionId) => {
     setExpandedSections((prev) => ({
@@ -67,8 +80,8 @@ export const Main = () => {
         setError("");
 
         const response = await axios.get(`${API_BASE_URL}/buffet-tickets`);
-
         const list = response?.data?.data || [];
+
         setBuffetList(list);
 
         if (list.length > 0) {
@@ -106,6 +119,10 @@ export const Main = () => {
     };
 
     fetchBuffetDetail();
+  }, [activeItem]);
+
+  useEffect(() => {
+    setMenuPage(1);
   }, [activeItem]);
 
   const currentIndex = buffetList.findIndex((item) => item.code === activeItem);
@@ -163,7 +180,6 @@ export const Main = () => {
               key={section.id}
               sx={{ borderBottom: "1px solid", borderColor: "grey.100" }}
             >
-              {/* Section Header */}
               <Stack
                 direction="row"
                 alignItems="center"
@@ -213,7 +229,6 @@ export const Main = () => {
                 />
               </Stack>
 
-              {/* Section Items */}
               {expandedSections[section.id] && (
                 <Stack
                   spacing={1.5}
@@ -224,32 +239,14 @@ export const Main = () => {
                   }}
                 >
                   {loadingList && section.id === "buffet" ? (
-                    <Stack
-                      direction="row"
-                      alignItems="center"
-                      spacing={1}
-                      sx={{ py: 1 }}
-                    >
+                    <Stack direction="row" alignItems="center" spacing={1}>
                       <CircularProgress size={16} />
-                      <Typography
-                        sx={{
-                          fontFamily: '"Be Vietnam Pro", Helvetica',
-                          fontSize: "14px",
-                          color: "#64748b",
-                        }}
-                      >
+                      <Typography sx={{ fontSize: "14px", color: "#64748b" }}>
                         Đang tải...
                       </Typography>
                     </Stack>
                   ) : error && section.id === "buffet" ? (
-                    <Typography
-                      sx={{
-                        fontFamily: '"Be Vietnam Pro", Helvetica',
-                        fontSize: "14px",
-                        color: "error.main",
-                        py: 1,
-                      }}
-                    >
+                    <Typography sx={{ fontSize: "14px", color: "error.main" }}>
                       {error}
                     </Typography>
                   ) : section.items.length > 0 ? (
@@ -305,7 +302,6 @@ export const Main = () => {
                   ) : (
                     <Typography
                       sx={{
-                        fontFamily: '"Be Vietnam Pro", Helvetica',
                         fontSize: "14px",
                         color: "#94a3b8",
                         py: 1,
@@ -327,19 +323,18 @@ export const Main = () => {
         spacing={{ xs: 3, sm: 4 }}
         sx={{ flex: 1, alignItems: "flex-start", width: "100%" }}
       >
-        {/* Image with navigation arrows */}
-        <Box
-          sx={{
-            width: "100%",
-            flex: 1,
-            position: "relative",
-          }}
-        >
+        {/* Image */}
+        <Box sx={{ width: "100%", flex: 1, position: "relative" }}>
           <Box
             sx={{
               borderRadius: "16px",
               boxShadow: "0px 1px 2px #0000000d",
-              aspectRatio: { xs: "1 / 1.15", sm: "1 / 1", md: "0.9", lg: "0.75" },
+              aspectRatio: {
+                xs: "1 / 1.15",
+                sm: "1 / 1",
+                md: "0.9",
+                lg: "0.75",
+              },
               backgroundImage: `url(${
                 buffetDetail?.image_url || FALLBACK_IMAGE
               })`,
@@ -363,7 +358,7 @@ export const Main = () => {
               "&:hover": { bgcolor: "rgba(255,255,255,0.9)" },
             }}
           >
-            <ChevronLeftIcon sx={{ width: { xs: 22, sm: 24 }, height: { xs: 22, sm: 24 } }} />
+            <ChevronLeftIcon />
           </IconButton>
 
           <IconButton
@@ -379,7 +374,7 @@ export const Main = () => {
               "&:hover": { bgcolor: "rgba(255,255,255,0.9)" },
             }}
           >
-            <ChevronRightIcon sx={{ width: { xs: 22, sm: 24 }, height: { xs: 22, sm: 24 } }} />
+            <ChevronRightIcon />
           </IconButton>
         </Box>
 
@@ -401,19 +396,12 @@ export const Main = () => {
             {loadingDetail ? (
               <Stack direction="row" alignItems="center" spacing={1}>
                 <CircularProgress size={20} />
-                <Typography
-                  sx={{
-                    fontFamily: '"Be Vietnam Pro", Helvetica',
-                    fontSize: "14px",
-                    color: "#64748b",
-                  }}
-                >
+                <Typography sx={{ fontSize: "14px", color: "#64748b" }}>
                   Đang tải chi tiết...
                 </Typography>
               </Stack>
             ) : (
               <>
-                {/* Product Title */}
                 <Typography
                   sx={{
                     fontFamily: '"Be Vietnam Pro", Helvetica',
@@ -427,7 +415,6 @@ export const Main = () => {
                   {buffetDetail?.name || "Chưa có dữ liệu"}
                 </Typography>
 
-                {/* Price Row */}
                 <Stack
                   direction="row"
                   alignItems="baseline"
@@ -459,13 +446,11 @@ export const Main = () => {
                   </Typography>
                 </Stack>
 
-                {/* VAT Note */}
                 <Typography
                   component="p"
                   sx={{
                     fontFamily: '"Be Vietnam Pro", Helvetica',
                     fontSize: "12px",
-                    fontWeight: 400,
                     lineHeight: "20px",
                     color: "#9ca3af",
                   }}
@@ -473,21 +458,137 @@ export const Main = () => {
                   (Giá chưa bao gồm VAT)
                 </Typography>
 
-                {/* Description */}
-                <Typography
-                  sx={{
-                    mt: 2,
-                    fontFamily: '"Be Vietnam Pro", Helvetica',
-                    fontSize: { xs: "14px", sm: "15px", md: "16px" },
-                    fontWeight: 400,
-                    lineHeight: { xs: "24px", sm: "26px", md: "28px" },
-                    color: "#4b5563",
-                    whiteSpace: "pre-line",
-                    wordBreak: "break-word",
-                  }}
-                >
-                  {buffetDetail?.description || "Chưa có mô tả"}
-                </Typography>
+                {/* Danh sách món trong combo */}
+                <Box sx={{ mt: 2 }}>
+                  <Typography
+                    sx={{
+                      fontFamily: '"Be Vietnam Pro", Helvetica',
+                      fontSize: { xs: "16px", sm: "17px" },
+                      fontWeight: 700,
+                      color: "#1f2937",
+                      mb: 1.5,
+                    }}
+                  >
+                    Các món có trong combo
+                  </Typography>
+
+                  {comboMenus.length > 0 ? (
+                    <>
+                      <Stack spacing={1}>
+                        {paginatedComboMenus.map((menuItem) => (
+                          <Box
+                            key={menuItem.id}
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1.2,
+                              p: 1.2,
+                              borderRadius: "10px",
+                              bgcolor: "#fff7ed",
+                              border: "1px solid #fed7aa",
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                width: 7,
+                                height: 7,
+                                borderRadius: "50%",
+                                bgcolor: "#f97316",
+                                flexShrink: 0,
+                              }}
+                            />
+
+                            <Box sx={{ flex: 1 }}>
+                              <Typography
+                                sx={{
+                                  fontFamily: '"Be Vietnam Pro", Helvetica',
+                                  fontSize: { xs: "14px", sm: "15px" },
+                                  fontWeight: 600,
+                                  color: "#374151",
+                                }}
+                              >
+                                {menuItem.name}
+                              </Typography>
+
+                              {menuItem.category && (
+                                <Typography
+                                  sx={{
+                                    fontFamily: '"Be Vietnam Pro", Helvetica',
+                                    fontSize: "12px",
+                                    color: "#9ca3af",
+                                  }}
+                                >
+                                  {menuItem.category}
+                                </Typography>
+                              )}
+                            </Box>
+                          </Box>
+                        ))}
+                      </Stack>
+
+                      {totalMenuPages > 1 && (
+                        <Stack
+                          direction="row"
+                          alignItems="center"
+                          justifyContent="space-between"
+                          sx={{ mt: 1.5 }}
+                        >
+                          <Button
+                            size="small"
+                            disabled={menuPage === 1}
+                            onClick={() => setMenuPage((prev) => prev - 1)}
+                            sx={{
+                              textTransform: "none",
+                              fontWeight: 700,
+                              color: "#f97316",
+                              "&.Mui-disabled": {
+                                color: "#d1d5db",
+                              },
+                            }}
+                          >
+                            Trước
+                          </Button>
+
+                          <Typography
+                            sx={{
+                              fontSize: "13px",
+                              color: "#6b7280",
+                              fontWeight: 600,
+                            }}
+                          >
+                            {menuPage}/{totalMenuPages}
+                          </Typography>
+
+                          <Button
+                            size="small"
+                            disabled={menuPage === totalMenuPages}
+                            onClick={() => setMenuPage((prev) => prev + 1)}
+                            sx={{
+                              textTransform: "none",
+                              fontWeight: 700,
+                              color: "#f97316",
+                              "&.Mui-disabled": {
+                                color: "#d1d5db",
+                              },
+                            }}
+                          >
+                            Sau
+                          </Button>
+                        </Stack>
+                      )}
+                    </>
+                  ) : (
+                    <Typography
+                      sx={{
+                        fontFamily: '"Be Vietnam Pro", Helvetica',
+                        fontSize: "14px",
+                        color: "#9ca3af",
+                      }}
+                    >
+                      Combo này chưa có món ăn.
+                    </Typography>
+                  )}
+                </Box>
               </>
             )}
           </Box>

@@ -24,7 +24,9 @@ const patchStatus = async (req, res) => {
 const createTicket = async (req, res) => {
     try {
         const { name, price, description } = req.body;
-        const image_url = req.file ? req.file.path : null;
+        const image_url = req.file ? req.file.secure_url : null;
+
+        console.log("Check link ảnh ở Controller (ĐÃ FIX):", image_url);
 
         if (!name || !price) {
             return res.status(400).json({ message: "Tên và giá vé là bắt buộc!" });
@@ -51,38 +53,42 @@ const createTicket = async (req, res) => {
 const updateTicket = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, price, description, menu_ids } = req.body;
 
-        // Nếu m dùng multer, ảnh sẽ nằm trong req.file. 
-        // Nếu không gửi file mới, image_url sẽ là null và Service sẽ giữ ảnh cũ.
+        // Multer sẽ bỏ dữ liệu vào req.body. 
+        // Nếu dùng FormData, tất cả sẽ là String hoặc undefined.
+        let { name, price, description, menu_ids } = req.body;
+
         const image_url = req.file ? req.file.path : null;
 
-        // Ép kiểu menu_ids về mảng nếu FE gửi lên dạng string hoặc undefined
-        const parsedMenuIds = Array.isArray(menu_ids) ? menu_ids : (menu_ids ? [menu_ids] : []);
+        // Ép kiểu price về số ngay tại đây
+        const numericPrice = (price !== undefined && price !== "") ? Number(price) : null;
 
+        let parsedMenuIds = null;
+        if (menu_ids !== undefined && menu_ids !== "undefined") {
+            try {
+                parsedMenuIds = typeof menu_ids === "string" ? JSON.parse(menu_ids) : menu_ids;
+            } catch (err) {
+                console.error("🔥 Parse menu_ids error:", err);
+            }
+        }
+
+        // Truyền dữ liệu sạch vào Service
         const updated = await buffetService.updateTicket(id, {
-            name,
-            price,
-            description,
+            name: name || null,
+            price: numericPrice,
+            description: description || null,
             image_url,
             menu_ids: parsedMenuIds
         });
 
-        if (!updated) {
-            return res.status(404).json({ message: "Không tìm thấy vé để cập nhật!" });
-        }
+        if (!updated) return res.status(404).json({ message: "Không tìm thấy vé!" });
 
-        return res.status(200).json({
-            success: true,
-            message: "Cập nhật vé và thực đơn thành công",
-            ticket: updated
-        });
+        return res.status(200).json({ success: true, ticket: updated });
     } catch (error) {
-        console.error("🔥 UPDATE TICKET ERROR:", error);
+        console.error("🔥 CONTROLLER ERROR:", error);
         return res.status(500).json({ error: error.message });
     }
 };
-
 const deleteTicket = async (req, res) => {
     try {
         const { id } = req.params;
@@ -94,7 +100,6 @@ const deleteTicket = async (req, res) => {
 
         res.json({ message: "Xóa vé thành công", deletedTicket: deleted });
     } catch (error) {
-        // Nếu lỗi do ràng buộc dữ liệu (mã 23503 trong Postgres)
         if (error.code === '23503') {
             return res.status(400).json({
                 message: "Vé này đã có dữ liệu giao dịch/hóa đơn, không thể xóa vĩnh viễn. Hãy dùng chức năng 'Tạm ngưng'!"
@@ -104,4 +109,10 @@ const deleteTicket = async (req, res) => {
     }
 };
 
-module.exports = { getTickets, patchStatus, createTicket, deleteTicket, updateTicket };
+module.exports = {
+    getTickets,
+    patchStatus,
+    createTicket,
+    deleteTicket,
+    updateTicket
+};
