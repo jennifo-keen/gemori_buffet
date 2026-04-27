@@ -18,8 +18,9 @@ const runForecast = async () => {
         // Fix đường dẫn: forecastService.js cùng folder với forecast.py
         const pyPath = path.join(__dirname, "../ai/ai/forecast.py");
 
-        // Gọi Python bằng lệnh 'py' (Windows)
-        const py = spawn("py", [pyPath, JSON.stringify(data)]);
+        // Gọi Python với lệnh phù hợp cho từng hệ điều hành
+        const pythonCmd = process.platform === "win32" ? "py" : "python3";
+        const py = spawn(pythonCmd, [pyPath, JSON.stringify(data)]);
 
         let output = "";
         let errorOutput = "";
