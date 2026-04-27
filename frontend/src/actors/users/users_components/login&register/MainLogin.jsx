@@ -38,7 +38,7 @@ export const MainLogin = () => {
       setError("");
 
       if (!email.trim() || !password.trim()) {
-        setError("Vui lòng nhập đầy đủ email và mật khẩu");
+        setError("Vui lòng nhập đầy đủ email và mật khẩu.");
         return;
       }
 
