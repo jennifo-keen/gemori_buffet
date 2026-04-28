@@ -21,6 +21,8 @@ import {
 } from "@mui/material";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 
+const API_BASE_URL = import.meta.env.VITE_SOCKET_URL;
+
 const genderOptions = [
   { value: "nam", label: "Nam" },
   { value: "nu", label: "Nữ" },
@@ -87,7 +89,11 @@ const MainRegister = () => {
   };
 
   const validateForm = () => {
-    if (!formData.email.trim() || !formData.phone.trim() || !formData.password.trim()) {
+    if (
+      !formData.email.trim() ||
+      !formData.phone.trim() ||
+      !formData.password.trim()
+    ) {
       return "Vui lòng nhập email, số điện thoại và mật khẩu";
     }
 
@@ -116,6 +122,11 @@ const MainRegister = () => {
     try {
       setLoading(true);
 
+      if (!API_BASE_URL) {
+        setErrorMsg("Thiếu cấu hình API");
+        return;
+      }
+
       const payload = {
         full_name: formData.full_name.trim(),
         email: formData.email.trim(),
@@ -126,7 +137,7 @@ const MainRegister = () => {
         gender: formData.gender || null,
       };
 
-      const response = await fetch("http://localhost:3000/api/users/register", {
+      const response = await fetch(`${API_BASE_URL}/users/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -296,7 +307,11 @@ const MainRegister = () => {
               </Box>
             </Stack>
 
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={2.5} alignItems="flex-start">
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2.5}
+              alignItems="flex-start"
+            >
               <Box flex={1} width="100%">
                 <Typography sx={labelSx}>Ngày tháng năm sinh</Typography>
                 <TextField
@@ -349,7 +364,8 @@ const MainRegister = () => {
                             fontWeight: 500,
                             lineHeight: "24px",
                             color: "rgba(51, 65, 85, 1)",
-                            fontFamily: '"Be Vietnam Pro", Helvetica, sans-serif',
+                            fontFamily:
+                              '"Be Vietnam Pro", Helvetica, sans-serif',
                           }}
                         >
                           {option.label}
