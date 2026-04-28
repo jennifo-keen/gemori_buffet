@@ -2,6 +2,8 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CloseIcon from "@mui/icons-material/Close";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { useNavigate } from "react-router-dom";
 import {
     Box,
     Button,
@@ -11,7 +13,7 @@ import {
     Stack,
     Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 const HEADER_BG = "#FFF7F4";
 const HEADER_TEXT = "#A21A16";
@@ -37,7 +39,7 @@ const StatusBadge = ({ status }) => {
     );
 };
 
-export const OrdersListAndDetailSection = ({ filterStatus }) => {
+export const OrdersListAndDetailSection = ({ filterStatus, filterDate }) => {
     const [orders, setOrders] = useState([]);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [items, setItems] = useState([]);
@@ -52,6 +54,42 @@ export const OrdersListAndDetailSection = ({ filterStatus }) => {
         const d = new Date(date);
         return d.toLocaleDateString("vi-VN") + " • " + d.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
     };
+
+    const fetchOrders = useCallback(async () => {
+        try {
+            let url = `${BASE_URL}/orders`;
+            if (filterDate && filterDate.trim() !== "") {
+                url += `?date=${filterDate}`;
+            }
+
+            const res = await fetch(url);
+            const json = await res.json();
+
+            // ✅ KIỂM TRA: Nếu json.data không tồn tại thì trả về mảng rỗng
+            if (!json || !json.data) {
+                setOrders([]);
+                return [];
+            }
+
+            const mapped = json.data.map((o) => ({
+                id: o.id,
+                code: `#ORD-${o.id.slice(0, 6)}`,
+                table_id: o.table_id,
+                table: o.table_code,
+                time: formatDate(o.order_time),
+                total: Number(o.total_amount).toLocaleString() + "₫",
+                status: mapStatus(o.order_status, o.payment_status),
+                raw_date: o.order_time
+            }));
+
+            setOrders(mapped);
+            return mapped;
+        } catch (error) {
+            console.error("Lỗi fetch:", error);
+            setOrders([]); // Reset về mảng rỗng khi lỗi
+            return [];    // ✅ QUAN TRỌNG: Phải return mảng rỗng thay vì undefined
+        }
+    }, [BASE_URL, filterDate]);
 
     const handleSelect = async (id) => {
         setSelectedId(id);
@@ -72,24 +110,26 @@ export const OrdersListAndDetailSection = ({ filterStatus }) => {
     };
 
     useEffect(() => {
-        const fetchOrders = async () => {
-            try {
-                const res = await fetch(`${BASE_URL}/orders`);
-                const json = await res.json();
-                const mapped = json.data.map((o) => ({
-                    id: o.id,
-                    code: `#ORD-${o.id.slice(0, 6)}`,
-                    table: o.table_code,
-                    time: formatDate(o.order_time),
-                    total: Number(o.total_amount).toLocaleString() + "₫",
-                    status: mapStatus(o.order_status, o.payment_status),
-                }));
-                setOrders(mapped);
-                if (mapped.length > 0) handleSelect(mapped[0].id);
-            } catch (error) { console.error(error); }
+        let isMounted = true;
+
+        const loadData = async () => {
+            const mapped = await fetchOrders();
+
+            // ✅ KIỂM TRA: Đảm bảo mapped có tồn tại và là mảng trước khi dùng .length
+            if (isMounted && Array.isArray(mapped) && mapped.length > 0) {
+                setPage(prev => (prev !== 1 ? 1 : prev));
+                setTimeout(() => {
+                    if (isMounted) handleSelect(mapped[0].id);
+                }, 0);
+            } else if (isMounted) {
+                setSelectedOrder(null);
+                setSelectedId(null);
+            }
         };
-        fetchOrders();
-    }, []);
+
+        loadData();
+        return () => { isMounted = false; };
+    }, [fetchOrders]);
 
     const filteredOrders = orders.filter(o => !filterStatus || o.status === filterStatus);
     const totalPages = Math.ceil(filteredOrders.length / itemsPerPage) || 1;
@@ -97,8 +137,45 @@ export const OrdersListAndDetailSection = ({ filterStatus }) => {
     const startIndex = (safePage - 1) * itemsPerPage;
     const paginatedOrders = filteredOrders.slice(startIndex, startIndex + itemsPerPage);
 
+    // ✅ Hàm xóa giờ đã có thể gọi fetchOrders thoải mái
+    const handleDeleteOrder = async (id) => {
+        if (!window.confirm("Bạn có chắc chắn muốn xóa đơn hàng này không? Hành động này không thể hoàn tác.")) return;
+
+        try {
+            const res = await fetch(`${BASE_URL}/orders/${id}`, {
+                method: "DELETE",
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                setSelectedOrder(null);
+                setSelectedId(null);
+                await fetchOrders(); // Hết lỗi undefined rồi nhé!
+                alert("Đã xóa đơn hàng thành công!");
+            } else {
+                alert("Lỗi: " + result.message);
+            }
+        } catch (error) {
+            console.error("Lỗi khi xóa:", error);
+        }
+    };
+
+    const navigate = useNavigate();
+
+    // Giả sử 'order' là object chứa thông tin đơn hàng đang xem
+    const handlePaymentRedirect = () => {
+        // console.log("Dữ liệu đơn hiện tại:", selectedOrder); // Ông log dòng này ra để kiểm tra xem có table_id chưa
+
+        if (selectedOrder && selectedOrder.table_id) {
+            const url = `/staff/checkout?tableId=${selectedOrder.table_id}&tableCode=${selectedOrder.table_code}`;
+            navigate(url);
+        } else {
+            alert("Không tìm thấy thông tin bàn! Hãy kiểm tra xem API đã trả về table_id chưa.");
+        }
+    };
+
     return (
-        <Stack direction="row" spacing={1.5} alignItems="stretch"> {/* Căn stretch để 2 cột dài bằng nhau */}
+        <Stack direction="row" spacing={1.5} alignItems="stretch">
             {/* DANH SÁCH BÊN TRÁI */}
             <Paper sx={{ flex: 1.8, overflow: "hidden", display: "flex", flexDirection: "column" }}>
                 <Box sx={{ display: "flex", p: 1, bgcolor: HEADER_BG, borderBottom: "1px solid #f1f1f1" }}>
@@ -109,7 +186,7 @@ export const OrdersListAndDetailSection = ({ filterStatus }) => {
                     <Box sx={{ flex: 1 }}><Typography fontSize="12px" fontWeight={700} color={HEADER_TEXT}>Trạng thái</Typography></Box>
                 </Box>
 
-                <Box sx={{ flex: 1 }}> {/* Box này chứa các dòng đơn hàng */}
+                <Box sx={{ flex: 1 }}>
                     {paginatedOrders.map((o) => {
                         const isActive = selectedId === o.id;
                         return (
@@ -135,83 +212,65 @@ export const OrdersListAndDetailSection = ({ filterStatus }) => {
                         page={safePage}
                         onChange={(_, v) => setPage(v)}
                         sx={{
-                            "& .MuiPaginationItem-root": {
-                                fontSize: "10px",      // Chỉnh cỡ chữ nhỏ lại
-                                minWidth: "24px",     // Thu hẹp chiều rộng nút
-                                height: "24px",       // Thu hẹp chiều cao nút
-                                margin: "0 2px",      // Khoảng cách giữa các số sát nhau hơn
-                                fontWeight: 500       // Độ đậm của chữ
-                            },
-                            "& .MuiSvgIcon-root": {
-                                fontSize: "14px"      // Chỉnh icon mũi tên (trước/sau) nhỏ lại cho cân đối
-                            }
+                            "& .MuiPaginationItem-root": { fontSize: "10px", minWidth: "24px", height: "24px", margin: "0 2px" },
+                            "& .MuiSvgIcon-root": { fontSize: "14px" }
                         }}
                     />
                 </Stack>
             </Paper>
 
             {/* CHI TIẾT BÊN PHẢI */}
-            <Paper sx={{
-                flex: 1,
-                p: 2,
-                display: "flex",
-                flexDirection: "column", // Chuyển sang cột để đẩy các phần tử
-                minHeight: 400
-            }}>
+            <Paper sx={{ flex: 1, p: 2, display: "flex", flexDirection: "column", minHeight: 400 }}>
                 {!selectedOrder ? (
                     <Typography fontSize="13px" color="gray">Chọn đơn để xem chi tiết</Typography>
                 ) : (
                     <>
-                        {/* Header chi tiết */}
                         <Box>
                             <Stack direction="row" justifyContent="space-between" alignItems="center">
                                 <Typography fontSize="13px" fontWeight={700} color={ACTIVE_TEXT}>
                                     #{selectedOrder.id.slice(0, 6)} • Bàn {selectedOrder.table_code}
                                 </Typography>
-                                <IconButton size="small" onClick={() => setSelectedOrder(null)}><CloseIcon fontSize="inherit" /></IconButton>
+                                <IconButton size="small" onClick={() => { setSelectedOrder(null); setSelectedId(null); }}><CloseIcon fontSize="inherit" /></IconButton>
                             </Stack>
                             <Typography fontSize="20px" fontWeight={700} mt={1}>
                                 {Number(selectedOrder.total_amount).toLocaleString()}₫
                             </Typography>
-                            {selectedOrder.customer_name && (
-                                <Typography mt={0.5} fontSize="12px" fontWeight={500} color="gray">
-                                    Khách hàng: {selectedOrder.customer_name}
-                                </Typography>
-                            )}
                         </Box>
 
-                        {/* Danh sách món ăn - Dùng flex: 1 để tự chiếm khoảng không còn lại */}
-                        <Box sx={{
-                            flex: 1,
-                            mt: 2,
-                            borderTop: "1px dashed #eee",
-                            pt: 1,
-                            overflowY: "auto" // Nếu quá nhiều món sẽ có scroll tự thân
-                        }}>
+                        <Box sx={{ flex: 1, mt: 2, borderTop: "1px dashed #eee", pt: 1, overflowY: "auto" }}>
                             {(showAllItems ? items : items.slice(0, 8)).map((it, i) => (
                                 <Stack key={i} direction="row" spacing={1.5} mt={1.5} alignItems="center">
                                     <Box component="img" src={it.image} sx={{ width: 40, height: 40, borderRadius: 1.5, objectFit: "cover" }} />
                                     <Box>
-                                        <Typography fontSize="13px" fontWeight={500} lineHeight={1.2}>{it.name}</Typography>
+                                        <Typography fontSize="13px" fontWeight={500}>{it.name}</Typography>
                                         <Typography fontSize="11px" color="gray">Số lượng: x{it.qty}</Typography>
                                     </Box>
                                 </Stack>
                             ))}
                             {items.length > 8 && (
-                                <Button fullWidth size="small" startIcon={showAllItems ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                                    onClick={() => setShowAllItems(!showAllItems)} sx={{ mt: 1, fontSize: "11px", textTransform: "none", color: "#A21A16" }}>
-                                    {showAllItems ? "Thu gọn" : `Xem thêm ${items.length - 8} món`}
+                                <Button fullWidth size="small" onClick={() => setShowAllItems(!showAllItems)} sx={{ mt: 1, fontSize: "11px", textTransform: "none", color: "#A21A16" }}>
+                                    {showAllItems ? "Thu gọn" : `Xem thêm món`}
                                 </Button>
                             )}
                         </Box>
 
-                        {/* Footer nút bấm - Luôn nằm ở Bottom nhờ flex: 1 ở trên */}
                         {selectedOrder.payment_status !== "paid" && (
                             <Stack direction="row" spacing={1} mt={2} pt={2} sx={{ borderTop: "1px solid #f5f5f5" }}>
-                                <Button fullWidth variant="outlined" sx={{ fontSize: "12px", color: "#A21A16", borderColor: "#A21A16", py: 1, fontWeight: 600 }}>
-                                    In hóa đơn
+                                <Button
+                                    fullWidth
+                                    variant="outlined"
+                                    startIcon={<DeleteOutlineIcon />}
+                                    onClick={() => handleDeleteOrder(selectedOrder.id)}
+                                    sx={{
+                                        fontSize: "12px", color: "#666", borderColor: "#ccc", fontWeight: 600, textTransform: "none",
+                                        "&:hover": { borderColor: "#A21A16", color: "#A21A16" }
+                                    }}
+                                >
+                                    Xóa đơn
                                 </Button>
-                                <Button fullWidth variant="contained" sx={{ fontSize: "12px", bgcolor: "#A21A16", py: 1, fontWeight: 600, "&:hover": { bgcolor: "#801512" } }}>
+                                <Button fullWidth variant="contained"
+                                    onClick={handlePaymentRedirect}
+                                    sx={{ fontSize: "12px", bgcolor: "#A21A16", fontWeight: 600, textTransform: "none", "&:hover": { bgcolor: "#801512" } }}>
                                     Thanh toán
                                 </Button>
                             </Stack>

@@ -1,13 +1,15 @@
 const OrderService = require("./order.service");
-
 class OrderController {
 
     // GET /orders
+    // GET /orders
     async getOrders(req, res) {
         try {
-            const { status } = req.query;
+            // ✅ Lấy cả status VÀ date từ query string
+            const { status, date } = req.query;
 
-            const data = await OrderService.getOrders(status);
+            // ✅ Truyền cả 2 tham số vào Service
+            const data = await OrderService.getOrders(status, date);
 
             res.json({ success: true, data });
         } catch (err) {
@@ -58,6 +60,25 @@ class OrderController {
         } catch (err) {
             console.error("updateStatus error:", err.message);
             res.status(500).json({ success: false });
+        }
+    }
+    // DELETE /orders/:id
+    async deleteOrder(req, res) {
+        try {
+            const { id } = req.params;
+            const success = await OrderService.deleteOrder(id);
+
+            if (!success) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Không tìm thấy đơn hàng để xóa",
+                });
+            }
+
+            res.json({ success: true, message: "Xóa đơn hàng thành công" });
+        } catch (err) {
+            console.error("deleteOrder error:", err.message);
+            res.status(500).json({ success: false, message: "Lỗi hệ thống khi xóa đơn" });
         }
     }
 }
