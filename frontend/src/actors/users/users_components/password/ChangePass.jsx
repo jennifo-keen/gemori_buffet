@@ -14,6 +14,8 @@ import {
   Typography,
 } from "@mui/material";
 
+const API_BASE_URL = import.meta.env.VITE_SOCKET_URL;
+
 const passwordFields = [
   {
     id: "currentPassword",
@@ -75,6 +77,8 @@ export const ChangePass = () => {
       [field]: "",
       api: "",
     }));
+
+    setSuccess("");
   };
 
   const validate = () => {
@@ -107,10 +111,17 @@ export const ChangePass = () => {
       setLoading(true);
       setSuccess("");
 
+      if (!API_BASE_URL) {
+        setErrors({
+          api: "Thiếu cấu hình API",
+        });
+        return;
+      }
+
       const token = localStorage.getItem("token");
 
       const res = await axios.post(
-        `${import.meta.env.VITE_SOCKET_URL}/password/change`,
+        `${API_BASE_URL}/password/change`,
         form,
         {
           headers: {
@@ -119,7 +130,7 @@ export const ChangePass = () => {
         }
       );
 
-      setSuccess(res.data.message);
+      setSuccess(res.data.message || "Cập nhật mật khẩu thành công");
 
       setForm({
         currentPassword: "",

@@ -11,4 +11,7 @@ router.get("/:id", OrderController.getOrderDetail);
 // UPDATE status
 router.patch("/:id/status", OrderController.updateStatus);
 
+// Ví dụ khai báo
+router.delete("/:id", OrderController.deleteOrder);
+
 module.exports = router;

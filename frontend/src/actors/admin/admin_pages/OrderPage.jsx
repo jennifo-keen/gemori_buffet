@@ -8,6 +8,7 @@ import { ThemeProvider } from "../../users/users_components/layout/ThemeProvider
 const OrderPage = () => {
     const [status, setStatus] = useState(null);
     const [counts, setCounts] = useState({ all: 0, ordering: 0, paid: 0 });
+    const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
     useEffect(() => {
         // Định nghĩa hàm async ngay bên trong useEffect
@@ -41,12 +42,12 @@ const OrderPage = () => {
     return (
         <ThemeProvider>
             <Stack spacing={3} sx={{ p: 3 }}>
-                <OrderOverviewHeaderSection />
+
+                <OrderOverviewHeaderSection onDateChange={(newDate) => setDate(newDate)} />
                 <OrderStatusFilterTabsSection onChange={setStatus} counts={counts} />
-                <OrdersListAndDetailSection filterStatus={status} />
+                <OrdersListAndDetailSection filterStatus={status} filterDate={date} />
             </Stack>
         </ThemeProvider>
     );
 };
-
 export default OrderPage;

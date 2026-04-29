@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE_URL = `${import.meta.env.VITE_SOCKET_URL}`;
+const API_BASE_URL = import.meta.env.VITE_SOCKET_URL;
 
 const comboBadgeStyles = {
   default: { backgroundColor: "#e2e8f0", color: "#334155" },
@@ -91,7 +91,7 @@ export const HistoryTable = () => {
       setError("");
 
       const response = await fetch(
-        `${API_BASE_URL}/api/history/${customerId}?page=${page}&limit=${pagination.limit}`
+        `${API_BASE_URL}/history/${customerId}?page=${page}&limit=${pagination.limit}`
       );
       const result = await response.json();
 

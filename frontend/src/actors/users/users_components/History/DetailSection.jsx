@@ -23,7 +23,7 @@ import {
 } from "@mui/material";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-const API_BASE_URL = `${import.meta.env.VITE_URL}`;
+const API_BASE_URL = import.meta.env.VITE_SOCKET_URL;
 
 const formatCurrency = (value) => {
   if (value == null) return "--";
@@ -97,7 +97,7 @@ export const DetailsSection = () => {
         setError("");
 
         const response = await fetch(
-          `${API_BASE_URL}/api/history/${customerId}/${orderId}`
+          `${API_BASE_URL}/history/${customerId}/${orderId}`
         );
         const result = await response.json();
 

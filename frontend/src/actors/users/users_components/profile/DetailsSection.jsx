@@ -91,6 +91,11 @@ export const DetailsSection = () => {
       setLoading(true);
       setErrorMessage("");
 
+      if (!API_BASE_URL) {
+        setErrorMessage("Thiếu cấu hình API");
+        return;
+      }
+
       const response = await axios.get(`${API_BASE_URL}/profile/me`, {
         headers: authHeaders,
       });
@@ -151,6 +156,11 @@ export const DetailsSection = () => {
       setErrorMessage("");
       setSuccessMessage("");
 
+      if (!API_BASE_URL) {
+        setErrorMessage("Thiếu cấu hình API");
+        return;
+      }
+
       const payload = {
         fullName: formData.fullName,
         phone: formData.phone,
@@ -199,8 +209,6 @@ export const DetailsSection = () => {
       setSaving(false);
     }
   };
-
-
 
   if (loading) {
     return (
@@ -318,7 +326,6 @@ export const DetailsSection = () => {
         {successMessage && <Alert severity="success">{successMessage}</Alert>}
 
         <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-          {/* BOX 1 */}
           <Box sx={{ pb: 2, borderBottom: `1px solid ${BORDER_COLOR}` }}>
             <Box sx={fieldRowSx}>
               <Box sx={fieldColSx}>
@@ -348,7 +355,6 @@ export const DetailsSection = () => {
             </Box>
           </Box>
 
-          {/* BOX 2 */}
           <Box sx={{ pb: 2, borderBottom: `1px solid ${BORDER_COLOR}` }}>
             <Box sx={fieldRowSx}>
               <Box sx={fieldColSx}>
@@ -389,7 +395,6 @@ export const DetailsSection = () => {
             </Box>
           </Box>
 
-          {/* BOX 3 */}
           <Box sx={{ pb: 2, borderBottom: `1px solid ${BORDER_COLOR}` }}>
             <Typography sx={fieldLabelSx}>Địa chỉ</Typography>
 
@@ -418,7 +423,6 @@ export const DetailsSection = () => {
             gap: 2,
           }}
         >
-
           <Box
             sx={{
               display: "flex",

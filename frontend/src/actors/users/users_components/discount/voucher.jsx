@@ -15,6 +15,8 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import HistoryIcon from "@mui/icons-material/History";
 import ConfirmationNumberOutlinedIcon from "@mui/icons-material/ConfirmationNumberOutlined";
 
+const API_BASE_URL = import.meta.env.VITE_SOCKET_URL;
+
 export const Voucher = () => {
   const [vouchers, setVouchers] = useState([]);
   const [search, setSearch] = useState("");
@@ -23,7 +25,12 @@ export const Voucher = () => {
   useEffect(() => {
     const fetchVouchers = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_SOCKET_URL}/vouchers/active`);
+        if (!API_BASE_URL) {
+          console.error("Thiếu cấu hình API");
+          return;
+        }
+
+        const res = await axios.get(`${API_BASE_URL}/vouchers/active`);
         setVouchers(res.data.data || []);
       } catch (error) {
         console.error("Lỗi lấy voucher:", error);
@@ -50,7 +57,9 @@ export const Voucher = () => {
     }
 
     if (voucher.discount_type === "fixed") {
-      return `Giảm ${Number(voucher.discount_value).toLocaleString("vi-VN")}đ tổng hóa đơn`;
+      return `Giảm ${Number(voucher.discount_value).toLocaleString(
+        "vi-VN"
+      )}đ tổng hóa đơn`;
     }
 
     return `Giảm ${voucher.discount_value}`;
