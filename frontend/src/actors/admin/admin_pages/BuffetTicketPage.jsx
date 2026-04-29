@@ -12,7 +12,7 @@ const BuffetTicketPage = () => {
     const fetchTickets = async () => {
         try {
             setLoading(true);
-            const response = await fetch("http://localhost:3000/api/admin/tickets");
+            const response = await fetch(`${import.meta.env.VITE_SOCKET_URL}/admin/tickets`);
             const result = await response.json();
 
             // Gia cố: Ép kiểu về mảng dù Backend trả về kiểu gì
@@ -35,7 +35,7 @@ const BuffetTicketPage = () => {
 
     const fetchAllMenus = async () => {
         try {
-            const response = await fetch("http://localhost:3000/api/admin/menus");
+            const response = await fetch(`${import.meta.env.VITE_SOCKET_URL}/admin/menus`);
             const result = await response.json();
 
             console.log("MENU API:", result);

@@ -23,7 +23,7 @@ import {
 } from "@mui/material";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+const API_BASE_URL = `${import.meta.env.VITE_URL}`;
 
 const formatCurrency = (value) => {
   if (value == null) return "--";

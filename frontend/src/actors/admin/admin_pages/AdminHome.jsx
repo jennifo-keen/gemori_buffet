@@ -14,8 +14,8 @@ const AdminHome = () => {
         try {
             setLoading(true);
             const url = date
-                ? `http://localhost:3000/api/admin/dashboard?date=${date}`
-                : "http://localhost:3000/api/admin/dashboard";
+                ? `${import.meta.env.VITE_SOCKET_URL}/admin/dashboard?date=${date}`
+                : `${import.meta.env.VITE_SOCKET_URL}/admin/dashboard`;
 
             const res = await fetch(url);
             if (!res.ok) throw new Error("Không thể lấy dữ liệu từ server");

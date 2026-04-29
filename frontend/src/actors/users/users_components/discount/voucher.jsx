@@ -23,7 +23,7 @@ export const Voucher = () => {
   useEffect(() => {
     const fetchVouchers = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/api/vouchers/active");
+        const res = await axios.get(`${import.meta.env.VITE_SOCKET_URL}/vouchers/active`);
         setVouchers(res.data.data || []);
       } catch (error) {
         console.error("Lỗi lấy voucher:", error);

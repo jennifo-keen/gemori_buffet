@@ -11,7 +11,7 @@ export const DailyRevenueChartSection = () => {
     const fetchRevenue = async (month) => {
         try {
             setLoading(true);
-            const url = `http://localhost:3000/api/admin/report/revenue?month=${month}&year=2026`;
+            const url = `${import.meta.env.VITE_SOCKET_URL}/admin/report/revenue?month=${month}&year=2026`;
             const response = await fetch(url);
             const result = await response.json();
 

@@ -17,7 +17,7 @@ import {
 import axios from "axios";
 
 const BORDER_COLOR = "rgba(177, 65, 53, 0.1)";
-const API_BASE_URL = "http://localhost:3000/api";
+const API_BASE_URL = `${import.meta.env.VITE_SOCKET_URL}`;
 
 const formatDateForInput = (dateString) => {
   if (!dateString) return "";

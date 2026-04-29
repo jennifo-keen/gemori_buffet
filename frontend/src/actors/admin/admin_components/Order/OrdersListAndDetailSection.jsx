@@ -46,7 +46,7 @@ export const OrdersListAndDetailSection = ({ filterStatus }) => {
     const [showAllItems, setShowAllItems] = useState(false);
 
     const itemsPerPage = 8;
-    const BASE_URL = "http://localhost:3000/api/admin";
+    const BASE_URL = `${import.meta.env.VITE_SOCKET_URL}/admin`;
 
     const formatDate = (date) => {
         const d = new Date(date);

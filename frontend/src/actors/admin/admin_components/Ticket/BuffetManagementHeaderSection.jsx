@@ -67,7 +67,7 @@ export const BuffetManagementHeaderSection = ({ onTicketAdded }) => {
             data.append("description", formData.description);
 
 
-            const response = await fetch("http://localhost:3000/api/admin/tickets/create_ticket", {
+            const response = await fetch(`${import.meta.env.VITE_SOCKET_URL}/admin/tickets/create_ticket`, {
                 method: "POST",
                 body: data
             });

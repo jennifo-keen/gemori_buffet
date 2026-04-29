@@ -110,7 +110,7 @@ export const ChangePass = () => {
       const token = localStorage.getItem("token");
 
       const res = await axios.post(
-        "http://localhost:3000/api/password/change",
+        `${import.meta.env.VITE_SOCKET_URL}/password/change`,
         form,
         {
           headers: {

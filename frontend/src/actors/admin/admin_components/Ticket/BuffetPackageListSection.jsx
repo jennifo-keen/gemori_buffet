@@ -107,7 +107,7 @@ export const BuffetPackageListSection = ({ tickets = [], setTickets, loading, al
                 formData.append("image", imageFile);
             }
 
-            const response = await fetch(`http://localhost:3000/api/admin/tickets/${selectedTicket.id}`, {
+            const response = await fetch(`${import.meta.env.VITE_SOCKET_URL}/admin/tickets/${selectedTicket.id}`, {
                 method: "PATCH",
                 body: formData,
             });
@@ -131,7 +131,7 @@ export const BuffetPackageListSection = ({ tickets = [], setTickets, loading, al
 
     const handleToggleStatus = async (id, currentStatus, index) => {
         try {
-            const response = await fetch(`http://localhost:3000/api/admin/tickets/${id}/status`, {
+            const response = await fetch(`${import.meta.env.VITE_SOCKET_URL}/admin/tickets/${id}/status`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ is_active: !currentStatus }),
@@ -152,7 +152,7 @@ export const BuffetPackageListSection = ({ tickets = [], setTickets, loading, al
         if (!window.confirm(`Xóa vĩnh viễn gói vé "${name}"?`)) return;
 
         try {
-            const response = await fetch(`http://localhost:3000/api/admin/tickets/${id}`, { method: "DELETE" });
+            const response = await fetch(`${import.meta.env.VITE_SOCKET_URL}/admin/tickets/${id}`, { method: "DELETE" });
 
             if (response.ok) {
                 setTickets(prev => prev.filter(t => t.id !== id));

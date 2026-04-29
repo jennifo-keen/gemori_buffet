@@ -52,7 +52,7 @@ export const OrderProvider = ({ children }) => {
     loadMenuAndOrder();
     if (!tableCode) return;
 
-    const socket = io('http://localhost:3000');
+    const socket = io(import.meta.env.VITE_URL);
     socketRef.current = socket;
 
     socket.on('connect', () => {

@@ -31,7 +31,7 @@ export const VoucherCampaignListSection = () => {
     const fetchVouchers = async () => {
         try {
             setLoading(true);
-            const response = await fetch("http://localhost:3000/api/admin/vouchers", {
+            const response = await fetch(`${import.meta.env.VITE_SOCKET_URL}/admin/vouchers`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
