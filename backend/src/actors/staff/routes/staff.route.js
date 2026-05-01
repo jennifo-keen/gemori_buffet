@@ -44,6 +44,7 @@ router.get('/tables', tablesController.getAll);
 router.patch('/tables/:id/open', requireRole('staff', 'admin'), tablesController.openTable);
 router.patch('/tables/:id/close', requireRole('staff', 'admin'), tablesController.closeTable);
 router.get('/tables/:tableCode/order', tablesController.getTableOrder);
+router.post('/tables', requireRole('admin'), tablesController.addTable);
 
 // ============ VOUCHERS ROUTES ============
 router.post('/vouchers/validate', requireRole('staff', 'admin'), vouchersController.validate);

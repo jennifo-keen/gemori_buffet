@@ -28,4 +28,11 @@ const getTableOrder = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-module.exports = { getAll, openTable, closeTable, getTableOrder };
+const addTable = async (req, res, next) => {
+  try {
+    const table = await tablesService.addTable();
+    res.status(201).json(table);
+  } catch (err) { next(err); }
+};
+
+module.exports = { getAll, openTable, closeTable, getTableOrder, addTable };

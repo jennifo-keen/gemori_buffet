@@ -1,6 +1,8 @@
 const { pool } = require('../../../config/db');
 const { getIO } = require('../../../config/socket');
 
+const TABLES_PER_FLOOR = 10;
+
 // Lấy tất cả bàn với thông tin số món
 const getAllTables = async () => {
   const result = await pool.query(`
@@ -158,4 +160,34 @@ const getTableCurrentOrderByCode = async (tableCode) => {
   return { ...order, items: itemsResult.rows };
 };
 
-module.exports = { getAllTables, openTable, closeTable, getTableCurrentOrder, getTableCurrentOrderByCode };
+const addTable = async () => {
+  // Lấy số bàn hiện tại để tính code tiếp theo
+  const countResult = await pool.query('SELECT COUNT(*) FROM tables');
+  const count       = parseInt(countResult.rows[0].count);
+  const nextNum     = count + 1;
+
+  // Format: B01, B02, ... B99
+  const tableCode = `B${String(nextNum).padStart(2, '0')}`;
+
+  // Kiểm tra trùng
+  const exist = await pool.query('SELECT id FROM tables WHERE table_code = $1', [tableCode]);
+  if (exist.rows[0]) throw { status: 400, message: `Bàn ${tableCode} đã tồn tại` };
+
+  const result = await pool.query(
+    `INSERT INTO tables (table_code, status)
+     VALUES ($1, 'empty')
+     RETURNING *`,
+    [tableCode]
+  );
+
+  // Emit socket cho staff + kitchen biết có bàn mới
+  try {
+    const io = getIO();
+    io.to('staff').emit('table_added', { table: result.rows[0] });
+    io.to('kitchen').emit('table_added', { table: result.rows[0] });
+  } catch (e) { console.error('Socket:', e.message); }
+
+  return result.rows[0];
+};
+
+module.exports = { getAllTables, openTable, closeTable, getTableCurrentOrder, getTableCurrentOrderByCode, addTable };
