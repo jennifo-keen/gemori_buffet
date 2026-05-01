@@ -1,20 +1,23 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Stack, Box, Typography, CircularProgress } from '@mui/material';
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import SelectFloor from '../staff_components/SelectFloor';
 import SquareTable from '../staff_components/SquareTable';
+import Table_8 from '../staff_components/Table_8';
+import Table_4 from '../staff_components/Table_4';
 
-// ✅ Dùng config mới — bỏ FLOORS, FLOOR1_ROW1, FLOOR1_ROW2
 import { getFloors, getFloorTables, getChairConfig } from '../staff_config/floorConfig';
 import { handleTableAction } from '../staff_config/tablesActions';
 
 import useAuthStaff from '../staff_hook/useAuthStaff';
 import useDialog    from '../staff_hook/useDialog';
 
-const Floor1 = ({ onTableClick, basePath = '/staff' }) => {
+const FloorDynamic = ({ onTableClick, basePath = '/staff' }) => {
   const navigate = useNavigate();
+  const { floorNum } = useParams();              // "2", "3", "4"...
+  const floorIndex   = parseInt(floorNum) - 1;  
   const { showError } = useDialog();
   const {
     tables,
@@ -50,38 +53,44 @@ const Floor1 = ({ onTableClick, basePath = '/staff' }) => {
   }));
 
   // ✅ Lấy bàn tầng 1 (index = 0)
-  const floorTables = getFloorTables(tables, 0);
+  const floorTables = getFloorTables(tables, floorIndex);
   const half        = Math.ceil(floorTables.length / 2);
   const row1        = floorTables.slice(0, half);
   const row2        = floorTables.slice(half);
 
   // ✅ Render 1 bàn — lấy chairConfig từ floorConfig
-  const renderTable = (table) => {
-    const config  = getChairConfig(table.table_code);
-    const chairTop    = config.chairTop    ?? 2;
-    const chairBottom = config.chairBottom ?? 2;
+ const renderTable = (table) => {
+  const config      = getChairConfig(table.table_code);
+  const status      = getStatus(table);
+  const tableNum    = table.table_code;
 
-    return (
-      <Box
-        key={table.table_code}
-        onClick={() => handleClick(table.table_code)}
-        sx={{ cursor: 'pointer' }}
-      >
-        <SquareTable
-          table={{
-            tableNumber: table.table_code,
-            capacity:    `${chairTop + chairBottom} người`,
-            foodStatus:  '',
-            status:      getStatus(table),
-          }}
-          tableActiveColor={getTableColor(table)}
-          chairActiveColor={getChairColor(table)}
-          chairTop={chairTop}
-          chairBottom={chairBottom}
-        />
-      </Box>
-    );
-  };
+  const wrapper = (children) => (
+    <Box key={tableNum} onClick={() => handleClick(tableNum)} sx={{ cursor: 'pointer' }}>
+      {children}
+    </Box>
+  );
+
+  if (config.type === 'Table_8') return wrapper(
+    <Table_8 table={{ tableNumber: tableNum, capacity: '8 người', foodStatus: '', status }} />
+  );
+  if (config.type === 'Table_4') return wrapper(
+    <Table_4 table={{ tableNumber: tableNum, capacity: '4 người', foodStatus: '', status }} />
+  );
+
+  const chairTop    = config.chairTop    ?? 2;
+  const chairBottom = config.chairBottom ?? 2;
+  return wrapper(
+    <SquareTable
+      table={{ tableNumber: tableNum, capacity: `${chairTop + chairBottom} người`, foodStatus: '', status }}
+      tableActiveColor={config.tableColor || getTableColor(table)}
+      chairActiveColor={config.chairColor || getChairColor(table)}
+      chairTop={chairTop}
+      chairBottom={chairBottom}
+      chairLeft={config.chairLeft}
+      chairRight={config.chairRight}
+    />
+  );
+};
 
   return (
     <Box sx={{ p: "32px", gap: "22px" }}>
@@ -94,7 +103,7 @@ const Floor1 = ({ onTableClick, basePath = '/staff' }) => {
             title={f.title}
             emptyTables={f.emptyTables}
             pendingTables={f.pendingTables}
-            status={i === 0 ? 1 : 0}  // tầng 1 đang active
+            status={i === floorIndex ? 1 : 0}  // tầng 1 đang active
             path={f.path}
           />
         ))}
@@ -130,4 +139,4 @@ const Floor1 = ({ onTableClick, basePath = '/staff' }) => {
   );
 };
 
-export default Floor1;
+export default FloorDynamic;

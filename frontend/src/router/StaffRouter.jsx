@@ -6,6 +6,7 @@ import ProtectedStaffRoute from '../actors/staff/staff_context/ProtectedStaffRou
 import StaffLayout from '../actors/staff/staff_pages/StaffLayout.jsx';
 import Floor1 from '../actors/staff/staff_pages/Floor1.jsx';
 import Floor2 from '../actors/staff/staff_pages/Floor2.jsx';
+import FloorDynamic from '../actors/staff/staff_pages/FloorDynamic.jsx';
 import StaffLogin from '../actors/staff/staff_pages/StaffLogin.jsx';
 import StaffOrders from '../actors/staff/staff_pages/StaffOrders.jsx';
 import StaffCheckOut from '../actors/staff/staff_pages/StaffCheckOut.jsx';
@@ -32,6 +33,7 @@ const staffRouter = {
       children: [
         { index: true, element: <Floor1 /> },
         { path: "f2", element: <Floor2 /> },
+        { path: "f:floorNum", element: <FloorDynamic /> },
         { path: "order", element: <StaffOrders /> },
         { 
           path: "checkout", 

@@ -7,7 +7,7 @@ import { getAllTables } from '../staff_api/tableApi';
 import { AuthStaffContext } from './AuthStaffContext';
 
 export const AuthStaffProvider = ({ children }) => {
-  // 🟢 1. KHỞI TẠO: Check cả data Staff và data Admin
+  //KHỞI TẠO: Check cả data Staff và data Admin
   const [admin, setAdmin] = useState(() => {
     const staffSaved = localStorage.getItem('staff_info');
     const adminSaved = localStorage.getItem('user'); // Dữ liệu login uyen.le của bạn
@@ -62,6 +62,14 @@ export const AuthStaffProvider = ({ children }) => {
 
     socket.on('item_status_updated', () => {
       fetchTables();
+    });
+
+    socket.on('table_added', ({ table }) => {
+      setTables(prev => [...prev, table].sort((a, b) => {
+        const numA = parseInt(a.table_code.replace(/\D/g, ''));
+        const numB = parseInt(b.table_code.replace(/\D/g, ''));
+        return numA - numB;
+      }));
     });
 
     socket.on('disconnect', () => {
