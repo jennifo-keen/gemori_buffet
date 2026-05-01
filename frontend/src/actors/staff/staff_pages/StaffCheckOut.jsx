@@ -364,7 +364,7 @@ const handleDeleteItem = (itemId) => {
                           <Box
                             component="img"
                             alt="QR Code"
-                            src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(`${import.meta.env.VITE_URL}/order/${tableCode}`)}`}
+                            src={`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(`https://gemori-buffet.vercel.app/order/${tableCode}`)}`}
                             sx={{
                               width: 160,
                               height: 160,
