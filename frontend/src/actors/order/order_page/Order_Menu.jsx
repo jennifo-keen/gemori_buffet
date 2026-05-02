@@ -32,7 +32,6 @@ const OrderContent = () => {
 
       {/* Sidebar category */}
       <Box sx={{
-        width: { xs: '15vh', md: '20vh' },
         borderRight: "1px solid",
         borderColor: "grey.100",
         backgroundColor: "#fffdfa",
