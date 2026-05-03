@@ -2,7 +2,7 @@ import React from "react";
 import { Stack, Typography, Button } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
-export const CampaignManagementHeaderSection = () => {
+export const CampaignManagementHeaderSection = ({ onAddClick }) => {
     return (
         <Stack direction="row" alignItems="center" justifyContent="space-between" width="100%">
             <Stack spacing={0.5}>
@@ -16,6 +16,7 @@ export const CampaignManagementHeaderSection = () => {
             <Button
                 variant="contained"
                 startIcon={<AddCircleOutlineIcon />}
+                onClick={onAddClick} // Gọi hàm mở modal
                 sx={{
                     backgroundColor: "#8a0000",
                     borderRadius: "8px",
