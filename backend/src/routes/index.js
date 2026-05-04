@@ -15,6 +15,7 @@ router.use('/admin/login', require("../actors/admin/login/login.route"));
 router.use('/admin/vouchers', require("../actors/admin/voucher/voucher.route"));
 router.use('/admin/ai/charts', require("../actors/admin/ai/chart/chart.route"));
 router.use('/admin/inventory', require("../actors/admin/inventory/inventory.route"));
+router.use('/admin/users', require("../actors/admin/user/user.route"));
 
 
 router.use('/auth', require('../actors/admin/auth/auth.route'));

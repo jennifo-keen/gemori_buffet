@@ -11,6 +11,7 @@ import ProtectedRoute from "../actors/admin/admin_context/login/ProtectedRoute";
 import AdLogin from "../actors/admin/AdLogin";
 import VoucherPage from "../actors/admin/admin_pages/VoucherPage"
 import InventoryPage from "../actors/admin/admin_pages/InventoryPage";
+import UserPage from "../actors/admin/admin_pages/UserPage";
 
 const AdminRouter = {
     path: "/admin",
@@ -35,6 +36,7 @@ const AdminRouter = {
                 { path: "quan-ly-don-hang", element: <OrderPage /> },
                 { path: "quan-ly-voucher", element: <VoucherPage /> },
                 { path: "quan-ly-kho", element: <InventoryPage /> },
+                { path: "quan-ly-nguoi-dung", element: <UserPage /> },
             ],
         },
     ],

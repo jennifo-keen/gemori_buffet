@@ -52,7 +52,7 @@ const navSections = [
     {
         sectionLabel: "HỆ THỐNG",
         items: [
-            { id: "nguoi-dung", path: "/admin/nguoi-dung", label: "Người dùng", icon: <PeopleAltOutlinedIcon /> },
+            { id: "nguoi-dung", path: "/admin/quan-ly-nguoi-dung", label: "Người dùng", icon: <PeopleAltOutlinedIcon /> },
             { id: "ai-thong-ke", path: "/admin/ai-thong-ke", label: "Ai & Thống kê", icon: <BarChartOutlinedIcon /> },
             { id: "dieu-hanh", path: "/admin/dieu-hanh", label: "Điều hành hệ thống", icon: <SettingsOutlinedIcon /> },
         ],
