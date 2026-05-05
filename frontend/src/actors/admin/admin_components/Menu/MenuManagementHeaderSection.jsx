@@ -45,7 +45,7 @@ export const MenuManagementHeaderSection = ({ onRefresh }) => {
 
         try {
             // CHÚ Ý: Sửa port 3000 thành 5000 (hoặc port của BE cậu đang chạy)
-            const response = await fetch("http://localhost:3000/api/admin/menus/add", {
+            const response = await fetch(`${import.meta.env.VITE_SOCKET_URL}/admin/menus/add`, {
                 method: "POST",
                 body: data, // Để body là data, KHÔNG thêm Headers Content-Type nhé!
             });

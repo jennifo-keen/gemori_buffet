@@ -66,7 +66,7 @@ export const AiAssistantChatSection = () => {
         setLoading(true);
 
         try {
-            const res = await axios.post("http://localhost:3000/api/admin/chat", {
+            const res = await axios.post(`${import.meta.env.VITE_SOCKET_URL}/admin/chat`, {
                 question: userMessage.content
             });
 

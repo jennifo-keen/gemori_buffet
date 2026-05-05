@@ -7,7 +7,7 @@ export const AccuracyChart = () => {
 
     useEffect(() => {
         // Đảm bảo API này trả về tối đa 15 ngày gần nhất
-        fetch("http://localhost:3000/api/admin/ai/charts")
+        fetch(`${import.meta.env.VITE_SOCKET_URL}/admin/ai/charts`)
             .then(res => res.json())
             .then(json => {
                 if (Array.isArray(json)) {
