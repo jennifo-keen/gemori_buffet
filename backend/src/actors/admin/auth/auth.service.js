@@ -4,7 +4,7 @@ const { pool } = require('../../../config/db');
 
 const login = async (username, password) => {
   const result = await pool.query(
-    'SELECT * FROM admins WHERE username = $1',
+    'SELECT * FROM admins WHERE username = $1', // Nó lấy sạch các cột, bao gồm cả full_name
     [username]
   );
 
@@ -23,7 +23,7 @@ const login = async (username, password) => {
 
   return {
     token,
-    admin: {
+    user: {
       id: admin.id,
       full_name: admin.full_name,
       username: admin.username,

@@ -1,101 +1,151 @@
+import { useEffect, useState } from "react";
 import GroupsIcon from "@mui/icons-material/Groups";
 import PersonOffOutlinedIcon from "@mui/icons-material/PersonOffOutlined";
 import VerifiedUserOutlinedIcon from "@mui/icons-material/VerifiedUserOutlined";
-import { Box, Card, CardContent, Stack, Typography } from "@mui/material";
-// Thay vì dùng Unstable_Grid2, hãy dùng Grid chuẩn từ gói material
-import { Grid } from "@mui/material";// Sử dụng Grid2 để layout chuẩn hơn
+import {
+    Box,
+    Card,
+    CardContent,
+    Grid,
+    Stack,
+    Typography,
+    useTheme,
+    Skeleton,
+} from "@mui/material";
 
-const StatCard = ({ label, value, borderColor, icon }) => (
-    <Card
-        component="section"
-        elevation={0} // Bỏ bóng đổ nặng nề
-        sx={{
-            height: "100%",
-            minHeight: 120,
-            borderRadius: 3, // Bo góc mềm mại hơn
-            border: "1px solid", // Dùng border nhẹ thay vì đổ bóng
-            borderColor: "divider",
-            borderLeft: `6px solid`, // Điểm nhấn ở mép trái
-            borderLeftColor: borderColor,
-            position: "relative",
-            overflow: "hidden",
-            bgcolor: "background.paper",
-            transition: "transform 0.2s",
-            "&:hover": { transform: "translateY(-4px)" } // Hiệu ứng hover nhẹ cho sang
-        }}
-    >
-        <CardContent sx={{ p: 3, "&:last-child": { pb: 3 } }}>
-            <Stack spacing={0.5}>
-                <Typography
-                    variant="caption"
-                    component="h2"
+// 1. Đổi tên prop từ 'icon' thành 'Icon' để ESLint nhận diện là một Component
+// Component con StatCard - Fix dứt điểm lỗi gạch đỏ "Icon is defined but never used"
+const StatCard = (props) => {
+    // 1. Phân tách props ra, đặt tên tạm là iconComponent
+    const { title, value, borderColor, Icon: iconComponent, iconColor, loading } = props;
+    const theme = useTheme();
+
+    // 2. Gán lại cho một biến viết hoa để JSX nhận diện, đồng thời đánh dấu cho ESLint
+    const SelectedIcon = iconComponent;
+
+    return (
+        <Card
+            variant="outlined"
+            sx={{
+                width: 254,
+                position: "relative",
+                height: "100%",
+                minHeight: 100,
+                borderRadius: 3,
+                borderColor,
+                boxShadow: theme.shadows[1],
+                overflow: "hidden",
+            }}
+        >
+            <CardContent sx={{ p: 3, "&:last-child": { pb: 3 } }}>
+                <Stack spacing={0.5}>
+                    <Typography
+                        component="h2"
+                        sx={{
+                            color: "text.secondary",
+                            fontFamily: '"Be Vietnam Pro", Helvetica, Arial, sans-serif',
+                            fontSize: 10,
+                            fontWeight: 700,
+                            lineHeight: "16px",
+                            letterSpacing: "1.2px",
+                            textTransform: "uppercase",
+                        }}
+                    >
+                        {title}
+                    </Typography>
+
+                    {loading ? (
+                        <Skeleton width="60%" height={42} sx={{ mt: 0.5 }} />
+                    ) : (
+                        <Typography
+                            component="p"
+                            sx={{
+                                color: "text.primary",
+                                fontFamily: '"Be Vietnam Pro", Helvetica, Arial, sans-serif',
+                                fontSize: 35,
+                                fontWeight: 900,
+                                lineHeight: "1",
+                                letterSpacing: 0,
+                            }}
+                        >
+                            {value}
+                        </Typography>
+                    )}
+                </Stack>
+
+                <Box
+                    aria-hidden="true"
                     sx={{
-                        color: "text.disabled",
-                        fontWeight: 700,
-                        lineHeight: "16px",
-                        letterSpacing: "1px",
-                        textTransform: "uppercase"
+                        position: "absolute",
+                        top: 8,
+                        right: 10,
+                        width: 56,
+                        height: 56,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
                     }}
                 >
-                    {label}
-                </Typography>
-                <Typography
-                    component="p"
-                    sx={{
-                        color: "text.primary",
-                        fontSize: "32px",
-                        lineHeight: "40px",
-                        fontWeight: 900,
-                        fontFamily: '"Be Vietnam Pro", sans-serif',
-                    }}
-                >
-                    {value}
-                </Typography>
-            </Stack>
-            <Box
-                aria-hidden="true"
-                sx={{
-                    position: "absolute",
-                    top: 15,
-                    right: 15,
-                    opacity: 0.8
-                }}
-            >
-                {icon}
-            </Box>
-        </CardContent>
-    </Card>
-);
+                    {/* 3. Dùng biến SelectedIcon đã gán lại, chắc chắn hết lỗi */}
+                    {SelectedIcon && <SelectedIcon sx={{ fontSize: 38, color: iconColor }} />}
+                </Box>
+            </CardContent>
+        </Card>
+    );
+};
 
-const UserStatsOverviewSection = ({ statsData = { total: 0, active: 0, locked: 0 } }) => {
-    // Cấu hình màu sắc và icon cho từng loại stats
-    const statsConfig = [
+const UserStatsOverviewSection = () => {
+    const [stats, setStats] = useState({ total: 0, active: 0, locked: 0 });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_SOCKET_URL}/admin/users/stats`);
+                const result = await response.json();
+                if (result.success) {
+                    setStats(result.data);
+                }
+            } catch (error) {
+                console.error("Lỗi fetch stats:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchStats();
+    }, []);
+
+    // 2. Cập nhật key từ 'icon' thành 'Icon' để khớp với StatCard
+    const dashboardCards = [
         {
-            label: "TỔNG CỘNG",
-            value: (statsData?.total || 0).toLocaleString(),
-            borderColor: "#6366f1", // Màu Indigo hiện đại
-            icon: <GroupsIcon sx={{ fontSize: 32, color: "#6366f1" }} />,
+            title: "TỔNG CỘNG",
+            value: Number(stats.total || 0).toLocaleString(),
+            borderColor: "primary.light",
+            Icon: GroupsIcon,
+            iconColor: "primary.main",
         },
         {
-            label: "ĐANG HOẠT ĐỘNG",
-            value: (statsData?.active || 0).toLocaleString(),
-            borderColor: "#10b981", // Màu Emerald xanh mướt
-            icon: <VerifiedUserOutlinedIcon sx={{ fontSize: 32, color: "#10b981" }} />,
+            title: "ĐANG HOẠT ĐỘNG",
+            value: Number(stats.active || 0).toLocaleString(),
+            borderColor: "secondary.light",
+            Icon: VerifiedUserOutlinedIcon,
+            iconColor: "secondary.main",
         },
         {
-            label: "TÀI KHOẢN KHÓA",
-            value: (statsData?.locked || 0).toLocaleString(),
-            borderColor: "#f43f5e", // Màu Rose đỏ tinh tế
-            icon: <PersonOffOutlinedIcon sx={{ fontSize: 32, color: "#f43f5e" }} />,
+            title: "TÀI KHOẢN KHÓA",
+            value: Number(stats.locked || 0).toLocaleString(),
+            borderColor: "warning.light",
+            Icon: PersonOffOutlinedIcon,
+            iconColor: "warning.main",
         },
     ];
 
     return (
-        <Box component="section" sx={{ width: "100%", mb: 2 }}>
+        <Box component="section" aria-label="Dashboard summary" sx={{ mb: 3 }}>
             <Grid container spacing={3}>
-                {statsConfig.map((stat) => (
-                    <Grid key={stat.label} xs={12} sm={4}>
-                        <StatCard {...stat} />
+                {dashboardCards.map((card) => (
+                    <Grid key={card.title} item xs={12} sm={6} md={4}>
+                        <StatCard {...card} loading={loading} />
                     </Grid>
                 ))}
             </Grid>

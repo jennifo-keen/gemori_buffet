@@ -54,7 +54,6 @@ const navSections = [
         items: [
             { id: "nguoi-dung", path: "/admin/quan-ly-nguoi-dung", label: "Người dùng", icon: <PeopleAltOutlinedIcon /> },
             { id: "ai-thong-ke", path: "/admin/ai-thong-ke", label: "Ai & Thống kê", icon: <BarChartOutlinedIcon /> },
-            { id: "dieu-hanh", path: "/admin/dieu-hanh", label: "Điều hành hệ thống", icon: <SettingsOutlinedIcon /> },
         ],
     },
 ];
@@ -71,18 +70,20 @@ export const AdminSidebar = () => {
 
     // Khởi tạo userData: Ưu tiên lấy fullName, nếu không có mới lấy name hoặc username
     const [userData] = useState(() => {
+        // Check cả 2 kho lưu trữ vì m có tính năng "Remember Me"
         const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
+
         if (storedUser) {
             try {
                 const user = JSON.parse(storedUser);
                 return {
-                    // Check mọi trường có thể chứa tên thật
-                    fullName: user.fullName || user.name || user.username || "Quản trị viên",
+                    // Sửa chỗ này: Ưu tiên lấy full_name từ DB trả về
+                    fullName: user.full_name || user.username || "Quản trị viên",
                     role: user.role === 'admin' ? "Quản trị viên" : "Nhân viên",
                     avatar: user.avatar || ""
                 };
             } catch (error) {
-                console.error("Lỗi parse user data:", error);
+                console.error("Lỗi parse:", error);
             }
         }
         return { fullName: "Admin", role: "Hệ thống", avatar: "" };

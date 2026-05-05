@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import loginBgr from "../../assets/img/logo_bg_login_admin.png";
 
 export const AdLogin = () => {
     // --- STATE UI ---
@@ -108,8 +109,9 @@ export const AdLogin = () => {
                 sx={{
                     display: "grid",
                     gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-                    maxWidth: "1200px",
-                    width: "100%",
+                    maxWidth: "1000px", // Giảm từ 1200 xuống 900
+                    width: "100%",      // Đảm bảo co giãn tốt trên mobile
+                    height: "700px",
                     bgcolor: "background.paper",
                     borderRadius: "12px",
                     overflow: "hidden",
@@ -128,7 +130,7 @@ export const AdLogin = () => {
                 >
                     <Box
                         component="img"
-                        src="/login_bgr.png" // Đường dẫn nên để từ root public
+                        src={loginBgr} // 2. Sử dụng biến đã import
                         alt="Gemori Buffet"
                         sx={{
                             width: "100%",
