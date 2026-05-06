@@ -9,10 +9,15 @@ import { AuthStaffContext } from './AuthStaffContext';
 export const AuthStaffProvider = ({ children }) => {
   //KHỞI TẠO: Check cả data Staff và data Admin
   const [admin, setAdmin] = useState(() => {
-    const staffSaved = localStorage.getItem('staff_info');
-    const adminSaved = localStorage.getItem('user'); // Dữ liệu login uyen.le của bạn
-    const saved = staffSaved || adminSaved;
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const staffSaved = localStorage.getItem('staff_info');
+      const adminSaved = localStorage.getItem('user');
+      const saved = staffSaved || adminSaved;
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      console.error("Invalid JSON in localStorage:", e);
+      return null;
+    }
   });
 
   const [tables, setTables] = useState([]);
@@ -92,10 +97,10 @@ export const AuthStaffProvider = ({ children }) => {
   // --- AUTH ACTIONS ---
   const loginStaff = async (username, password) => {
     const res = await axiosInstance.post('/auth/login', { username, password });
-    const { token, admin } = res.data;
+    const { token, user } = res.data;
     localStorage.setItem('staff_token', token);
-    localStorage.setItem('staff_info', JSON.stringify(admin));
-    setAdmin(admin);
+    localStorage.setItem('staff_info', JSON.stringify(user));
+    setAdmin(user);
     await fetchTables();
     initSocket();
     return admin;
