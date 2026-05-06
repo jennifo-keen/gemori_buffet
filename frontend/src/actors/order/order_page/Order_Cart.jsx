@@ -22,6 +22,8 @@ export const Order_Cart = () => {
 useEffect(() => { loadMenuAndOrder(); }, [loadMenuAndOrder]);
   const orderedItems = order?.items || [];
 
+
+
  // Thống kê món đã gọi
   const lastOrderTime = orderedItems.length > 0
     ? new Date(orderedItems[orderedItems.length - 1].item_order_time)

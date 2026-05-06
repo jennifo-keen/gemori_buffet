@@ -2,16 +2,14 @@ import React from "react";
 
 import PercentIcon from "@mui/icons-material/Percent";
 import { Box, Paper, Stack, Typography } from "@mui/material";
+import { formatDate } from "../../../utils/timezoneFix";
 
 const formatDiscount = (voucher) => {
   if (voucher.discount_type === 'percent') return `Giảm ${voucher.discount_value}%`;
   return `Giảm ${Number(voucher.discount_value).toLocaleString('vi-VN')}đ`;
 };
 
-const formatDate = (dateStr) => {
-  if (!dateStr) return null;
-  return new Date(dateStr).toLocaleDateString('vi-VN');
-};
+
 
 const Order_ItemVoucher = ({ voucher }) => {
   return (

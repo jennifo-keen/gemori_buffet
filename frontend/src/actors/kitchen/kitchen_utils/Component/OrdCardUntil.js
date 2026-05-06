@@ -1,10 +1,8 @@
-// Tính thời gian tương đối
+import { formatTime, getRelativeTime as getRelativeTimeUtil } from '../../../../utils/timezoneFix';
+
+// ✅ Sử dụng getRelativeTime từ utility
 export const getRelativeTime = (dateStr) => {
-  if (!dateStr) return '';
-  const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000 / 60);
-  if (diff < 1) return 'Vừa xong';
-  if (diff < 60) return `${diff} phút trước`;
-  return `${Math.floor(diff / 60)} giờ trước`;
+  return getRelativeTimeUtil(dateStr);
 };
 
 // Lấy trạng thái ưu tiên nhất của bàn
@@ -18,20 +16,20 @@ export const getPriorityStatus = (items) => {
 export const getPriorityLabel = (items) => {
   const oldest = items.find(i => i.status === 'pending');
   if (!oldest) return null;
-  const diff = Math.floor((Date.now() - new Date(oldest.item_order_time)) / 1000 / 60);
+  const date = new Date(oldest.item_order_time);
+  const diff = Math.floor((Date.now() - date.getTime()) / 1000 / 60);
   if (diff >= 15) return 'Ưu tiên cao';
   if (diff >= 8)  return 'Ưu tiên TB';
   return null;
 };
 
 export const formatOrderTime = (dateStr) => {
-  return dateStr 
-    ? new Date(dateStr).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
-    : '--:--';
+  return formatTime(dateStr);
 };
 
 export const isHighPriority = (items) => {
   const oldest = items?.find(i => i.status === 'pending');
   if (!oldest) return false;
-  return Math.floor((Date.now() - new Date(oldest.item_order_time)) / 1000 / 60) >= 10;
+  const date = new Date(oldest.item_order_time);
+  return Math.floor((Date.now() - date.getTime()) / 1000 / 60) >= 10;
 };

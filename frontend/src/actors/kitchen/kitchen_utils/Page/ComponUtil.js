@@ -1,3 +1,5 @@
+// ✅ Browser tự động xử lý timezone - chỉ parse date
+
 /**
  * Sắp xếp danh sách bàn: Bàn có món 'pending' lâu nhất sẽ lên đầu
  */

@@ -21,13 +21,12 @@ import CloseIcon   from "@mui/icons-material/Close";
 import ConfirmIcon from "@mui/icons-material/ConfirmationNumberOutlined";
 import EditIcon    from "@mui/icons-material/Edit";
 import ShopIcon    from "@mui/icons-material/ShoppingBagOutlined";
+import { formatDate } from "../../../utils/timezoneFix";
 
 const BORDER_COLOR = "rgba(177, 65, 53, 0.1)";
 
-const formatDate = (dateStr) => {
-  if (!dateStr) return '---';
-  return new Date(dateStr).toLocaleDateString('vi-VN');
-};
+// ✅ Convert UTC date từ backend sang Vietnam timezone (UTC+7)
+
 
 
 const OrdProfile = () => {
