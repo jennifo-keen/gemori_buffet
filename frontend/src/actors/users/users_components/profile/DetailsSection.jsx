@@ -63,7 +63,7 @@ export const DetailsSection = () => {
     fullName: "",
     email: "",
     phone: "",
-    dateOfBirth: "",
+    birthday: "",
     address: "",
   });
 
@@ -107,7 +107,7 @@ export const DetailsSection = () => {
         fullName: userData?.fullName || "",
         email: userData?.email || "",
         phone: userData?.phone || "",
-        dateOfBirth: formatDateForInput(userData?.dateOfBirth),
+        birthday: formatDateForInput(userData?.birthday),
         address: userData?.address || "",
       });
     } catch (error) {
@@ -145,7 +145,7 @@ export const DetailsSection = () => {
       fullName: profile?.fullName || "",
       email: profile?.email || "",
       phone: profile?.phone || "",
-      dateOfBirth: formatDateForInput(profile?.dateOfBirth),
+      birthday: formatDateForInput(profile?.birthday),
       address: profile?.address || "",
     });
   };
@@ -164,7 +164,7 @@ export const DetailsSection = () => {
       const payload = {
         fullName: formData.fullName,
         phone: formData.phone,
-        dateOfBirth: formData.dateOfBirth || null,
+        birthday: formData.birthday || null,
         address: formData.address,
       };
 
@@ -183,7 +183,7 @@ export const DetailsSection = () => {
         ...prev,
         fullName: updatedData?.fullName || "",
         phone: updatedData?.phone || "",
-        dateOfBirth: formatDateForInput(updatedData?.dateOfBirth),
+        birthday: formatDateForInput(updatedData?.birthday),
         address: updatedData?.address || "",
       }));
 
@@ -382,13 +382,13 @@ export const DetailsSection = () => {
                     fullWidth
                     size="small"
                     type="date"
-                    value={formData.dateOfBirth}
-                    onChange={handleChange("dateOfBirth")}
+                    value={formData.birthday}
+                    onChange={handleChange("birthday")}
                     InputLabelProps={{ shrink: true }}
                   />
                 ) : (
                   <Typography sx={fieldValueSx}>
-                    {formatDateForDisplay(profile?.dateOfBirth)}
+                    {formatDateForDisplay(profile?.birthday)}
                   </Typography>
                 )}
               </Box>
