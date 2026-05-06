@@ -59,7 +59,7 @@ app.use(
 );
 
 app.use(express.json());
-
+app.get('/test-ping', (req, res) => res.send('Pong'));
 app.get("/", (req, res) => {
   res.send("Server is running perfectly!");
 });
