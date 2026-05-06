@@ -1,3 +1,4 @@
+console.log("🚚 Đã load thành công Inventory Route!");
 const express = require('express');
 const router = express.Router();
 const inventoryController = require('./inventory.controller');
