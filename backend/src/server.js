@@ -29,8 +29,8 @@ const defaultAllowedOrigins = [
 // Lấy thêm domain từ biến môi trường ALLOWED_ORIGINS nếu có
 const envAllowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",")
-      .map((origin) => origin.trim())
-      .filter(Boolean)
+    .map((origin) => origin.trim())
+    .filter(Boolean)
   : [];
 
 const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...envAllowedOrigins])];
@@ -59,7 +59,7 @@ app.use(
 );
 
 app.use(express.json());
-app.get('/test-ping', (req, res) => res.send('Pong'));
+
 app.get("/", (req, res) => {
   res.send("Server is running perfectly!");
 });
