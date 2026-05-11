@@ -20,7 +20,7 @@ const processSQL = (sql, question) => {
     question = question.toLowerCase();
     const currentYear = getCurrentYear();
 
-    // ===== 1. 📅 THÁNG =====
+    // THÁNG
     const monthMatch = question.match(/tháng\s*(\d{1,2})(?:\s*năm\s*(\d{4}))?/);
 
     if (monthMatch) {
@@ -35,7 +35,7 @@ const processSQL = (sql, question) => {
         `;
     }
 
-    // ===== 2. 📅 THÁNG TRƯỚC =====
+    //THÁNG TRƯỚC
     if (question.includes("tháng trước")) {
         return `
         SELECT COALESCE(SUM(amount),0) as total
@@ -44,17 +44,17 @@ const processSQL = (sql, question) => {
         `;
     }
 
-    // ===== 3. 📅 HÔM QUA =====
+    //HÔM QUA
     if (question.includes("hôm qua")) {
         return sql.replace(/CURRENT_DATE/g, "CURRENT_DATE - INTERVAL '1 day'");
     }
 
-    // ===== 4. 📅 HÔM NAY =====
+    //HÔM NAY
     if (question.includes("hôm nay")) {
         return sql.replace(/CURRENT_DATE/g, "CURRENT_DATE");
     }
 
-    // ===== 5. 📅 RANGE DATE =====
+    //RANGE DATE
     const dates = extractDates(question);
 
     if (dates.length >= 2) {
@@ -70,7 +70,7 @@ const processSQL = (sql, question) => {
         `;
     }
 
-    // ===== 6. 📅 1 NGÀY =====
+    //1 NGÀY
     if (dates.length === 1) {
         const d = convertDate(dates[0]);
 
@@ -81,7 +81,7 @@ const processSQL = (sql, question) => {
         `;
     }
 
-    // ===== 7. 🔥 LIMIT (top N) =====
+    // LIMIT (top N) 
     const limitMatch = question.match(/(?:top|limit)\s+(\d+)/i);
 
     if (limitMatch && sql.toLowerCase().includes("limit")) {

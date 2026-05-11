@@ -5,25 +5,26 @@
 
 ## Tech Stack
 
- **Node.js**            - Runtime 
- **Express v4**         - HTTP Server / REST API 
- **PostgreSQL** (Neon)  - Database trên cloud 
- **pg** (node-postgres) - Kết nối & query SQL trực tiếp 
- **Socket.IO**          - Realtime (bếp ↔ khách ↔ staff) 
- **JWT**                - Xác thực không trạng thái 
- **bcryptjs**           - Hash mật khẩu 
- **dotenv**             - Quản lý biến môi trường 
- **nodemon**            - Tự reload khi dev 
+ **Node.js**            - Runtime
+ **Express v4**         - HTTP Server / REST API
+ **PostgreSQL** (Neon)  - Database trên cloud
+ **pg** (node-postgres) - Kết nối & query SQL trực tiếp
+ **Socket.IO**          - Realtime (bếp ↔ khách ↔ staff)
+ **JWT**                - Xác thực không trạng thái
+ **bcryptjs**           - Hash mật khẩu
+ **dotenv**             - Quản lý biến môi trường
+ **nodemon**            - Tự reload khi dev
 
 ---
 
-##  Yêu cầu
- Node.js > 18+ 
- npm > 9+ 
+## Yêu cầu
+
+ Node.js > 18+
+ npm > 9+
 
 ---
 
-##  Các bước chạy dự án
+## Các bước chạy dự án
 
 ### 1.Cài dependencies
 
@@ -46,7 +47,8 @@ npm start
 
 ---
 
-##  Cấu trúc thư mục
+## Cấu trúc thư mục
+
 ```
 backend/
 ├── src/
@@ -80,12 +82,17 @@ backend/
 ## Socket.IO Events
 
 **Frontend kết nối:**
+
 ```javascript
-import { io } from 'socket.io-client';
-const socket = io('http://localhost:3000');
+import { io } from "socket.io-client";
+
+const socket = io(import.meta.env.ViTE_URL, {
+  transports: ["websocket", "polling"],
+});
 ```
 
 **Role:**
+
 | Role | Quyền |
 |---|---|
 | `admin` | Toàn quyền |
